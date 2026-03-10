@@ -7,6 +7,7 @@ extends CharacterBody2D
 var _fire_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
+var _last_pointer_pos: Vector2
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -16,33 +17,36 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e := event as InputEventScreenTouch
 		_has_pointer = e.pressed
 		_pointer_pos = e.position
+		_last_pointer_pos = e.position
 	elif event is InputEventMouseButton:
 		var e := event as InputEventMouseButton
 		_has_pointer = e.pressed
 		_pointer_pos = e.position
+		_last_pointer_pos = e.position
 	elif event is InputEventScreenDrag:
 		var e := event as InputEventScreenDrag
 		if _has_pointer:
+			var delta_pos := e.position - _pointer_pos
+			global_position += delta_pos
 			_pointer_pos = e.position
+			_last_pointer_pos = e.position
 	elif event is InputEventMouseMotion:
 		var e := event as InputEventMouseMotion
 		if _has_pointer:
+			var delta_pos := e.position - _pointer_pos
+			global_position += delta_pos
 			_pointer_pos = e.position
+			_last_pointer_pos = e.position
 
 func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
 
 func _update_movement(delta: float) -> void:
-	if _has_pointer:
-		var dir := (_pointer_pos - global_position)
-		var dist := dir.length()
-		if dist > 2.0:
-			dir = dir.normalized()
-			var step := move_speed * delta
-			if step > dist:
-				step = dist
-			global_position += dir * step
+	var viewport_rect := get_viewport_rect()
+	var margin := 16.0
+	global_position.x = clamp(global_position.x, margin, viewport_rect.size.x - margin)
+	global_position.y = clamp(global_position.y, margin, viewport_rect.size.y - margin)
 
 func _update_shooting(delta: float) -> void:
 	_fire_timer -= delta
