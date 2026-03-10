@@ -5,7 +5,6 @@ extends Area2D
 
 func _process(delta: float) -> void:
 	global_position.y -= speed * delta
-	var viewport_size := get_viewport_rect().size
 	if global_position.y < -50:
 		queue_free()
 

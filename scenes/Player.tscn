@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://drk5g4eslf2h3"]
+[gd_scene load_steps=5 format=3 uid="uid://drk5g4eslf2h3"]
 
 [ext_resource type="Script" uid="uid://b3aigm1lpksqa" path="res://scripts/player.gd" id="1_p0vlq"]
+[ext_resource type="PackedScene" uid="uid://du8esn7dxfruf" path="res://scenes/bullets/PlayerBullet.tscn" id="2_3li8b"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://art/player/player_ship_base.png" id="2_v6fml"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_v6fml"]
@@ -9,6 +10,7 @@ height = 132.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_p0vlq")
+bullet_scene = ExtResource("2_3li8b")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(-0.28250122, 0)

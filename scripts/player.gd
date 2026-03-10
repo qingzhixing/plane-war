@@ -8,9 +8,12 @@ var _fire_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
+@onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	if bullet_scene == null and _fallback_bullet_scene != null:
+		bullet_scene = _fallback_bullet_scene
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -42,7 +45,7 @@ func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
 
-func _update_movement(delta: float) -> void:
+func _update_movement(_delta: float) -> void:
 	var viewport_rect := get_viewport_rect()
 	var margin := 16.0
 	global_position.x = clamp(global_position.x, margin, viewport_rect.size.x - margin)
