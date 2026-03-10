@@ -25,11 +25,12 @@ alwaysApply: true
 
 ## Git 提交信息风格（约定）
 
-- 提交信息推荐格式：`<表情> <类型大写>: <简短英文/中文描述>`
+- 提交信息推荐格式：`<表情> <类型大写>: <简短描述>`，**描述优先使用中文**。
   - 示例：
     - `📦 NEW: 生成游戏GDD`
-    - `📝 DOCS: add workflow rule`
-    - `📝 DOCS: update Godot4 tech notes`
+    - `📝 DOCS: 添加工作流规则`
+    - `📝 DOCS: 更新 Godot4 技术说明`
+    - `🐛 FIX: 调整拖拽控制与屏幕边界`
 - 类型建议：
   - `NEW`：新功能/新模块
   - `DOCS`：文档与 GDD 相关变更
