@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://enemybasic01"]
+
+[ext_resource type="Script" uid="uid://d3lm60pm8ir82" path="res://scripts/enemy_basic.gd" id="1_eb01"]
+[ext_resource type="Texture2D" uid="uid://cbbujfsfctoh0" path="res://art/enemies/enemy_basic_01.png" id="2_ebtex"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jkybx"]
+radius = 53.0
+height = 178.0
+
+[node name="EnemyBasic01" type="Area2D"]
+script = ExtResource("1_eb01")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -1)
+rotation = -3.1415927
+scale = Vector2(0.14053592, 0.14053592)
+texture = ExtResource("2_ebtex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_jkybx")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

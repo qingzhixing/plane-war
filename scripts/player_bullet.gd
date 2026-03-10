@@ -9,11 +9,11 @@ func _process(delta: float) -> void:
 		queue_free()
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
 
-func _on_body_entered(body: Node) -> void:
-	if not body.is_in_group("enemy"):
+func _on_area_entered(area: Node) -> void:
+	if not area.is_in_group("enemy"):
 		return
-	if body.has_method("apply_damage"):
-		body.apply_damage(damage)
+	if area.has_method("apply_damage"):
+		area.apply_damage(damage)
 	queue_free()

@@ -3,15 +3,19 @@ extends CharacterBody2D
 @export var move_speed: float = 600.0
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
+@export var max_hp: int = 3
 
 var _fire_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
+var _hp: int
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_hp = max_hp
+	add_to_group("player")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
 
@@ -63,3 +67,9 @@ func _spawn_bullet() -> void:
 	var bullet := bullet_scene.instantiate()
 	bullet.global_position = global_position + Vector2(0, -20)
 	get_tree().current_scene.add_child(bullet)
+
+func apply_damage(amount: int) -> void:
+	_hp -= amount
+	if _hp <= 0:
+		# TODO: 在这里触发失败/继续游玩逻辑
+		queue_free()
