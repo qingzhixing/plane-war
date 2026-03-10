@@ -15,11 +15,13 @@
 - `docs/gdd/sections/08_ui_ux.md`：UI/UX 流程与界面清单
 - `docs/gdd/sections/09_audio_and_feedback.md`：音频、打击感与反馈
 - `docs/gdd/sections/10_mvp_acceptance_and_milestones.md`：MVP 验收与里程碑
+- `docs/gdd/sections/11_art_and_assets.md`：占位美术与资源命名约定
+- `docs/gdd/sections/12_technical_notes.md`：技术栈与项目结构（Godot 4）
 
 ## 快速摘要（当前已确认需求）
 
 - **平台**：Windows + Android（跨平台）
-- **引擎**：Godot（CI 细节待工程与版本确定）
+- **引擎**：Godot 4（CI 细节依赖具体导出配置）
 - **画面**：像素风；参考东方氛围但弹幕更少更简单
 - **操作**：竖屏、单手拖拽移动、自动射击
 - **局内**：2–5 分钟波次制 → Boss；升级三选一（pick-3）
