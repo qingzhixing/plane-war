@@ -52,8 +52,10 @@ func _process(delta: float) -> void:
 func _update_movement(_delta: float) -> void:
 	var viewport_rect := get_viewport_rect()
 	var margin := 16.0
-	global_position.x = clamp(global_position.x, margin, viewport_rect.size.x - margin)
-	global_position.y = clamp(global_position.y, margin, viewport_rect.size.y - margin)
+	var clamped := global_position
+	clamped.x = clamp(clamped.x, margin, viewport_rect.size.x - margin)
+	clamped.y = clamp(clamped.y, margin, viewport_rect.size.y - margin)
+	global_position = clamped
 
 func _update_shooting(delta: float) -> void:
 	_fire_timer -= delta
@@ -73,3 +75,9 @@ func apply_damage(amount: int) -> void:
 	if _hp <= 0:
 		# TODO: 在这里触发失败/继续游玩逻辑
 		queue_free()
+
+func get_hp() -> int:
+	return _hp
+
+func get_max_hp() -> int:
+	return max_hp
