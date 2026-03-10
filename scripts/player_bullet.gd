@@ -12,6 +12,8 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node) -> void:
+	if not body.is_in_group("enemy"):
+		return
 	if body.has_method("apply_damage"):
 		body.apply_damage(damage)
 	queue_free()
