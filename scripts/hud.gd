@@ -10,6 +10,9 @@ var _exp_bar: ProgressBar
 var _pause_button: Button
 var _settings_button: Button
 var _is_paused: bool = false
+var _score_label: Label
+var _combo_label: Label
+var _dps_label: Label
 
 func _ready() -> void:
 	if player_path != NodePath(""):
@@ -19,6 +22,17 @@ func _ready() -> void:
 	# HP 与护盾（同一行）
 	_label = $Root/HpLabel
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	# 分数 / 连击 / DPS（若存在）
+	_score_label = $Root.get_node_or_null("ScoreLabel")
+	if _score_label != null:
+		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_label = $Root.get_node_or_null("ComboLabel")
+	if _combo_label != null:
+		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dps_label = $Root.get_node_or_null("DpsLabel")
+	if _dps_label != null:
+		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# 波次
 	_wave_label = $Root/WaveLabel
@@ -63,6 +77,22 @@ func _process(_delta: float) -> void:
 		_label.text = part
 	else:
 		_label.text = "HP: ?"
+
+	# 分数 / 连击 / DPS HUD
+	if is_instance_valid(_main):
+		if _score_label != null and _main.has_method("get_score"):
+			var s: int = _main.get_score()
+			_score_label.text = "Score: %d" % s
+		if _combo_label != null and _main.has_method("get_combo"):
+			var c: int = _main.get_combo()
+			if c > 0:
+				_combo_label.text = "Combo: %d" % c
+			else:
+				_combo_label.text = ""
+		if _dps_label != null and _main.has_method("get_current_dps") and _main.has_method("get_max_dps"):
+			var cur: float = _main.get_current_dps()
+			var max_val: float = _main.get_max_dps()
+			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 
 
 func _unhandled_input(event: InputEvent) -> void:

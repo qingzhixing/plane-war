@@ -4,6 +4,7 @@ extends Area2D
 @export var fire_interval_phase_a: float = 2.0
 @export var fire_interval_phase_b: float = 4.0
 @export var bullet_scene: PackedScene
+@export var score_value: int = 500
 
 var _hp: int
 var _phase_b: bool = false
@@ -94,6 +95,8 @@ func apply_damage(amount: int) -> void:
 func _on_dead() -> void:
 	_hp = 0
 	_update_boss_hud()
+	get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
+	get_tree().call_group("game_over_ui", "show_game_over")
 	queue_free()
 
 

@@ -115,12 +115,13 @@ func apply_damage(amount: int) -> void:
 		return
 	if _shield_count > 0:
 		_shield_count -= 1
+		get_tree().call_group("battle_stats_manager", "on_player_hit")
 		return
 	_hp -= amount
 	_invincible_timer = _hit_invincibility_duration
 	if _hp <= 0:
 		_hp = 0
-		emit_signal("died")
+	get_tree().call_group("battle_stats_manager", "on_player_hit")
 
 func get_hp() -> int:
 	return _hp

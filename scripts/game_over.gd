@@ -11,6 +11,7 @@ var _continue_btn: Button
 var _restart_btn: Button
 
 func _ready() -> void:
+	add_to_group("game_over_ui")
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 		if _player != null and _player.has_signal("died"):
@@ -44,6 +45,18 @@ func _ready() -> void:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 
 func show_game_over() -> void:
+	# 更新结算信息：以评分与表现为核心
+	if _label != null and _main != null:
+		var lines: Array[String] = []
+		if _main.has_method("get_score"):
+			lines.append("Score: %d" % _main.get_score())
+		if _main.has_method("get_max_combo"):
+			lines.append("Max Combo: %d" % _main.get_max_combo())
+		if _main.has_method("get_max_dps"):
+			lines.append("Max DPS: %.0f" % _main.get_max_dps())
+		if lines.is_empty():
+			lines.append("Battle Summary")
+		_label.text = "\n".join(lines)
 	if _continue_btn != null:
 		_continue_btn.visible = _main != null and _main.has_method("can_continue") and _main.can_continue()
 	var root := get_node_or_null("Root")
@@ -53,10 +66,8 @@ func show_game_over() -> void:
 	get_tree().paused = true
 
 func _on_player_died() -> void:
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_lose"):
-		audio.play_lose()
-	show_game_over()
+	# 新评分制下，玩家 HP 归零不再直接触发 Game Over/结算界面
+	pass
 
 func _on_continue_pressed() -> void:
 	if _main == null or not _main.has_method("use_continue"):

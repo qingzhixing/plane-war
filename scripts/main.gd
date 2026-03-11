@@ -12,14 +12,33 @@ var _exp_multiplier: float = 1.0
 var _wave: int = 1
 var _boss_spawned: bool = false
 
+# 战斗统计（评分 / 连击 / DPS）
+var score: int = 0
+var combo: int = 0
+var max_combo: int = 0
+var current_dps: float = 0.0
+var max_dps: float = 0.0
+
+const _DPS_WINDOW_SECONDS: float = 5.0
+const _COMBO_WINDOW_SECONDS: float = 2.5
+
+var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
+var _combo_time_left: float = 0.0
+
 func _ready() -> void:
 	add_to_group("experience_listener")
+	add_to_group("battle_stats_manager")
 	level_up.connect(_on_level_up)
 	var wave_timer := Timer.new()
 	wave_timer.wait_time = 28.0
 	wave_timer.timeout.connect(_on_wave_timeout)
 	add_child(wave_timer)
 	wave_timer.start()
+
+
+func _process(delta: float) -> void:
+	_update_combo(delta)
+	_update_dps()
 
 func _on_wave_timeout() -> void:
 	_wave += 1
@@ -68,6 +87,108 @@ func can_continue() -> bool:
 
 func use_continue() -> void:
 	_continue_used = true
+
+
+func get_score() -> int:
+	return score
+
+
+func get_combo() -> int:
+	return combo
+
+
+func get_max_combo() -> int:
+	return max_combo
+
+
+func get_current_dps() -> float:
+	return current_dps
+
+
+func get_max_dps() -> float:
+	return max_dps
+
+
+func record_player_damage(amount: int, _target: Node) -> void:
+	if amount <= 0:
+		return
+	var now: float = float(Time.get_ticks_msec()) / 1000.0
+	_damage_events.append({
+		"time": now,
+		"amount": amount,
+	})
+	_on_successful_hit()
+
+
+func record_enemy_killed(_enemy: Node, base_score: int) -> void:
+	if base_score <= 0:
+		return
+	var multiplier := _get_combo_multiplier()
+	var gained := int(round(float(base_score) * multiplier))
+	if gained < 0:
+		gained = 0
+	score += gained
+
+
+func on_player_hit() -> void:
+	if combo > 0:
+		combo = 0
+		_combo_time_left = 0.0
+
+
+func _on_successful_hit() -> void:
+	# 命中敌人时刷新或提升连击
+	if combo <= 0:
+		combo = 1
+	else:
+		combo += 1
+	_combo_time_left = _COMBO_WINDOW_SECONDS
+	if combo > max_combo:
+		max_combo = combo
+
+
+func _update_combo(delta: float) -> void:
+	if combo <= 0:
+		return
+	_combo_time_left -= delta
+	if _combo_time_left <= 0.0:
+		combo = 0
+		_combo_time_left = 0.0
+
+
+func _update_dps() -> void:
+	var now: float = float(Time.get_ticks_msec()) / 1000.0
+	var cutoff := now - _DPS_WINDOW_SECONDS
+
+	var i := 0
+	while i < _damage_events.size():
+		var e = _damage_events[i]
+		if e.has("time") and e["time"] < cutoff:
+			_damage_events.remove_at(i)
+		else:
+			i += 1
+
+	var total_damage := 0.0
+	for e in _damage_events:
+		if e.has("amount"):
+			total_damage += float(e["amount"])
+
+	current_dps = total_damage / _DPS_WINDOW_SECONDS
+	if current_dps > max_dps:
+		max_dps = current_dps
+
+
+func _get_combo_multiplier() -> float:
+	if combo < 10:
+		return 1.0
+	elif combo < 25:
+		return 1.2
+	elif combo < 50:
+		return 1.5
+	elif combo < 100:
+		return 2.0
+	else:
+		return 3.0
 
 
 func is_boss_spawned() -> bool:

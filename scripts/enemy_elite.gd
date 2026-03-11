@@ -3,6 +3,7 @@ extends Area2D
 @export var move_speed: float = 90.0
 @export var max_hp: int = 9
 @export var exp_value: int = 18
+@export var score_value: int = 50
 @export var fire_interval: float = 2.0
 @export var bullet_scene: PackedScene
 
@@ -71,6 +72,7 @@ func _give_exp() -> void:
 func apply_damage(amount: int) -> void:
 	_hp -= amount
 	if _hp <= 0:
+		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_give_exp()
 		queue_free()
 
@@ -78,6 +80,7 @@ func apply_damage(amount: int) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
+		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_give_exp()
 		queue_free()
 

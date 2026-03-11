@@ -20,4 +20,5 @@ func _on_area_entered(area: Node) -> void:
 		return
 	if area.has_method("apply_damage"):
 		area.apply_damage(damage)
+		get_tree().call_group("battle_stats_manager", "record_player_damage", damage, area)
 	queue_free()
