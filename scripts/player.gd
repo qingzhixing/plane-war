@@ -3,6 +3,7 @@ extends CharacterBody2D
 signal died
 
 @export var move_speed: float = 600.0
+@export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
 @export var max_hp: int = 3
@@ -62,7 +63,19 @@ func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
 
-func _update_movement(_delta: float) -> void:
+func _update_movement(delta: float) -> void:
+	var dir := Vector2.ZERO
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+		dir.y -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		dir.y += 1.0
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+		dir.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+		dir.x += 1.0
+	if dir != Vector2.ZERO:
+		global_position += dir.normalized() * move_speed * keyboard_speed_multiplier * delta
+
 	var viewport_rect := get_viewport_rect()
 	var margin := 16.0
 	var clamped := global_position

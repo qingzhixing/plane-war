@@ -51,6 +51,14 @@ func _process(_delta: float) -> void:
 		_label.text = "HP: ?"
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		var e := event as InputEventKey
+		if e.keycode == KEY_P and e.pressed and not e.echo:
+			var ui := _main.get_node_or_null("UpgradeUI")
+			if ui == null or not ui.visible:
+				_on_pause_button_pressed()
+
 func _on_pause_button_pressed() -> void:
 	_is_paused = not _is_paused
 	get_tree().paused = _is_paused
