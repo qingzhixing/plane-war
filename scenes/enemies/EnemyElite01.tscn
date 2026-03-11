@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://enemyelite01"]
+
+[ext_resource type="Script" path="res://scripts/enemy_elite.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/enemy_basic_02.png" id="2_tex"]
+
+[node name="EnemyElite01" type="Area2D"]
+scale = Vector2(0.8, 0.8)
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, 0)
+scale = Vector2(0.18, 0.18)
+texture = ExtResource("2_tex")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-36, 144, -21, 163, 6, 162, 25, 144, 22, 86, 61, 68, 94, 106, 132, 78, 101, 26, 98, -24, 118, -74, 78, -113, -87, -114, -130, -74, -131, -22, -107, -12, -111, 30, -146, 75, -118, 105, -83, 58, -41, 81)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+

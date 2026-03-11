@@ -7,9 +7,11 @@ var _sfx_slider: HSlider
 var _bgm_mute_check: CheckBox
 var _sfx_mute_check: CheckBox
 var _close_button: Button
+var _is_from_menu: bool = false
 
 
 func _ready() -> void:
+	add_to_group("settings_menu")
 	visible = false
 
 	_root = Control.new()
@@ -111,16 +113,25 @@ func _ready() -> void:
 	_close_button.custom_minimum_size = Vector2(200, 64)
 	_close_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_close_button.add_theme_font_size_override("font_size", 24)
-	_close_button.pressed.connect(hide_settings)
+	_close_button.pressed.connect(_on_close_pressed)
 	vbox.add_child(_close_button)
 
 
 func show_settings() -> void:
+	_is_from_menu = false
 	visible = true
 
 
-func hide_settings() -> void:
-	visible = false
+func show_settings_from_menu() -> void:
+	_is_from_menu = true
+	visible = true
+
+
+func _on_close_pressed() -> void:
+	if _is_from_menu:
+		visible = false
+	else:
+		visible = false
 
 
 func _get_audio_manager() -> Node:

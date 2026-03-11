@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://boss01"]
+
+[ext_resource type="Script" path="res://scripts/boss01.gd" id="1_script"]
+
+[node name="Boss01" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-80, 80, 80, 80, 80, -80, -80, -80)
+

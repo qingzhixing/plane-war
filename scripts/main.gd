@@ -10,6 +10,7 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _exp_multiplier: float = 1.0
 var _wave: int = 1
+var _boss_spawned: bool = false
 
 func _ready() -> void:
 	add_to_group("experience_listener")
@@ -22,6 +23,9 @@ func _ready() -> void:
 
 func _on_wave_timeout() -> void:
 	_wave += 1
+	# 第 4 波后尝试生成 Boss，一次性
+	if _wave >= 4 and not _boss_spawned:
+		_spawn_boss()
 
 func get_wave() -> int:
 	return _wave
@@ -64,3 +68,32 @@ func can_continue() -> bool:
 
 func use_continue() -> void:
 	_continue_used = true
+
+
+func _spawn_boss() -> void:
+	if _boss_spawned:
+		return
+	_boss_spawned = true
+
+	# 停止刷普通敌人
+	var spawner := get_node_or_null("EnemySpawner")
+	if spawner != null:
+		var timer := spawner.get_node_or_null("Timer")
+		if timer != null and timer is Timer:
+			(timer as Timer).stop()
+
+	# 清场：移除当前场景中的所有普通敌人
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+
+	# 在屏幕上方中间生成 Boss
+	var boss_scene := load("res://scenes/enemies/Boss01.tscn") as PackedScene
+	if boss_scene == null:
+		return
+	var boss := boss_scene.instantiate()
+	if boss == null:
+		return
+	var viewport_rect := get_viewport().get_visible_rect()
+	boss.global_position = Vector2(viewport_rect.size.x * 0.5, viewport_rect.size.y * 0.2)
+	get_tree().current_scene.add_child(boss)
