@@ -1,0 +1,73 @@
+extends Area2D
+
+@export var move_speed: float = 120.0
+@export var stop_y: float = 320.0
+@export var horizontal_amplitude: float = 80.0
+@export var horizontal_speed: float = 1.2
+@export var max_hp: int = 4
+@export var fire_interval: float = 1.5
+@export var bullet_scene: PackedScene
+
+var _hp: int
+var _time: float = 0.0
+var _origin_x: float
+var _fire_timer: float = 0.0
+
+@onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
+
+func _ready() -> void:
+	_hp = max_hp
+	_origin_x = global_position.x
+	add_to_group("enemy")
+	if bullet_scene == null and _fallback_bullet_scene != null:
+		bullet_scene = _fallback_bullet_scene
+
+
+func _process(delta: float) -> void:
+	_time += delta
+
+	# 垂直移动：从上方进入，到达 stop_y 后减速/停留
+	if global_position.y < stop_y:
+		global_position.y += move_speed * delta
+	else:
+		global_position.y = stop_y
+
+	# 水平缓慢小幅移动（炮台机左右晃动）
+	global_position.x = _origin_x + sin(_time * horizontal_speed) * horizontal_amplitude
+
+	# 超出屏幕下缘时清理
+	var viewport_rect := get_viewport_rect()
+	if global_position.y > viewport_rect.size.y + 100.0:
+		queue_free()
+
+	# 射击逻辑
+	_fire_timer -= delta
+	if _fire_timer <= 0.0:
+		_fire_timer = fire_interval
+		_fire_pattern()
+
+
+func _fire_pattern() -> void:
+	if bullet_scene == null:
+		return
+
+	# 向下发射 3 发子弹：中间 + 左右微小角度，形成轻微扇形
+	var angles := [0.0, -0.18, 0.18]
+	for angle in angles:
+		var bullet := bullet_scene.instantiate()
+		bullet.global_position = global_position + Vector2(0, 20)
+		if bullet.has_method("setup_direction"):
+			bullet.setup_direction(Vector2(0, 1).rotated(angle))
+		get_tree().current_scene.add_child(bullet)
+
+
+func apply_damage(amount: int) -> void:
+	_hp -= amount
+	if _hp <= 0:
+		queue_free()
+
+
+func _on_body_entered(body: Node) -> void:
+	if body.has_method("apply_damage") and body.is_in_group("player"):
+		body.apply_damage(1)
+		queue_free()
