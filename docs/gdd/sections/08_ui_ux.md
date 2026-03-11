@@ -23,18 +23,17 @@
 ## 局内 HUD
 
 - 不再展示任何形式的 HP 条或 HP 数字，玩家“危险状态”仅通过连击中断、评分下降等间接反馈体现。
-- 顶部提示文字（`InfoLabel`，场景中可由原 `HpLabel` 重命名而来）：用于显示简单提示，例如“尽量保持不被打中以维持连击和高分”。
 - 波次（`WaveLabel`，如「第 1 波」；当 Boss 登场且战斗进行中时，可将该区域改为「Boss 战」或在波次后附加标记，如「第 4 波 - Boss」，以强调当前阶段）
 - 经验条（`ExpBar`）
-- 暂停按钮（`PauseButton`，左上，**大号触控按钮**，文字“暂停 / 继续”）
-- 设置按钮（`SettingsButton`，用于打开设置界面，不参与结算）
-- 符卡/炸弹按钮（若启用）
+- 左上角按钮区域：使用一个垂直容器（例如 `TopLeftButtons: VBoxContainer`）承载以下按钮，统一对齐与间距：
+  - 暂停按钮（`PauseButton`，左上，**大号触控按钮**，文字“暂停 / 继续”）
+  - 设置按钮（`SettingsButton`，用于打开设置界面，不参与结算）
+  - “提前结算”按钮（`EndRunButton`），用于玩家主动结束本局并进入结算界面。
+- 符卡/炸弹按钮（若启用，可放在独立容器中）
 - **评分与表现相关 HUD（Score / Combo / DPS）**：通过容器组件（如 `VBoxContainer`/`HBoxContainer`）进行分组和对齐，避免单纯靠坐标硬排。
   - `ScoreLabel`：当前分数（Score），推荐放在右上角信息区域的一行，文本形式如「Score: 12345」。
   - `ComboLabel`：当前连击数（Combo），放在 Score 下方，当 `combo > 0` 时显示「Combo: 12」，无连击时留空；连击达到阈值（如 10 / 25 / 50 连）时在附近短暂弹出“10 Combo!” 等提示。
   - `DpsLabel`：当前 DPS 与当局最高 DPS，放在 Combo 下方，以较小字号显示「DPS: 123  Max: 456」，避免喧宾夺主。
-- “提前结算”按钮（`EndRunButton`）：位于 HUD 中明显但不抢眼的位置（例如左下或右下角），用于玩家主动结束本局并进入结算界面。
-
 > 实现约定：`hud.gd` 只会从场景中查找上述节点名（可在容器内部），不再动态创建 Label；若节点不存在，则对应功能不显示。UI 场景的节点命名需与此约定保持一致，并优先使用 Godot 自带的 `VBoxContainer` / `HBoxContainer` / `MarginContainer` 等组件完成布局。
 
 ### Boss HUD
