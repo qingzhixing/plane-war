@@ -8,6 +8,9 @@ var _label: Label
 var _button: Button
 
 func _ready() -> void:
+	# 死亡界面在暂停时仍需响应输入（Godot 4 用 process_mode）
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 		if _player != null and _player.has_signal("died"):
@@ -29,14 +32,12 @@ func _ready() -> void:
 	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
 
 	var vbox := VBoxContainer.new()
-	vbox.anchor_left = 0.5
-	vbox.anchor_top = 0.5
-	vbox.anchor_right = 0.5
-	vbox.anchor_bottom = 0.5
-	vbox.position = Vector2.ZERO
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.add_child(vbox)
+	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	# 居中到屏幕中间
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.custom_minimum_size = Vector2(220, 120)
 
 	_label = Label.new()
 	_label.text = "You Dead!"
@@ -46,6 +47,7 @@ func _ready() -> void:
 
 	_button = Button.new()
 	_button.text = "重新开始"
+	_button.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
 	vbox.add_child(_button)
 	_button.pressed.connect(_on_restart_pressed)
 
