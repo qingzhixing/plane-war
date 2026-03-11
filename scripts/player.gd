@@ -17,8 +17,9 @@ var _invincible_timer: float = 0.0
 var bullet_damage: int = 1
 var _shield_count: int = 0
 var _hit_invincibility_duration: float = 0.5
-var _double_shot: bool = false
-var _spread_shot: bool = false
+var _bullet_count: int = 1
+const _max_bullet_count: int = 6
+const _spread_rad_per_bullet: float = 0.2
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -97,21 +98,16 @@ func _spawn_bullet() -> void:
 	if bullet_scene == null:
 		return
 	var scene := get_tree().current_scene
-	var offsets: Array[Vector2] = [Vector2(0, -20)]
-	if _double_shot:
-		offsets = [Vector2(-18, -20), Vector2(18, -20)]
-	elif _spread_shot:
-		offsets = [Vector2(0, -20), Vector2(-12, -20), Vector2(12, -20)]
-	var dirs: Array[Vector2] = []
-	if _spread_shot:
-		dirs = [Vector2(0, -1), Vector2(-0.26, -0.97), Vector2(0.26, -0.97)]
-	for i in offsets.size():
+	var n: int = clampi(_bullet_count, 1, _max_bullet_count)
+	for i in n:
+		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
+		var dir := Vector2(sin(angle), -cos(angle))
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position + offsets[i]
+		bullet.global_position = global_position + Vector2(0, -20)
 		if "damage" in bullet:
 			bullet.damage = bullet_damage
-		if dirs.size() > i and bullet.has_method("set_direction"):
-			bullet.set_direction(dirs[i])
+		if bullet.has_method("set_direction"):
+			bullet.set_direction(dir)
 		scene.add_child(bullet)
 
 func apply_damage(amount: int) -> void:
@@ -132,6 +128,12 @@ func get_hp() -> int:
 func get_max_hp() -> int:
 	return max_hp
 
+func get_bullet_count() -> int:
+	return _bullet_count
+
+func get_max_bullet_count() -> int:
+	return _max_bullet_count
+
 func release_pointer() -> void:
 	_has_pointer = false
 
@@ -150,10 +152,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"max_hp":
 			max_hp += 1
 			_hp = mini(_hp + 1, max_hp)
-		"double_shot":
-			_double_shot = true
-		"spread":
-			_spread_shot = true
+		"multi_shot":
+			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
 		"shield":
 			_shield_count += 1
 		"hit_invincibility":

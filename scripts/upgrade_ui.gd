@@ -4,15 +4,14 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
-	{"id": "double_shot", "name": "双发", "desc": "一次射出两发子弹"},
-	{"id": "spread", "name": "散射", "desc": "一次三发，左右微角度"},
+	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，角度分散"},
 	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
 	{"id": "hit_invincibility", "name": "受击无敌延长", "desc": "受击后无敌时间 +0.3 秒"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
-	{"id": "double_shot", "name": "双发", "desc": "一次射出两发子弹"},
+	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，角度分散"},
 	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 ]
@@ -69,7 +68,15 @@ func _build_ui() -> void:
 		_cards.append(btn)
 
 func show_pick() -> void:
-	var pool := UPGRADES.duplicate()
+	var pool: Array[Dictionary] = []
+	var player := _main.get_node_or_null(_main.player_path) as Node
+	var at_max_bullets: bool = false
+	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
+		at_max_bullets = player.get_bullet_count() >= player.get_max_bullet_count()
+	for u in UPGRADES:
+		if u["id"] == "multi_shot" and at_max_bullets:
+			continue
+		pool.append(u)
 	pool.shuffle()
 	for i in min(3, pool.size()):
 		var u: Dictionary = pool[i]
