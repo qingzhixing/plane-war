@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://btv236w48os2y"]
+[gd_scene load_steps=9 format=3 uid="uid://btv236w48os2y"]
 
 [ext_resource type="PackedScene" uid="uid://drk5g4eslf2h3" path="res://scenes/Player.tscn" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://enemybasic01" path="res://scenes/enemies/EnemyBasic01.tscn" id="2_enemy"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/game_over.gd" id="5_game_over"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="6_main"]
 [ext_resource type="Script" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
+[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("6_main")
@@ -71,6 +72,12 @@ offset_left = 16.0
 offset_top = 16.0
 text = "暂停"
 
+[node name="SettingsButton" type="Button" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 80.0
+text = "设置"
+
 [node name="GameOver" type="CanvasLayer" parent="."]
 process_mode = 3
 script = ExtResource("5_game_over")
@@ -120,5 +127,9 @@ text = "重新开始"
 [node name="UpgradeUI" type="CanvasLayer" parent="."]
 process_mode = 3
 script = ExtResource("7_upgrade_ui")
+
+[node name="SettingsUI" type="CanvasLayer" parent="."]
+process_mode = 3
+script = ExtResource("8_settings_ui")
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]

@@ -8,6 +8,7 @@ var _label: Label
 var _wave_label: Label
 var _exp_bar: ProgressBar
 var _pause_button: Button
+var _settings_button: Button
 var _is_paused: bool = false
 
 func _ready() -> void:
@@ -37,6 +38,12 @@ func _ready() -> void:
 	_pause_button.add_theme_font_size_override("font_size", 24)
 	_pause_button.pressed.connect(_on_pause_button_pressed)
 	_update_pause_button_text()
+
+	# 设置按钮：打开设置界面，但不改变当前暂停状态
+	_settings_button = $Root/SettingsButton
+	_settings_button.custom_minimum_size = Vector2(160, 64)
+	_settings_button.add_theme_font_size_override("font_size", 24)
+	_settings_button.pressed.connect(_on_settings_button_pressed)
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_exp") and _main.has_method("get_exp_to_next"):
@@ -73,6 +80,14 @@ func _on_pause_button_pressed() -> void:
 	_is_paused = not _is_paused
 	get_tree().paused = _is_paused
 	_update_pause_button_text()
+
+
+func _on_settings_button_pressed() -> void:
+	if not is_instance_valid(_main):
+		return
+	var settings := _main.get_node_or_null("SettingsUI")
+	if settings != null and settings.has_method("show_settings"):
+		settings.show_settings()
 
 
 func _update_pause_button_text() -> void:
