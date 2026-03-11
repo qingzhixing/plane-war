@@ -16,7 +16,7 @@ func _ready() -> void:
 	add_to_group("experience_listener")
 	level_up.connect(_on_level_up)
 	var wave_timer := Timer.new()
-	wave_timer.wait_time = 45.0
+	wave_timer.wait_time = 28.0
 	wave_timer.timeout.connect(_on_wave_timeout)
 	add_child(wave_timer)
 	wave_timer.start()

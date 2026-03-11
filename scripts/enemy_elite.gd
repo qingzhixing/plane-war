@@ -1,8 +1,8 @@
 extends Area2D
 
 @export var move_speed: float = 90.0
-@export var max_hp: int = 6
-@export var exp_value: int = 15
+@export var max_hp: int = 9
+@export var exp_value: int = 18
 @export var fire_interval: float = 2.0
 @export var bullet_scene: PackedScene
 
