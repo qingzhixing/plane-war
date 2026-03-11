@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://btv236w48os2y"]
+[gd_scene load_steps=6 format=3 uid="uid://btv236w48os2y"]
 
 [ext_resource type="PackedScene" uid="uid://drk5g4eslf2h3" path="res://scenes/Player.tscn" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://enemybasic01" path="res://scenes/enemies/EnemyBasic01.tscn" id="2_enemy"]
 [ext_resource type="Script" uid="uid://cidep4suu0t6u" path="res://scripts/enemy_spawner.gd" id="3_spawner"]
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/hud.gd" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/game_over.gd" id="5_game_over"]
 
 [node name="Main" type="Node2D"]
 
@@ -21,6 +22,10 @@ autostart = true
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("4_hud")
+player_path = NodePath("../Player")
+
+[node name="GameOver" type="CanvasLayer" parent="."]
+script = ExtResource("5_game_over")
 player_path = NodePath("../Player")
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]

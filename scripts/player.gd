@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal died
+
 @export var move_speed: float = 600.0
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
@@ -80,7 +82,8 @@ func _spawn_bullet() -> void:
 func apply_damage(amount: int) -> void:
 	_hp -= amount
 	if _hp <= 0:
-		get_tree().reload_current_scene()
+		_hp = 0
+		emit_signal("died")
 
 func get_hp() -> int:
 	return _hp
