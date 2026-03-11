@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://mainmenu"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="2_settings"]
+
+[node name="MainMenuRoot" type="Control"]
+script = ExtResource("1_script")
+
+[node name="SettingsUI" type="CanvasLayer" parent="."]
+process_mode = 3
+script = ExtResource("2_settings")
+
