@@ -43,6 +43,12 @@ offset_bottom = 52.0
 text = "HP: 3"
 horizontal_alignment = 2
 
+[node name="PauseButton" type="Button" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+text = "暂停"
+
 [node name="GameOver" type="CanvasLayer" parent="."]
 process_mode = 3
 script = ExtResource("5_game_over")
