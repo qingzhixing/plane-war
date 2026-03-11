@@ -5,15 +5,14 @@
 [ext_resource type="Script" uid="uid://cidep4suu0t6u" path="res://scripts/enemy_spawner.gd" id="3_spawner"]
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/game_over.gd" id="5_game_over"]
-[ext_resource type="Script" path="res://scripts/main.gd" id="6_main"]
-[ext_resource type="Script" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
-[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
-[ext_resource type="Script" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
+[ext_resource type="Script" uid="uid://cmpx7cpm1wjx" path="res://scripts/main.gd" id="6_main"]
+[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
+[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
+[ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
+[ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("6_main")
-player_path = NodePath("Player")
 
 [node name="Player" parent="." instance=ExtResource("1_elqb8")]
 position = Vector2(378, 1136)
@@ -25,7 +24,6 @@ enemy_scene = ExtResource("2_enemy")
 enemy_scene_elite = ExtResource("9_enemy_elite")
 
 [node name="Timer" type="Timer" parent="EnemySpawner"]
-wait_time = 1.0
 autostart = true
 
 [node name="HUD" type="CanvasLayer" parent="."]
@@ -49,7 +47,6 @@ offset_top = 20.0
 offset_right = 540.0
 offset_bottom = 48.0
 max_value = 1.0
-value = 0.0
 show_percentage = false
 
 [node name="WaveLabel" type="Label" parent="HUD/Root"]
@@ -58,8 +55,8 @@ offset_left = 16.0
 offset_top = 72.0
 offset_right = 120.0
 offset_bottom = 108.0
-text = "第 1 波"
 theme_override_font_sizes/font_size = 28
+text = "第 1 波"
 
 [node name="HpLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
@@ -67,25 +64,25 @@ offset_left = 520.0
 offset_top = 16.0
 offset_right = 685.0
 offset_bottom = 52.0
+theme_override_font_sizes/font_size = 32
 text = "HP: 5"
 horizontal_alignment = 2
-theme_override_font_sizes/font_size = 32
 
 [node name="PauseButton" type="Button" parent="HUD/Root"]
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
-text = "暂停"
-custom_minimum_size = Vector2(160, 64)
 theme_override_font_sizes/font_size = 24
+text = "暂停"
 
 [node name="SettingsButton" type="Button" parent="HUD/Root"]
+custom_minimum_size = Vector2(160, 64)
 layout_mode = 0
 offset_left = 16.0
 offset_top = 80.0
-text = "设置"
-custom_minimum_size = Vector2(160, 64)
 theme_override_font_sizes/font_size = 24
+text = "设置"
 
 [node name="GameOver" type="CanvasLayer" parent="."]
 process_mode = 3

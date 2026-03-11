@@ -20,54 +20,35 @@ func _ready() -> void:
 
 	visible = false
 
-	var root := Control.new()
-	root.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(root)
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.set_offsets_preset(Control.PRESET_FULL_RECT)
+	# 复用场景中已有的 GameOver UI 结构：GameOver/Root/... 节点
+	var root := get_node_or_null("Root")
+	if root is Control:
+		root.mouse_filter = Control.MOUSE_FILTER_STOP
+		root.visible = false
+		_panel = root.get_node_or_null("Panel") as ColorRect
+		var center := root.get_node_or_null("Center") as CenterContainer
+		var vbox := center.get_node_or_null("VBox") as VBoxContainer
+		_label = vbox.get_node_or_null("Label") as Label
+		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
+		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
+	else:
+		return
 
-	_panel = ColorRect.new()
-	_panel.color = Color(0, 0, 0, 0.6)
-	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	root.add_child(_panel)
-	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
+	if _panel != null:
+		_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 
-	var center := CenterContainer.new()
-	center.mouse_filter = Control.MOUSE_FILTER_STOP
-	root.add_child(center)
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.set_offsets_preset(Control.PRESET_FULL_RECT)
+	if _continue_btn != null:
+		_continue_btn.pressed.connect(_on_continue_pressed)
 
-	var vbox := VBoxContainer.new()
-	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 16)
-	center.add_child(vbox)
-
-	_label = Label.new()
-	_label.text = "You Dead!"
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", 32)
-	vbox.add_child(_label)
-
-	_continue_btn = Button.new()
-	_continue_btn.text = "继续游玩"
-	_continue_btn.custom_minimum_size = Vector2(260, 80)
-	_continue_btn.add_theme_font_size_override("font_size", 28)
-	vbox.add_child(_continue_btn)
-	_continue_btn.pressed.connect(_on_continue_pressed)
-
-	_restart_btn = Button.new()
-	_restart_btn.text = "重新开始"
-	_restart_btn.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
-	_restart_btn.custom_minimum_size = Vector2(260, 80)
-	_restart_btn.add_theme_font_size_override("font_size", 28)
-	vbox.add_child(_restart_btn)
-	_restart_btn.pressed.connect(_on_restart_pressed)
+	if _restart_btn != null:
+		_restart_btn.pressed.connect(_on_restart_pressed)
 
 func show_game_over() -> void:
-	_continue_btn.visible = _main != null and _main.has_method("can_continue") and _main.can_continue()
+	if _continue_btn != null:
+		_continue_btn.visible = _main != null and _main.has_method("can_continue") and _main.can_continue()
+	var root := get_node_or_null("Root")
+	if root is Control:
+		root.visible = true
 	visible = true
 	get_tree().paused = true
 

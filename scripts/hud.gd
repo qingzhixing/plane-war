@@ -45,7 +45,10 @@ func _process(_delta: float) -> void:
 		if exp_next > 0:
 			_exp_bar.value = float(_main.get_exp()) / float(exp_next)
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
-		_wave_label.text = "第 %d 波" % _main.get_wave()
+		var wave_text := "第 %d 波" % _main.get_wave()
+		if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
+			wave_text = "%s - Boss" % wave_text
+		_wave_label.text = wave_text
 	if not is_instance_valid(_player):
 		_label.text = "HP: 0"
 		return

@@ -1,10 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://boss01"]
+[gd_scene load_steps=3 format=3 uid="uid://d4l4ugijajvl"]
 
-[ext_resource type="Script" path="res://scripts/boss01.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cpkyocm2p0eis" path="res://scripts/boss01.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bqln58s6vxeib" path="res://assets/sprites/enemies/enemy_elite_01.png" id="2_7scm5"]
 
-[node name="Boss01" type="Node2D"]
+[node name="Boss01" type="Area2D"]
+scale = Vector2(0.7, 0.7)
 script = ExtResource("1_script")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-80, 80, 80, 80, 80, -80, -80, -80)
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_7scm5")
 
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(4, 345, 23, 290, 24, 256, 48, 223, 46, 202, 68, 171, 93, 192, 100, 243, 120, 190, 98, 147, 116, 106, 281, -2, 374, -87, 404, -203, 326, -87, 249, -41, 161, -8, 73, -15, 43, -57, -6, -198, 5, -228, -10, -287, -30, -229, -14, -196, -65, -38, -103, -8, -168, -7, -258, -32, -338, -86, -397, -158, -420, -203, -419, -162, -387, -79, -325, -11, -251, 26, -125, 102, -99, 149, -119, 190, -102, 248, -87, 192, -75, 175, -46, 207, -46, 230, -19, 269, -18, 294)

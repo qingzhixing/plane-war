@@ -70,6 +70,10 @@ func use_continue() -> void:
 	_continue_used = true
 
 
+func is_boss_spawned() -> bool:
+	return _boss_spawned
+
+
 func _spawn_boss() -> void:
 	if _boss_spawned:
 		return

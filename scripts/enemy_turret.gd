@@ -7,12 +7,15 @@ extends Area2D
 @export var max_hp: int = 4
 @export var exp_value: int = 8
 @export var fire_interval: float = 1.5
+@export var pre_fire_delay: float = 0.7
 @export var bullet_scene: PackedScene
 
 var _hp: int
 var _time: float = 0.0
 var _origin_x: float
 var _fire_timer: float = 0.0
+var _is_charging: bool = false
+var _charge_timer: float = 0.0
 
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
@@ -41,11 +44,18 @@ func _process(delta: float) -> void:
 	if global_position.y > viewport_rect.size.y + 100.0:
 		queue_free()
 
-	# 射击逻辑
-	_fire_timer -= delta
-	if _fire_timer <= 0.0:
-		_fire_timer = fire_interval
-		_fire_pattern()
+	# 射击逻辑：先累计冷却，再进入前摇，前摇结束后真正发射
+	if _is_charging:
+		_charge_timer -= delta
+		if _charge_timer <= 0.0:
+			_is_charging = false
+			_fire_pattern()
+			_fire_timer = fire_interval
+	else:
+		_fire_timer -= delta
+		if _fire_timer <= 0.0:
+			_is_charging = true
+			_charge_timer = pre_fire_delay
 
 
 func _fire_pattern() -> void:

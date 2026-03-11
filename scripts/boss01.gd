@@ -1,4 +1,4 @@
-extends Node2D
+extends Area2D
 
 @export var max_hp: int = 30
 @export var fire_interval_phase_a: float = 2.0
@@ -15,6 +15,7 @@ var _move_time: float = 0.0
 func _ready() -> void:
 	_hp = max_hp
 	add_to_group("boss")
+	add_to_group("enemy")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
 	_update_boss_hud()
@@ -108,4 +109,3 @@ func _update_boss_hud() -> void:
 	var hud := get_tree().get_first_node_in_group("boss_hud")
 	if hud != null and hud.has_method("set_boss_hp"):
 		hud.set_boss_hp(_hp, max_hp)
-
