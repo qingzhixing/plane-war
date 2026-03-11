@@ -4,11 +4,9 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
-	{"id": "move_speed", "name": "移速提升", "desc": "移动速度提升 15%"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
-	{"id": "move_speed", "name": "移速提升", "desc": "移动速度提升 15%"},
 ]
 
 var _root: Control

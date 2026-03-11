@@ -114,5 +114,3 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"max_hp":
 			max_hp += 1
 			_hp = mini(_hp + 1, max_hp)
-		"move_speed":
-			move_speed *= 1.15
