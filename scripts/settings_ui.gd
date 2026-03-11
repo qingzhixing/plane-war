@@ -8,6 +8,7 @@ var _bgm_mute_check: CheckBox
 var _sfx_mute_check: CheckBox
 var _close_button: Button
 var _is_from_menu: bool = false
+var _was_paused_before: bool = false
 
 
 func _ready() -> void:
@@ -119,6 +120,8 @@ func _ready() -> void:
 
 func show_settings() -> void:
 	_is_from_menu = false
+	_was_paused_before = get_tree().paused
+	get_tree().paused = true
 	visible = true
 
 
@@ -132,6 +135,7 @@ func _on_close_pressed() -> void:
 		visible = false
 	else:
 		visible = false
+		get_tree().paused = _was_paused_before
 
 
 func _get_audio_manager() -> Node:

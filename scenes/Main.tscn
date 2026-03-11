@@ -42,10 +42,14 @@ mouse_filter = 2
 
 [node name="ExpBar" type="ProgressBar" parent="HUD/Root"]
 layout_mode = 0
-offset_left = 200.0
-offset_top = 20.0
-offset_right = 540.0
-offset_bottom = 48.0
+anchor_left = 0.05
+anchor_top = 1.0
+anchor_right = 0.95
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = -48.0
+offset_right = 0.0
+offset_bottom = -16.0
 max_value = 1.0
 show_percentage = false
 
