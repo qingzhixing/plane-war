@@ -9,6 +9,7 @@ var _panel: ColorRect
 var _label: Label
 var _continue_btn: Button
 var _restart_btn: Button
+var _main_menu_btn: Button
 
 func _ready() -> void:
 	add_to_group("game_over_ui")
@@ -32,6 +33,7 @@ func _ready() -> void:
 		_label = vbox.get_node_or_null("Label") as Label
 		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
 		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
+		_main_menu_btn = vbox.get_node_or_null("MainMenuButton") as Button
 	else:
 		return
 
@@ -43,6 +45,8 @@ func _ready() -> void:
 
 	if _restart_btn != null:
 		_restart_btn.pressed.connect(_on_restart_pressed)
+	if _main_menu_btn != null:
+		_main_menu_btn.pressed.connect(_on_main_menu_pressed)
 
 func show_game_over() -> void:
 	# 更新结算信息：以评分与表现为核心
@@ -57,8 +61,9 @@ func show_game_over() -> void:
 		if lines.is_empty():
 			lines.append("Battle Summary")
 		_label.text = "\n".join(lines)
+	# 新规则下不再提供“继续游玩”
 	if _continue_btn != null:
-		_continue_btn.visible = _main != null and _main.has_method("can_continue") and _main.can_continue()
+		_continue_btn.visible = false
 	var root := get_node_or_null("Root")
 	if root is Control:
 		root.visible = true
@@ -84,3 +89,14 @@ func _on_continue_pressed() -> void:
 func _on_restart_pressed() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+
+func _on_main_menu_pressed() -> void:
+	get_tree().paused = false
+	var tree := get_tree()
+	if tree == null:
+		return
+	var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
+	if err != OK:
+		# 如果主菜单场景路径不同，保底行为为重新加载当前场景
+		tree.reload_current_scene()

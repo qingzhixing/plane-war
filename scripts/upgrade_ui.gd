@@ -3,19 +3,14 @@ extends CanvasLayer
 const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
-	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，角度分散"},
-	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
 	{"id": "hit_invincibility", "name": "受击无敌延长", "desc": "受击后无敌时间 +0.3 秒"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
-	{"id": "heal", "name": "生命恢复", "desc": "恢复 2 点 HP"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
-	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，角度分散"},
-	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
+	{"id": "hit_invincibility", "name": "受击无敌延长", "desc": "受击后无敌时间 +0.3 秒"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
-	{"id": "heal", "name": "生命恢复", "desc": "恢复 2 点 HP"},
 ]
 
 var _root: Control

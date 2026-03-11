@@ -1,21 +1,16 @@
 extends CharacterBody2D
 
-signal died
-
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
-@export var max_hp: int = 5
 
 var _fire_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
-var _hp: int
 var _invincible_timer: float = 0.0
 var bullet_damage: int = 1
-var _shield_count: int = 0
 var _hit_invincibility_duration: float = 0.5
 var _bullet_count: int = 1
 const _max_bullet_count: int = 6
@@ -24,7 +19,6 @@ const _spread_rad_per_bullet: float = 0.2
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	_hp = max_hp
 	add_to_group("player")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
@@ -110,24 +104,11 @@ func _spawn_bullet() -> void:
 			bullet.set_direction(dir)
 		scene.add_child(bullet)
 
-func apply_damage(amount: int) -> void:
+func apply_damage(_amount: int) -> void:
 	if _invincible_timer > 0.0:
 		return
-	if _shield_count > 0:
-		_shield_count -= 1
-		get_tree().call_group("battle_stats_manager", "on_player_hit")
-		return
-	_hp -= amount
 	_invincible_timer = _hit_invincibility_duration
-	if _hp <= 0:
-		_hp = 0
 	get_tree().call_group("battle_stats_manager", "on_player_hit")
-
-func get_hp() -> int:
-	return _hp
-
-func get_max_hp() -> int:
-	return max_hp
 
 func get_bullet_count() -> int:
 	return _bullet_count
@@ -135,14 +116,8 @@ func get_bullet_count() -> int:
 func get_max_bullet_count() -> int:
 	return _max_bullet_count
 
-func get_shield_count() -> int:
-	return _shield_count
-
 func release_pointer() -> void:
 	_has_pointer = false
-
-func set_heal(amount: int) -> void:
-	_hp = clampi(amount, 0, max_hp)
 
 func set_invincible(seconds: float) -> void:
 	_invincible_timer = seconds
@@ -153,14 +128,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 			fire_interval *= 0.85
 		"damage":
 			bullet_damage += 1
-		"max_hp":
-			max_hp += 1
-			_hp = mini(_hp + 1, max_hp)
 		"multi_shot":
 			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
-		"shield":
-			_shield_count += 1
 		"hit_invincibility":
 			_hit_invincibility_duration += 0.3
-		"heal":
-			set_heal(_hp + 2)
