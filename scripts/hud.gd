@@ -6,8 +6,6 @@ var _player: Node = null
 var _label: Label
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
-
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 

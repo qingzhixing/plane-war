@@ -8,9 +8,6 @@ var _label: Label
 var _button: Button
 
 func _ready() -> void:
-	# 死亡界面在暂停时仍需响应输入（Godot 4 用 process_mode）
-	process_mode = Node.PROCESS_MODE_ALWAYS
-
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 		if _player != null and _player.has_signal("died"):
