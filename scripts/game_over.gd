@@ -31,13 +31,17 @@ func _ready() -> void:
 	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
 
+	# 使用 CenterContainer + VBox 保证整体绝对居中
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(center)
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.set_offsets_preset(Control.PRESET_FULL_RECT)
+
 	var vbox := VBoxContainer.new()
-	root.add_child(vbox)
 	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	# 居中到屏幕中间
-	vbox.set_anchors_preset(Control.PRESET_CENTER)
-	vbox.custom_minimum_size = Vector2(220, 120)
+	center.add_child(vbox)
 
 	_label = Label.new()
 	_label.text = "You Dead!"
@@ -61,4 +65,3 @@ func _on_player_died() -> void:
 func _on_restart_pressed() -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
-
