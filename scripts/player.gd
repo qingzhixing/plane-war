@@ -80,8 +80,7 @@ func _spawn_bullet() -> void:
 func apply_damage(amount: int) -> void:
 	_hp -= amount
 	if _hp <= 0:
-		# TODO: 在这里触发失败/继续游玩逻辑
-		queue_free()
+		get_tree().reload_current_scene()
 
 func get_hp() -> int:
 	return _hp
