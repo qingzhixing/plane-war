@@ -72,6 +72,9 @@ func show_game_over() -> void:
 	get_tree().paused = true
 
 func _on_player_died() -> void:
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_lose"):
+		audio.play_lose()
 	show_game_over()
 
 func _on_continue_pressed() -> void:

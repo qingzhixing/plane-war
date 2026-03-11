@@ -21,6 +21,10 @@ window/size/viewport_width=720
 window/size/viewport_height=1280
 window/size/resizable=false
 
+[autoload]
+
+AudioManager="*res://scripts/audio_manager.gd"
+
 [dotnet]
 
 project/assembly_name="plane-war"
