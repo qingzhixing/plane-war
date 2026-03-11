@@ -8,7 +8,7 @@
 [node name="Main" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_elqb8")]
-position = Vector2(545, 1760)
+position = Vector2(378, 1136)
 
 [node name="EnemySpawner" type="Node2D" parent="."]
 position = Vector2(541, 282)

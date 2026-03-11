@@ -63,10 +63,6 @@ func _update_movement(_delta: float) -> void:
 	clamped.x = clamp(clamped.x, margin, viewport_rect.size.x - margin)
 	clamped.y = clamp(clamped.y, margin, viewport_rect.size.y - margin)
 	global_position = clamped
-	# 同步指针基准到当前实际屏幕位置，避免 clamp 与下一帧拖拽“打架”导致卡顿
-	if _has_pointer:
-		_pointer_pos = get_viewport().get_canvas_transform() * clamped
-		_last_pointer_pos = _pointer_pos
 
 func _update_shooting(delta: float) -> void:
 	_fire_timer -= delta
