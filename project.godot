@@ -15,15 +15,14 @@ run/main_scene="uid://btv236w48os2y"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+AudioManager="*res://scripts/audio_manager.gd"
+
 [display]
 
 window/size/viewport_width=720
 window/size/viewport_height=1280
-window/size/resizable=true
-
-[autoload]
-
-AudioManager="*res://scripts/audio_manager.gd"
 
 [dotnet]
 
@@ -32,3 +31,4 @@ project/assembly_name="plane-war"
 [rendering]
 
 renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
