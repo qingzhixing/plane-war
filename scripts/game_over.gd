@@ -75,16 +75,8 @@ func _on_player_died() -> void:
 	pass
 
 func _on_continue_pressed() -> void:
-	if _main == null or not _main.has_method("use_continue"):
-		return
-	var p := _main.get_node_or_null(_main.player_path) as Node
-	if p != null and p.has_method("set_heal") and p.has_method("get_max_hp") and p.has_method("set_invincible"):
-		_main.use_continue()
-		var max_hp_val: int = p.get_max_hp()
-		p.set_heal(int(ceil(max_hp_val * 0.5)))
-		p.set_invincible(1.0)
-	visible = false
-	get_tree().paused = false
+	# 旧的“继续游玩 + 回复 HP + 无敌”机制已移除，本函数保留占位以兼容旧场景结构，不再执行任何逻辑。
+	pass
 
 func _on_restart_pressed() -> void:
 	get_tree().paused = false

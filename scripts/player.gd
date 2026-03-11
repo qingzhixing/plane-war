@@ -9,12 +9,10 @@ var _fire_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
-var _invincible_timer: float = 0.0
 var bullet_damage: int = 1
-var _hit_invincibility_duration: float = 0.5
 var _bullet_count: int = 1
 const _max_bullet_count: int = 6
-const _spread_rad_per_bullet: float = 0.2
+const _spread_rad_per_bullet: float = 0.12
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -57,8 +55,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			_last_pointer_pos = e.position
 
 func _process(delta: float) -> void:
-	if _invincible_timer > 0.0:
-		_invincible_timer -= delta
 	_update_movement(delta)
 	_update_shooting(delta)
 
@@ -105,9 +101,6 @@ func _spawn_bullet() -> void:
 		scene.add_child(bullet)
 
 func apply_damage(_amount: int) -> void:
-	if _invincible_timer > 0.0:
-		return
-	_invincible_timer = _hit_invincibility_duration
 	get_tree().call_group("battle_stats_manager", "on_player_hit")
 
 func get_bullet_count() -> int:
@@ -119,9 +112,6 @@ func get_max_bullet_count() -> int:
 func release_pointer() -> void:
 	_has_pointer = false
 
-func set_invincible(seconds: float) -> void:
-	_invincible_timer = seconds
-
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
 		"fire_rate":
@@ -130,5 +120,3 @@ func apply_upgrade(upgrade_id: String) -> void:
 			bullet_damage += 1
 		"multi_shot":
 			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
-		"hit_invincibility":
-			_hit_invincibility_duration += 0.3
