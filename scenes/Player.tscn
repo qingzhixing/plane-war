@@ -1,12 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://drk5g4eslf2h3"]
+[gd_scene load_steps=4 format=3 uid="uid://drk5g4eslf2h3"]
 
 [ext_resource type="Script" uid="uid://b3aigm1lpksqa" path="res://scripts/player.gd" id="1_p0vlq"]
 [ext_resource type="PackedScene" uid="uid://du8esn7dxfruf" path="res://scenes/bullets/PlayerBullet.tscn" id="2_3li8b"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://art/player/player_ship_base.png" id="2_v6fml"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_v6fml"]
-radius = 21.07779
-height = 70.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_p0vlq")
@@ -17,7 +13,6 @@ position = Vector2(-0.28250122, 0)
 scale = Vector2(0.4, 0.38)
 texture = ExtResource("2_v6fml")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-1, -5)
-scale = Vector2(0.9963092, 1)
-shape = SubResource("CapsuleShape2D_v6fml")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(0, -1)
+polygon = PackedVector2Array(39, 34, 120, 37, 142, 15, 143, -7, 120, -34, 34, -46, 31, -86, 8, -110, -10, -110, -32, -85, -36, -46, -126, -29, -143, -7, -142, 13, -122, 34, -35, 35, -25, 89, 23, 90, 34, 35, 34, 35)
