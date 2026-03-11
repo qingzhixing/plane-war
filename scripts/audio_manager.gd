@@ -23,6 +23,11 @@ var _sfx_player: AudioStreamPlayer
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
 
+var _bgm_volume_linear: float = 1.0
+var _sfx_volume_linear: float = 1.0
+var _bgm_muted: bool = false
+var _sfx_muted: bool = false
+
 
 func _ready() -> void:
 	# 全局音频管理：放到 AutoLoad 中，并且始终处理，不受暂停影响
@@ -34,10 +39,12 @@ func _ready() -> void:
 	_bgm_player.bus = "Master"
 	_bgm_player.finished.connect(_on_bgm_finished)
 	add_child(_bgm_player)
+	_apply_bgm_volume()
 
 	_sfx_player = AudioStreamPlayer.new()
 	_sfx_player.bus = "Master"
 	add_child(_sfx_player)
+	_apply_sfx_volume()
 
 	_reset_playlist()
 	_play_next_bgm()
@@ -67,12 +74,16 @@ func _on_bgm_finished() -> void:
 func play_enemy_injured() -> void:
 	if _sfx_player == null:
 		return
+	if _sfx_muted:
+		return
 	_sfx_player.stream = ENEMY_INJURED_STREAM
 	_sfx_player.play()
 
 
 func play_enemy_explosion() -> void:
 	if _sfx_player == null or ENEMY_EXPLOSION_STREAMS.is_empty():
+		return
+	if _sfx_muted:
 		return
 	var index := randi() % ENEMY_EXPLOSION_STREAMS.size()
 	_sfx_player.stream = ENEMY_EXPLOSION_STREAMS[index]
@@ -84,6 +95,46 @@ func play_lose() -> void:
 		_bgm_player.stop()
 	if _sfx_player == null:
 		return
+	if _sfx_muted:
+		return
 	_sfx_player.stream = LOSE_STREAM
 	_sfx_player.play()
+
+
+func set_bgm_volume_linear(value: float) -> void:
+	_bgm_volume_linear = clampf(value, 0.0, 1.0)
+	_apply_bgm_volume()
+
+
+func set_sfx_volume_linear(value: float) -> void:
+	_sfx_volume_linear = clampf(value, 0.0, 1.0)
+	_apply_sfx_volume()
+
+
+func set_bgm_muted(muted: bool) -> void:
+	_bgm_muted = muted
+	_apply_bgm_volume()
+
+
+func set_sfx_muted(muted: bool) -> void:
+	_sfx_muted = muted
+	_apply_sfx_volume()
+
+
+func _apply_bgm_volume() -> void:
+	if _bgm_player == null:
+		return
+	if _bgm_muted or _bgm_volume_linear <= 0.001:
+		_bgm_player.volume_db = -80.0
+	else:
+		_bgm_player.volume_db = linear_to_db(_bgm_volume_linear)
+
+
+func _apply_sfx_volume() -> void:
+	if _sfx_player == null:
+		return
+	if _sfx_muted or _sfx_volume_linear <= 0.001:
+		_sfx_player.volume_db = -80.0
+	else:
+		_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
 
