@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://4ock2n1a6tqp"
+path="res://.godot/imported/Pixel Wanderer_1.mp3-295afe96c0b056c6f41f97022ae2f2aa.mp3str"
+
+[deps]
+
+source_file="res://assets/BGM/Pixel Wanderer_1.mp3"
+dest_files=["res://.godot/imported/Pixel Wanderer_1.mp3-295afe96c0b056c6f41f97022ae2f2aa.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

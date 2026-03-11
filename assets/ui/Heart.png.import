@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqln58s6vxeib"
-path="res://.godot/imported/enemy_elite_01.png-b69f8730e68fea99db56e6d992683676.ctex"
+uid="uid://bh4jmqayun8c0"
+path="res://.godot/imported/Heart.png-937d8a1966a4949eaae46f01c378042f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/enemies/enemy_elite_01.png"
-dest_files=["res://.godot/imported/enemy_elite_01.png-b69f8730e68fea99db56e6d992683676.ctex"]
+source_file="res://assets/ui/Heart.png"
+dest_files=["res://.godot/imported/Heart.png-937d8a1966a4949eaae46f01c378042f.ctex"]
 
 [params]
 
