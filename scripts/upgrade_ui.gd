@@ -74,8 +74,10 @@ func _apply_viewport_fit() -> void:
 	var margin: float = 32.0
 	var gap: float = 16.0
 	var card_w: float = max(90.0, (vpr.size.x - margin * 2 - gap * 2) / 3.0)
-	var card_h: float = min(120.0, (vpr.size.y - margin * 2 - 80.0) / 3.0)
-	card_h = max(70.0, card_h)
+	# 让卡片在高屏幕上有更多竖向空间，避免文字溢出
+	var available_h: float = vpr.size.y - margin * 2 - 120.0
+	var card_h: float = available_h * 0.3
+	card_h = clampf(card_h, 90.0, 220.0)
 	for btn in _cards:
 		btn.custom_minimum_size = Vector2(card_w, card_h)
 

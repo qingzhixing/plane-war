@@ -19,12 +19,10 @@ func _ready() -> void:
 	# HP 与护盾（同一行）
 	_label = $Root/HpLabel
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label.add_theme_font_size_override("font_size", 32)
 
 	# 波次
 	_wave_label = $Root/WaveLabel
 	_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_wave_label.add_theme_font_size_override("font_size", 28)
 
 	# 经验条
 	_exp_bar = $Root/ExpBar
@@ -34,15 +32,11 @@ func _ready() -> void:
 	# 暂停按钮：始终可点，用于切换树的暂停状态
 	_pause_button = $Root/PauseButton
 	# 按钮需要拦截鼠标事件，保持默认（STOP），否则点不到
-	_pause_button.custom_minimum_size = Vector2(160, 64)
-	_pause_button.add_theme_font_size_override("font_size", 24)
 	_pause_button.pressed.connect(_on_pause_button_pressed)
 	_update_pause_button_text()
 
 	# 设置按钮：打开设置界面，但不改变当前暂停状态
 	_settings_button = $Root/SettingsButton
-	_settings_button.custom_minimum_size = Vector2(160, 64)
-	_settings_button.add_theme_font_size_override("font_size", 24)
 	_settings_button.pressed.connect(_on_settings_button_pressed)
 
 func _process(_delta: float) -> void:
