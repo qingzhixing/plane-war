@@ -34,7 +34,6 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="HpLabel" type="Label" parent="HUD/Root"]
-visible = false
 layout_mode = 0
 offset_left = 569.0
 offset_top = 16.0
