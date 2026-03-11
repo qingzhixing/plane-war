@@ -2,6 +2,7 @@ extends Area2D
 
 @export var speed: float = 250.0
 @export var max_hp: int = 2
+@export var exp_value: int = 5
 
 var _hp: int
 
@@ -15,13 +16,18 @@ func _process(delta: float) -> void:
 	if global_position.y > viewport_rect.size.y + 100.0:
 		queue_free()
 
+func _give_exp() -> void:
+	get_tree().call_group("experience_listener", "add_exp", exp_value)
+
 func apply_damage(amount: int) -> void:
 	_hp -= amount
 	if _hp <= 0:
+		_give_exp()
 		queue_free()
 
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
+		_give_exp()
 		queue_free()
 

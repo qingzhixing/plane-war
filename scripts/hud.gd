@@ -3,18 +3,26 @@ extends CanvasLayer
 @export var player_path: NodePath
 
 var _player: Node = null
+var _main: Node = null
 var _label: Label
+var _exp_bar: ProgressBar
 var _pause_button: Button
 var _is_paused: bool = false
 
 func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
+	_main = get_parent()
 
 	# 使用场景中预先放置的 Label，并放大字号
 	_label = $Root/HpLabel
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label.add_theme_font_size_override("font_size", 32)
+
+	# 经验条
+	_exp_bar = $Root/ExpBar
+	_exp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_exp_bar.max_value = 1.0
 
 	# 暂停按钮：始终可点，用于切换树的暂停状态
 	_pause_button = $Root/PauseButton
@@ -25,6 +33,10 @@ func _ready() -> void:
 	_update_pause_button_text()
 
 func _process(_delta: float) -> void:
+	if is_instance_valid(_main) and _main.has_method("get_exp") and _main.has_method("get_exp_to_next"):
+		var exp_next: int = _main.get_exp_to_next()
+		if exp_next > 0:
+			_exp_bar.value = float(_main.get_exp()) / float(exp_next)
 	if not is_instance_valid(_player):
 		_label.text = "HP: 0"
 		return

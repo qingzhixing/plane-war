@@ -12,6 +12,8 @@ var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
 var _hp: int
+var _invincible_timer: float = 0.0
+var bullet_damage: int = 1
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -55,6 +57,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_last_pointer_pos = e.position
 
 func _process(delta: float) -> void:
+	if _invincible_timer > 0.0:
+		_invincible_timer -= delta
 	_update_movement(delta)
 	_update_shooting(delta)
 
@@ -77,9 +81,13 @@ func _spawn_bullet() -> void:
 		return
 	var bullet := bullet_scene.instantiate()
 	bullet.global_position = global_position + Vector2(0, -20)
+	if "damage" in bullet:
+		bullet.damage = bullet_damage
 	get_tree().current_scene.add_child(bullet)
 
 func apply_damage(amount: int) -> void:
+	if _invincible_timer > 0.0:
+		return
 	_hp -= amount
 	if _hp <= 0:
 		_hp = 0
@@ -90,3 +98,21 @@ func get_hp() -> int:
 
 func get_max_hp() -> int:
 	return max_hp
+
+func set_heal(amount: int) -> void:
+	_hp = clampi(amount, 0, max_hp)
+
+func set_invincible(seconds: float) -> void:
+	_invincible_timer = seconds
+
+func apply_upgrade(upgrade_id: String) -> void:
+	match upgrade_id:
+		"fire_rate":
+			fire_interval *= 0.85
+		"damage":
+			bullet_damage += 1
+		"max_hp":
+			max_hp += 1
+			_hp = mini(_hp + 1, max_hp)
+		"move_speed":
+			move_speed *= 1.15

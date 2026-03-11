@@ -5,6 +5,7 @@ extends Area2D
 @export var horizontal_amplitude: float = 80.0
 @export var horizontal_speed: float = 1.2
 @export var max_hp: int = 4
+@export var exp_value: int = 8
 @export var fire_interval: float = 1.5
 @export var bullet_scene: PackedScene
 
@@ -61,13 +62,18 @@ func _fire_pattern() -> void:
 		get_tree().current_scene.add_child(bullet)
 
 
+func _give_exp() -> void:
+	get_tree().call_group("experience_listener", "add_exp", exp_value)
+
 func apply_damage(amount: int) -> void:
 	_hp -= amount
 	if _hp <= 0:
+		_give_exp()
 		queue_free()
 
 
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
+		_give_exp()
 		queue_free()

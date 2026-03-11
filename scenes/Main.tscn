@@ -1,12 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://btv236w48os2y"]
+[gd_scene load_steps=8 format=3 uid="uid://btv236w48os2y"]
 
 [ext_resource type="PackedScene" uid="uid://drk5g4eslf2h3" path="res://scenes/Player.tscn" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://enemybasic01" path="res://scenes/enemies/EnemyBasic01.tscn" id="2_enemy"]
 [ext_resource type="Script" uid="uid://cidep4suu0t6u" path="res://scripts/enemy_spawner.gd" id="3_spawner"]
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/game_over.gd" id="5_game_over"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="6_main"]
+[ext_resource type="Script" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("6_main")
+player_path = NodePath("Player")
 
 [node name="Player" parent="." instance=ExtResource("1_elqb8")]
 position = Vector2(378, 1136)
@@ -33,6 +37,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="ExpBar" type="ProgressBar" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 20.0
+offset_right = 540.0
+offset_bottom = 48.0
+max_value = 1.0
+value = 0.0
+show_percentage = false
 
 [node name="HpLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
@@ -94,5 +108,9 @@ horizontal_alignment = 1
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox"]
 layout_mode = 2
 text = "重新开始"
+
+[node name="UpgradeUI" type="CanvasLayer" parent="."]
+process_mode = 3
+script = ExtResource("7_upgrade_ui")
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]
