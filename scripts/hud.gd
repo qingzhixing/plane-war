@@ -19,6 +19,8 @@ func _ready() -> void:
 	# 暂停按钮：始终可点，用于切换树的暂停状态
 	_pause_button = $Root/PauseButton
 	# 按钮需要拦截鼠标事件，保持默认（STOP），否则点不到
+	_pause_button.custom_minimum_size = Vector2(160, 64)
+	_pause_button.add_theme_font_size_override("font_size", 24)
 	_pause_button.pressed.connect(_on_pause_button_pressed)
 	_update_pause_button_text()
 

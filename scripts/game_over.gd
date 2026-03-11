@@ -49,6 +49,8 @@ func _ready() -> void:
 	_button = Button.new()
 	_button.text = "重新开始"
 	_button.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_SHRINK_CENTER
+	_button.custom_minimum_size = Vector2(260, 80)
+	_button.add_theme_font_size_override("font_size", 28)
 	vbox.add_child(_button)
 	_button.pressed.connect(_on_restart_pressed)
 
