@@ -20,49 +20,25 @@ func _ready() -> void:
 		_player = get_node(player_path)
 	_main = get_parent()
 
-	# 顶部文本标签（原用于显示 HP，现作为提示文字使用）
-	_info_label = $Root/HpLabel
-	_info_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 顶部提示标签：推荐在场景中将原 HpLabel 重命名为 InfoLabel
+	_info_label = $Root.get_node_or_null("InfoLabel")
+	if _info_label == null:
+		_info_label = $Root.get_node_or_null("HpLabel")
+	if _info_label != null:
+		_info_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# 分数 / 连击 / DPS 标签（若场景中不存在，则在代码里创建）
+	# 分数 / 连击 / DPS 标签（从场景中获取，不再动态创建）
 	_score_label = $Root.get_node_or_null("ScoreLabel")
-	if _score_label == null:
-		_score_label = Label.new()
-		_score_label.name = "ScoreLabel"
-		_score_label.text = "Score: 0"
-		_score_label.anchor_left = 0.0
-		_score_label.anchor_top = 0.0
-		_score_label.anchor_right = 0.0
-		_score_label.anchor_bottom = 0.0
-		_score_label.position = Vector2(16, 16)
-		$Root.add_child(_score_label)
-	_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _score_label != null:
+		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	_combo_label = $Root.get_node_or_null("ComboLabel")
-	if _combo_label == null:
-		_combo_label = Label.new()
-		_combo_label.name = "ComboLabel"
-		_combo_label.text = ""
-		_combo_label.anchor_left = 1.0
-		_combo_label.anchor_top = 0.0
-		_combo_label.anchor_right = 1.0
-		_combo_label.anchor_bottom = 0.0
-		_combo_label.position = Vector2(-180, 16)
-		$Root.add_child(_combo_label)
-	_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _combo_label != null:
+		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	_dps_label = $Root.get_node_or_null("DpsLabel")
-	if _dps_label == null:
-		_dps_label = Label.new()
-		_dps_label.name = "DpsLabel"
-		_dps_label.text = ""
-		_dps_label.anchor_left = 0.0
-		_dps_label.anchor_top = 1.0
-		_dps_label.anchor_right = 0.0
-		_dps_label.anchor_bottom = 1.0
-		_dps_label.position = Vector2(16, -32)
-		$Root.add_child(_dps_label)
-	_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _dps_label != null:
+		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# 波次
 	_wave_label = $Root/WaveLabel
@@ -81,7 +57,6 @@ func _ready() -> void:
 
 	# 设置按钮：打开设置界面，但不改变当前暂停状态
 	_settings_button = $Root/SettingsButton
-	_settings_button.text = "结算"
 	_settings_button.pressed.connect(_on_settings_button_pressed)
 
 	# 提前结算按钮（可选）
@@ -145,7 +120,11 @@ func _on_pause_button_pressed() -> void:
 
 
 func _on_settings_button_pressed() -> void:
-	_on_end_run_pressed()
+	if not is_instance_valid(_main):
+		return
+	var settings := _main.get_node_or_null("SettingsUI")
+	if settings != null and settings.has_method("show_settings"):
+		settings.show_settings()
 
 
 func _on_end_run_pressed() -> void:
