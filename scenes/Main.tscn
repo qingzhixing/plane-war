@@ -51,14 +51,14 @@ show_percentage = false
 
 [node name="WaveLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
-offset_left = 16.0
-offset_top = 72.0
-offset_right = 120.0
-offset_bottom = 108.0
+offset_left = 31.0
+offset_top = 261.0
+offset_right = 135.0
+offset_bottom = 300.0
 theme_override_font_sizes/font_size = 28
 text = "第 1 波"
 
-[node name="HpLabel" type="Label" parent="HUD/Root"]
+[node name="InfoLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
 offset_left = 520.0
 offset_top = 16.0
@@ -79,10 +79,49 @@ text = "暂停"
 [node name="SettingsButton" type="Button" parent="HUD/Root"]
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 0
-offset_left = 16.0
-offset_top = 80.0
+offset_left = 15.0
+offset_top = 89.0
+offset_right = 175.0
+offset_bottom = 153.0
 theme_override_font_sizes/font_size = 24
 text = "设置"
+
+[node name="ScoreLabel" type="Label" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 444.0
+offset_top = 71.0
+offset_right = 688.0
+offset_bottom = 105.0
+theme_override_font_sizes/font_size = 24
+text = "Score: 0"
+
+[node name="ComboLabel" type="Label" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 444.0
+offset_top = 121.0
+offset_right = 684.0
+offset_bottom = 155.0
+theme_override_font_sizes/font_size = 24
+text = "Combo Placehold"
+
+[node name="DpsLabel" type="Label" parent="HUD/Root"]
+layout_mode = 0
+offset_left = 449.0
+offset_top = 167.0
+offset_right = 953.0
+offset_bottom = 199.0
+theme_override_font_sizes/font_size = 22
+text = "DPS: 0  Max: 0"
+
+[node name="EndRunButton" type="Button" parent="HUD/Root"]
+custom_minimum_size = Vector2(200, 64)
+layout_mode = 0
+offset_left = 15.0
+offset_top = 162.0
+offset_right = 215.0
+offset_bottom = 226.0
+theme_override_font_sizes/font_size = 24
+text = "提前结算"
 
 [node name="GameOver" type="CanvasLayer" parent="."]
 process_mode = 3
