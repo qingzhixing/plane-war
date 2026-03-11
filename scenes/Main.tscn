@@ -58,31 +58,23 @@ offset_bottom = 300.0
 theme_override_font_sizes/font_size = 28
 text = "第 1 波"
 
-[node name="InfoLabel" type="Label" parent="HUD/Root"]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 56.0
-offset_right = 400.0
-offset_bottom = 88.0
-theme_override_font_sizes/font_size = 24
-text = "尽量保持不被打中以维持连击和高分"
-horizontal_alignment = 0
-
-[node name="PauseButton" type="Button" parent="HUD/Root"]
-custom_minimum_size = Vector2(160, 64)
+[node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root"]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
+offset_right = 216.0
+offset_bottom = 260.0
+theme_override_constants/separation = 8
+
+[node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 64)
 theme_override_font_sizes/font_size = 24
 text = "暂停"
 
-[node name="SettingsButton" type="Button" parent="HUD/Root"]
+[node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+layout_mode = 2
 custom_minimum_size = Vector2(160, 64)
-layout_mode = 0
-offset_left = 15.0
-offset_top = 89.0
-offset_right = 175.0
-offset_bottom = 153.0
 theme_override_font_sizes/font_size = 24
 text = "设置"
 
@@ -101,20 +93,15 @@ text = "Score: 0"
 [node name="ComboLabel" type="Label" parent="HUD/Root/TopRightVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = ""
 
 [node name="DpsLabel" type="Label" parent="HUD/Root/TopRightVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "DPS: 0  Max: 0"
 
-[node name="EndRunButton" type="Button" parent="HUD/Root"]
+[node name="EndRunButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+layout_mode = 2
 custom_minimum_size = Vector2(200, 64)
-layout_mode = 0
-offset_left = 16.0
-offset_top = 208.0
-offset_right = 216.0
-offset_bottom = 272.0
 theme_override_font_sizes/font_size = 24
 text = "提前结算"
 

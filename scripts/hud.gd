@@ -4,7 +4,6 @@ extends CanvasLayer
 
 var _player: Node = null
 var _main: Node = null
-var _info_label: Label
 var _wave_label: Label
 var _exp_bar: ProgressBar
 var _pause_button: Button
@@ -19,11 +18,6 @@ func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 	_main = get_parent()
-
-	# 顶部提示标签：推荐在场景中将原 HpLabel 重命名为 InfoLabel
-	_info_label = $Root.get_node_or_null("InfoLabel")
-	if _info_label != null:
-		_info_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# 分数 / 连击 / DPS 标签（从场景中获取，不再动态创建）
 	var top_right := $Root.get_node_or_null("TopRightVBox")
@@ -52,18 +46,28 @@ func _ready() -> void:
 	_exp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_exp_bar.max_value = 1.0
 
+	# 左上按钮区域（暂停 / 设置 / 提前结算）
+	var buttons_root := $Root.get_node_or_null("TopLeftButtons")
+	if buttons_root is VBoxContainer:
+		_pause_button = buttons_root.get_node_or_null("PauseButton")
+		_settings_button = buttons_root.get_node_or_null("SettingsButton")
+		_end_run_button = buttons_root.get_node_or_null("EndRunButton")
+	else:
+		_pause_button = $Root.get_node_or_null("PauseButton")
+		_settings_button = $Root.get_node_or_null("SettingsButton")
+		_end_run_button = $Root.get_node_or_null("EndRunButton")
+
 	# 暂停按钮：始终可点，用于切换树的暂停状态
-	_pause_button = $Root/PauseButton
-	# 按钮需要拦截鼠标事件，保持默认（STOP），否则点不到
-	_pause_button.pressed.connect(_on_pause_button_pressed)
-	_update_pause_button_text()
+	if _pause_button != null:
+		# 按钮需要拦截鼠标事件，保持默认（STOP），否则点不到
+		_pause_button.pressed.connect(_on_pause_button_pressed)
+		_update_pause_button_text()
 
 	# 设置按钮：打开设置界面，但不改变当前暂停状态
-	_settings_button = $Root/SettingsButton
-	_settings_button.pressed.connect(_on_settings_button_pressed)
+	if _settings_button != null:
+		_settings_button.pressed.connect(_on_settings_button_pressed)
 
 	# 提前结算按钮（可选）
-	_end_run_button = $Root.get_node_or_null("EndRunButton")
 	if _end_run_button != null:
 		_end_run_button.pressed.connect(_on_end_run_pressed)
 
@@ -102,10 +106,6 @@ func _process(_delta: float) -> void:
 				_combo_label.text = ""
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
-
-		# 提示文本：简单提示“不要被打中”
-		if _info_label != null:
-			_info_label.text = "尽量保持不被打中以维持连击和高分"
 
 
 func _unhandled_input(event: InputEvent) -> void:
