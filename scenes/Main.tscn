@@ -46,12 +46,9 @@ anchor_left = 0.05
 anchor_top = 1.0
 anchor_right = 0.95
 anchor_bottom = 1.0
-offset_left = 0.0
 offset_top = -48.0
-offset_right = 0.0
 offset_bottom = -16.0
 max_value = 1.0
-show_percentage = false
 
 [node name="WaveLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
@@ -71,16 +68,22 @@ offset_bottom = 260.0
 theme_override_constants/separation = 8
 
 [node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons"]
-layout_mode = 2
 custom_minimum_size = Vector2(160, 64)
+layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "暂停"
 
 [node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons"]
-layout_mode = 2
 custom_minimum_size = Vector2(160, 64)
+layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "设置"
+
+[node name="EndRunButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+custom_minimum_size = Vector2(200, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "提前结算"
 
 [node name="TopRightVBox" type="VBoxContainer" parent="HUD/Root"]
 layout_mode = 0
@@ -102,12 +105,6 @@ theme_override_font_sizes/font_size = 24
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "DPS: 0  Max: 0"
-
-[node name="EndRunButton" type="Button" parent="HUD/Root/TopLeftButtons"]
-layout_mode = 2
-custom_minimum_size = Vector2(200, 64)
-theme_override_font_sizes/font_size = 24
-text = "提前结算"
 
 [node name="GameOver" type="CanvasLayer" parent="."]
 process_mode = 3

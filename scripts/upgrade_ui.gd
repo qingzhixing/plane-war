@@ -2,20 +2,24 @@ extends CanvasLayer
 
 const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，更集中但略微分散"},
+	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
+	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，更集中但略微分散"},
+	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
+	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 ]
 
 var _root: Control
 var _panel: ColorRect
 var _title: Label
-var _cards: Array[Button] = []
+var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
 var _main: Node
+
+const CARD_WIDTH: float = 280.0
+const CARD_HEIGHT: float = 140.0
+const CARD_MARGIN: float = 12.0
 
 func _ready() -> void:
 	_main = get_parent()
@@ -54,28 +58,71 @@ func _build_ui() -> void:
 	vbox.add_child(card_box)
 
 	for i in 3:
-		var btn := Button.new()
-		btn.add_theme_font_size_override("font_size", 22)
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.pressed.connect(_on_card_pressed.bind(i))
-		card_box.add_child(btn)
-		_cards.append(btn)
-	_apply_viewport_fit()
+		var card_root := Control.new()
+		card_root.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
+		card_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		card_box.add_child(card_root)
 
-func _apply_viewport_fit() -> void:
+		var bg := ColorRect.new()
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.set_offsets_preset(Control.PRESET_FULL_RECT)
+		bg.color = Color(0.2, 0.2, 0.3, 0.95)
+		card_root.add_child(bg)
+
+		var margin := MarginContainer.new()
+		margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+		margin.set_offsets_preset(Control.PRESET_FULL_RECT)
+		margin.add_theme_constant_override("margin_left", int(CARD_MARGIN))
+		margin.add_theme_constant_override("margin_right", int(CARD_MARGIN))
+		margin.add_theme_constant_override("margin_top", int(CARD_MARGIN))
+		margin.add_theme_constant_override("margin_bottom", int(CARD_MARGIN))
+		card_root.add_child(margin)
+
+		var card_vbox := VBoxContainer.new()
+		card_vbox.add_theme_constant_override("separation", 6)
+		margin.add_child(card_vbox)
+
+		var title_label := Label.new()
+		title_label.add_theme_font_size_override("font_size", 22)
+		title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card_vbox.add_child(title_label)
+
+		var desc_label := Label.new()
+		desc_label.add_theme_font_size_override("font_size", 18)
+		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		desc_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card_vbox.add_child(desc_label)
+
+		var btn := Button.new()
+		btn.flat = true
+		btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+		btn.set_offsets_preset(Control.PRESET_FULL_RECT)
+		btn.pressed.connect(_on_card_pressed.bind(i))
+		card_root.add_child(btn)
+
+		_cards.append({"root": card_root, "title_label": title_label, "desc_label": desc_label, "button": btn})
+
+	_update_card_sizes()
+
+
+func _update_card_sizes() -> void:
 	var vpr: Rect2 = get_viewport().get_visible_rect()
 	var margin: float = 32.0
 	var gap: float = 16.0
-	var card_w: float = max(90.0, (vpr.size.x - margin * 2 - gap * 2) / 3.0)
-	# 让卡片在高屏幕上有更多竖向空间，避免文字溢出
-	var available_h: float = vpr.size.y - margin * 2 - 120.0
-	var card_h: float = available_h * 0.3
-	card_h = clampf(card_h, 90.0, 220.0)
-	for btn in _cards:
-		btn.custom_minimum_size = Vector2(card_w, card_h)
+	# 动态计算宽度，保证三张卡在不同分辨率下都能完整显示
+	var available_w: float = max(0.0, vpr.size.x - margin * 2.0 - gap * 2.0)
+	var card_w: float = max(140.0, available_w / 3.0)
+	for card in _cards:
+		var root := card["root"] as Control
+		if root != null:
+			var size := root.custom_minimum_size
+			size.x = card_w
+			size.y = CARD_HEIGHT
+			root.custom_minimum_size = size
 
 func show_pick() -> void:
-	_apply_viewport_fit()
+	_update_card_sizes()
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
@@ -88,16 +135,32 @@ func show_pick() -> void:
 	pool.shuffle()
 	for i in min(3, pool.size()):
 		var u: Dictionary = pool[i]
-		_cards[i].text = u["name"] + "\n" + u["desc"]
-		_cards[i].set_meta("upgrade_id", u["id"])
-		_cards[i].visible = true
+		var card: Dictionary = _cards[i]
+		var title_label := card["title_label"] as Label
+		var desc_label := card["desc_label"] as Label
+		var btn := card["button"] as Button
+		var root := card["root"] as Control
+		if title_label != null:
+			title_label.text = u["name"]
+		if desc_label != null:
+			desc_label.text = u["desc"]
+		if btn != null:
+			btn.set_meta("upgrade_id", u["id"])
+		if root != null:
+			root.visible = true
 	for i in range(min(3, pool.size()), 3):
-		_cards[i].visible = false
+		var card_hidden: Dictionary = _cards[i]
+		var root_hidden := card_hidden["root"] as Control
+		if root_hidden != null:
+			root_hidden.visible = false
 	visible = true
 	get_tree().paused = true
 
 func _on_card_pressed(card_index: int) -> void:
-	var btn: Button = _cards[card_index]
+	if card_index < 0 or card_index >= _cards.size():
+		return
+	var card: Dictionary = _cards[card_index]
+	var btn := card["button"] as Button
 	if not btn.has_meta("upgrade_id"):
 		return
 	var upgrade_id: String = btn.get_meta("upgrade_id")
