@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b3aigm1lpksqa" path="res://scripts/player.gd" id="1_p0vlq"]
 [ext_resource type="PackedScene" uid="uid://du8esn7dxfruf" path="res://scenes/bullets/PlayerBullet.tscn" id="2_3li8b"]
-[ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://art/player/player_ship_base.png" id="2_v6fml"]
+[ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://assets/player/player_ship_base.png" id="2_v6fml"]
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(0.4, 0.4)

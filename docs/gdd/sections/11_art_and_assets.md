@@ -15,9 +15,9 @@
 ## 命名与目录建议
 
 - 目录建议：
-  - `res://art/player/`
-  - `res://art/enemies/`
-  - `res://art/bullets/`
+  - `res://assets/player/`
+  - `res://assets/enemies/`
+  - `res://assets/bullets/`
 - 资源命名建议：
   - 玩家：`player_ship_base.png`
   - 敌人：`enemy_basic_01.png` 等
