@@ -57,19 +57,30 @@ func _build_ui() -> void:
 	vbox.add_child(_title)
 
 	var card_box := HBoxContainer.new()
-	card_box.add_theme_constant_override("separation", 24)
+	card_box.add_theme_constant_override("separation", 16)
 	vbox.add_child(card_box)
 
 	for i in 3:
 		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(260, 140)
-		btn.add_theme_font_size_override("font_size", 26)
+		btn.add_theme_font_size_override("font_size", 22)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.pressed.connect(_on_card_pressed.bind(i))
 		card_box.add_child(btn)
 		_cards.append(btn)
+	_apply_viewport_fit()
+
+func _apply_viewport_fit() -> void:
+	var vpr: Rect2 = get_viewport().get_visible_rect()
+	var margin: float = 32.0
+	var gap: float = 16.0
+	var card_w: float = max(90.0, (vpr.size.x - margin * 2 - gap * 2) / 3.0)
+	var card_h: float = min(120.0, (vpr.size.y - margin * 2 - 80.0) / 3.0)
+	card_h = max(70.0, card_h)
+	for btn in _cards:
+		btn.custom_minimum_size = Vector2(card_w, card_h)
 
 func show_pick() -> void:
+	_apply_viewport_fit()
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
