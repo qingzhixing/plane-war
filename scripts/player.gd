@@ -99,6 +99,9 @@ func get_hp() -> int:
 func get_max_hp() -> int:
 	return max_hp
 
+func release_pointer() -> void:
+	_has_pointer = false
+
 func set_heal(amount: int) -> void:
 	_hp = clampi(amount, 0, max_hp)
 

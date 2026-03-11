@@ -14,6 +14,9 @@ func _ready() -> void:
 	level_up.connect(_on_level_up)
 
 func _on_level_up() -> void:
+	var p := get_node_or_null(player_path)
+	if p != null and p.has_method("release_pointer"):
+		p.release_pointer()
 	var ui := get_node_or_null("UpgradeUI")
 	if ui != null and ui.has_method("show_pick"):
 		ui.show_pick()
