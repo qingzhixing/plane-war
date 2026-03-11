@@ -60,13 +60,13 @@ text = "第 1 波"
 
 [node name="InfoLabel" type="Label" parent="HUD/Root"]
 layout_mode = 0
-offset_left = 520.0
-offset_top = 16.0
-offset_right = 685.0
-offset_bottom = 52.0
-theme_override_font_sizes/font_size = 32
-text = "HP: 5"
-horizontal_alignment = 2
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 400.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 24
+text = "尽量保持不被打中以维持连击和高分"
+horizontal_alignment = 0
 
 [node name="PauseButton" type="Button" parent="HUD/Root"]
 custom_minimum_size = Vector2(160, 64)
@@ -86,40 +86,35 @@ offset_bottom = 153.0
 theme_override_font_sizes/font_size = 24
 text = "设置"
 
-[node name="ScoreLabel" type="Label" parent="HUD/Root"]
+[node name="TopRightVBox" type="VBoxContainer" parent="HUD/Root"]
 layout_mode = 0
-offset_left = 444.0
-offset_top = 71.0
-offset_right = 688.0
-offset_bottom = 105.0
+offset_left = 480.0
+offset_top = 16.0
+offset_right = 720.0
+offset_bottom = 220.0
+
+[node name="ScoreLabel" type="Label" parent="HUD/Root/TopRightVBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Score: 0"
 
-[node name="ComboLabel" type="Label" parent="HUD/Root"]
-layout_mode = 0
-offset_left = 444.0
-offset_top = 121.0
-offset_right = 684.0
-offset_bottom = 155.0
+[node name="ComboLabel" type="Label" parent="HUD/Root/TopRightVBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Combo Placehold"
+text = ""
 
-[node name="DpsLabel" type="Label" parent="HUD/Root"]
-layout_mode = 0
-offset_left = 449.0
-offset_top = 167.0
-offset_right = 953.0
-offset_bottom = 199.0
+[node name="DpsLabel" type="Label" parent="HUD/Root/TopRightVBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "DPS: 0  Max: 0"
 
 [node name="EndRunButton" type="Button" parent="HUD/Root"]
 custom_minimum_size = Vector2(200, 64)
 layout_mode = 0
-offset_left = 15.0
-offset_top = 162.0
-offset_right = 215.0
-offset_bottom = 226.0
+offset_left = 16.0
+offset_top = 208.0
+offset_right = 216.0
+offset_bottom = 272.0
 theme_override_font_sizes/font_size = 24
 text = "提前结算"
 

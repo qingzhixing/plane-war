@@ -22,21 +22,24 @@ func _ready() -> void:
 
 	# 顶部提示标签：推荐在场景中将原 HpLabel 重命名为 InfoLabel
 	_info_label = $Root.get_node_or_null("InfoLabel")
-	if _info_label == null:
-		_info_label = $Root.get_node_or_null("HpLabel")
 	if _info_label != null:
 		_info_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# 分数 / 连击 / DPS 标签（从场景中获取，不再动态创建）
-	_score_label = $Root.get_node_or_null("ScoreLabel")
+	var top_right := $Root.get_node_or_null("TopRightVBox")
+	if top_right is VBoxContainer:
+		_score_label = top_right.get_node_or_null("ScoreLabel")
+		_combo_label = top_right.get_node_or_null("ComboLabel")
+		_dps_label = top_right.get_node_or_null("DpsLabel")
+	else:
+		_score_label = $Root.get_node_or_null("ScoreLabel")
+		_combo_label = $Root.get_node_or_null("ComboLabel")
+		_dps_label = $Root.get_node_or_null("DpsLabel")
+
 	if _score_label != null:
 		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	_combo_label = $Root.get_node_or_null("ComboLabel")
 	if _combo_label != null:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	_dps_label = $Root.get_node_or_null("DpsLabel")
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
