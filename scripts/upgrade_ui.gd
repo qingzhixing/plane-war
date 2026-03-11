@@ -4,9 +4,17 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
+	{"id": "double_shot", "name": "双发", "desc": "一次射出两发子弹"},
+	{"id": "spread", "name": "散射", "desc": "一次三发，左右微角度"},
+	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
+	{"id": "hit_invincibility", "name": "受击无敌延长", "desc": "受击后无敌时间 +0.3 秒"},
+	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
+	{"id": "double_shot", "name": "双发", "desc": "一次射出两发子弹"},
+	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
+	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 ]
 
 var _root: Control

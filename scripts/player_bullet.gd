@@ -2,11 +2,15 @@ extends Area2D
 
 @export var speed: float = 1200.0
 @export var damage: int = 1
+var _direction: Vector2 = Vector2(0, -1)
 
 func _process(delta: float) -> void:
-	global_position.y -= speed * delta
-	if global_position.y < -50:
+	global_position += _direction * speed * delta
+	if global_position.y < -50 or global_position.y > 2000:
 		queue_free()
+
+func set_direction(dir: Vector2) -> void:
+	_direction = dir.normalized()
 
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)

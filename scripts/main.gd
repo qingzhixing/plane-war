@@ -8,6 +8,7 @@ var _exp: int = 0
 var _level: int = 1
 var _exp_to_next: int = 10
 var _continue_used: bool = false
+var _exp_multiplier: float = 1.0
 
 func _ready() -> void:
 	add_to_group("experience_listener")
@@ -22,12 +23,15 @@ func _on_level_up() -> void:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
+	if upgrade_id == "exp_up":
+		_exp_multiplier += 0.2
+		return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
 		p.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
-	_exp += amount
+	_exp += int(amount * _exp_multiplier)
 	while _exp >= _exp_to_next:
 		_exp -= _exp_to_next
 		_level += 1

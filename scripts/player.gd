@@ -15,6 +15,10 @@ var _last_pointer_pos: Vector2
 var _hp: int
 var _invincible_timer: float = 0.0
 var bullet_damage: int = 1
+var _shield_count: int = 0
+var _hit_invincibility_duration: float = 0.5
+var _double_shot: bool = false
+var _spread_shot: bool = false
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -92,16 +96,32 @@ func _update_shooting(delta: float) -> void:
 func _spawn_bullet() -> void:
 	if bullet_scene == null:
 		return
-	var bullet := bullet_scene.instantiate()
-	bullet.global_position = global_position + Vector2(0, -20)
-	if "damage" in bullet:
-		bullet.damage = bullet_damage
-	get_tree().current_scene.add_child(bullet)
+	var scene := get_tree().current_scene
+	var offsets: Array[Vector2] = [Vector2(0, -20)]
+	if _double_shot:
+		offsets = [Vector2(-18, -20), Vector2(18, -20)]
+	elif _spread_shot:
+		offsets = [Vector2(0, -20), Vector2(-12, -20), Vector2(12, -20)]
+	var dirs: Array[Vector2] = []
+	if _spread_shot:
+		dirs = [Vector2(0, -1), Vector2(-0.26, -0.97), Vector2(0.26, -0.97)]
+	for i in offsets.size():
+		var bullet := bullet_scene.instantiate()
+		bullet.global_position = global_position + offsets[i]
+		if "damage" in bullet:
+			bullet.damage = bullet_damage
+		if dirs.size() > i and bullet.has_method("set_direction"):
+			bullet.set_direction(dirs[i])
+		scene.add_child(bullet)
 
 func apply_damage(amount: int) -> void:
 	if _invincible_timer > 0.0:
 		return
+	if _shield_count > 0:
+		_shield_count -= 1
+		return
 	_hp -= amount
+	_invincible_timer = _hit_invincibility_duration
 	if _hp <= 0:
 		_hp = 0
 		emit_signal("died")
@@ -130,3 +150,11 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"max_hp":
 			max_hp += 1
 			_hp = mini(_hp + 1, max_hp)
+		"double_shot":
+			_double_shot = true
+		"spread":
+			_spread_shot = true
+		"shield":
+			_shield_count += 1
+		"hit_invincibility":
+			_hit_invincibility_duration += 0.3
