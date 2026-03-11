@@ -5,6 +5,7 @@ extends CanvasLayer
 var _player: Node = null
 var _main: Node = null
 var _label: Label
+var _wave_label: Label
 var _exp_bar: ProgressBar
 var _pause_button: Button
 var _is_paused: bool = false
@@ -14,10 +15,15 @@ func _ready() -> void:
 		_player = get_node(player_path)
 	_main = get_parent()
 
-	# 使用场景中预先放置的 Label，并放大字号
+	# HP 与护盾（同一行）
 	_label = $Root/HpLabel
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label.add_theme_font_size_override("font_size", 32)
+
+	# 波次
+	_wave_label = $Root/WaveLabel
+	_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_wave_label.add_theme_font_size_override("font_size", 28)
 
 	# 经验条
 	_exp_bar = $Root/ExpBar
@@ -37,16 +43,20 @@ func _process(_delta: float) -> void:
 		var exp_next: int = _main.get_exp_to_next()
 		if exp_next > 0:
 			_exp_bar.value = float(_main.get_exp()) / float(exp_next)
+	if is_instance_valid(_main) and _main.has_method("get_wave"):
+		_wave_label.text = "第 %d 波" % _main.get_wave()
 	if not is_instance_valid(_player):
 		_label.text = "HP: 0"
 		return
 
 	if _player.has_method("get_hp"):
 		var hp := clampi(_player.get_hp(), 0, 99)
-		if hp <= 0:
-			_label.text = "HP: 0"
-		else:
-			_label.text = "HP: %d" % hp
+		var part: String = "HP: %d" % hp
+		if _player.has_method("get_shield_count"):
+			var shield: int = _player.get_shield_count()
+			if shield > 0:
+				part += "  盾: %d" % shield
+		_label.text = part
 	else:
 		_label.text = "HP: ?"
 

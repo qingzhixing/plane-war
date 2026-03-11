@@ -8,12 +8,14 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
 	{"id": "hit_invincibility", "name": "受击无敌延长", "desc": "受击后无敌时间 +0.3 秒"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
+	{"id": "heal", "name": "生命恢复", "desc": "恢复 2 点 HP"},
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "子弹伤害 +1"},
 	{"id": "max_hp", "name": "生命+1", "desc": "最大 HP +1 并恢复 1 点"},
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，角度分散"},
 	{"id": "shield", "name": "护盾", "desc": "抵挡 1 次伤害"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
+	{"id": "heal", "name": "生命恢复", "desc": "恢复 2 点 HP"},
 ]
 
 var _root: Control
@@ -51,17 +53,17 @@ func _build_ui() -> void:
 	_title = Label.new()
 	_title.text = "升级！选一个强化"
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override("font_size", 28)
+	_title.add_theme_font_size_override("font_size", 36)
 	vbox.add_child(_title)
 
 	var card_box := HBoxContainer.new()
-	card_box.add_theme_constant_override("separation", 20)
+	card_box.add_theme_constant_override("separation", 24)
 	vbox.add_child(card_box)
 
 	for i in 3:
 		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(200, 120)
-		btn.add_theme_font_size_override("font_size", 18)
+		btn.custom_minimum_size = Vector2(260, 140)
+		btn.add_theme_font_size_override("font_size", 26)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.pressed.connect(_on_card_pressed.bind(i))
 		card_box.add_child(btn)

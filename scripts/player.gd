@@ -6,7 +6,7 @@ signal died
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
-@export var max_hp: int = 3
+@export var max_hp: int = 5
 
 var _fire_timer: float = 0.0
 var _has_pointer: bool = false
@@ -134,6 +134,9 @@ func get_bullet_count() -> int:
 func get_max_bullet_count() -> int:
 	return _max_bullet_count
 
+func get_shield_count() -> int:
+	return _shield_count
+
 func release_pointer() -> void:
 	_has_pointer = false
 
@@ -158,3 +161,5 @@ func apply_upgrade(upgrade_id: String) -> void:
 			_shield_count += 1
 		"hit_invincibility":
 			_hit_invincibility_duration += 0.3
+		"heal":
+			set_heal(_hp + 2)
