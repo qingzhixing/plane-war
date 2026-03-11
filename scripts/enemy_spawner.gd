@@ -14,4 +14,3 @@ func _on_spawn_timeout() -> void:
 	var x := randf_range(50.0, viewport_rect.size.x - 50.0)
 	enemy.global_position = Vector2(x, -50.0)
 	get_tree().current_scene.add_child(enemy)
-

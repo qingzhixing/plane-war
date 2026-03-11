@@ -7,7 +7,7 @@
 
 ## 局内 HUD
 
-- HP（左上角显示心形图标 3 格，使用 `res://art/ui/icon_hp.png`）
+- HP（右上角显示心形图标 3 格，使用 `res://art/ui/icon_hp.png`）
 - 经验条
 - 暂停
 - 符卡/炸弹按钮（若启用）
