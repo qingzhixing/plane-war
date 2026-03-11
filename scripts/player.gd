@@ -34,6 +34,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e := event as InputEventScreenDrag
 		if _has_pointer:
 			var delta_pos := e.position - _pointer_pos
+			# 单帧位移上限，避免触摸抖动或焦点丢失造成的大跳
+			const max_delta := 120.0
+			if delta_pos.length() > max_delta:
+				delta_pos = delta_pos.normalized() * max_delta
 			global_position += delta_pos
 			_pointer_pos = e.position
 			_last_pointer_pos = e.position
@@ -41,6 +45,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e := event as InputEventMouseMotion
 		if _has_pointer:
 			var delta_pos := e.position - _pointer_pos
+			const max_delta := 120.0
+			if delta_pos.length() > max_delta:
+				delta_pos = delta_pos.normalized() * max_delta
 			global_position += delta_pos
 			_pointer_pos = e.position
 			_last_pointer_pos = e.position
@@ -56,6 +63,10 @@ func _update_movement(_delta: float) -> void:
 	clamped.x = clamp(clamped.x, margin, viewport_rect.size.x - margin)
 	clamped.y = clamp(clamped.y, margin, viewport_rect.size.y - margin)
 	global_position = clamped
+	# 同步指针基准到当前实际屏幕位置，避免 clamp 与下一帧拖拽“打架”导致卡顿
+	if _has_pointer:
+		_pointer_pos = get_viewport().get_canvas_transform() * clamped
+		_last_pointer_pos = _pointer_pos
 
 func _update_shooting(delta: float) -> void:
 	_fire_timer -= delta
