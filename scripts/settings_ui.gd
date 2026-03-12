@@ -117,6 +117,15 @@ func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 	vbox.add_child(_close_button)
 
+	# 提前结算按钮（局内可从设置中直接结束本局）
+	var end_run_button := Button.new()
+	end_run_button.text = "提前结算"
+	end_run_button.custom_minimum_size = Vector2(200, 64)
+	end_run_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	end_run_button.add_theme_font_size_override("font_size", 24)
+	end_run_button.pressed.connect(_on_end_run_pressed)
+	vbox.add_child(end_run_button)
+
 
 func show_settings() -> void:
 	_is_from_menu = false
@@ -136,6 +145,14 @@ func _on_close_pressed() -> void:
 	else:
 		visible = false
 		get_tree().paused = _was_paused_before
+
+
+func _on_end_run_pressed() -> void:
+	# 从设置面板触发与 HUD “提前结算” 一致的行为
+	var game_over := get_tree().get_first_node_in_group("game_over_ui")
+	if game_over != null and game_over.has_method("show_game_over"):
+		visible = false
+		game_over.show_game_over()
 
 
 func _get_audio_manager() -> Node:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://btv236w48os2y"]
+[gd_scene format=3 uid="uid://btv236w48os2y"]
 
 [ext_resource type="PackedScene" uid="uid://drk5g4eslf2h3" path="res://scenes/Player.tscn" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://enemybasic01" path="res://scenes/enemies/EnemyBasic01.tscn" id="2_enemy"]
@@ -10,28 +10,30 @@
 [ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
+[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
 
-[node name="Player" parent="." instance=ExtResource("1_elqb8")]
+[node name="Player" parent="." unique_id=1802700737 instance=ExtResource("1_elqb8")]
 position = Vector2(378, 1136)
 
-[node name="EnemySpawner" type="Node2D" parent="."]
+[node name="EnemySpawner" type="Node2D" parent="." unique_id=406994034]
 position = Vector2(541, 282)
 script = ExtResource("3_spawner")
 enemy_scene = ExtResource("2_enemy")
 enemy_scene_elite = ExtResource("9_enemy_elite")
 
-[node name="Timer" type="Timer" parent="EnemySpawner"]
+[node name="Timer" type="Timer" parent="EnemySpawner" unique_id=2032949683]
 autostart = true
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1215533867]
 process_mode = 3
 script = ExtResource("4_hud")
 player_path = NodePath("../Player")
 
-[node name="Root" type="Control" parent="HUD"]
+[node name="Root" type="Control" parent="HUD" unique_id=1325487772]
+theme = ExtResource("11_ui_theme")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,7 +42,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ExpBar" type="ProgressBar" parent="HUD/Root"]
+[node name="ExpBar" type="ProgressBar" parent="HUD/Root" unique_id=1904624421]
+unique_name_in_owner = true
 layout_mode = 0
 anchor_left = 0.05
 anchor_top = 1.0
@@ -50,7 +53,8 @@ offset_top = -48.0
 offset_bottom = -16.0
 max_value = 1.0
 
-[node name="WaveLabel" type="Label" parent="HUD/Root"]
+[node name="WaveLabel" type="Label" parent="HUD/Root" unique_id=1566627949]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 31.0
 offset_top = 261.0
@@ -59,7 +63,7 @@ offset_bottom = 300.0
 theme_override_font_sizes/font_size = 28
 text = "第 1 波"
 
-[node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root"]
+[node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root" unique_id=1840417451]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
@@ -67,51 +71,63 @@ offset_right = 216.0
 offset_bottom = 260.0
 theme_override_constants/separation = 8
 
-[node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+[node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=484967350]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "暂停"
 
-[node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+[node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=626905230]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "设置"
 
-[node name="EndRunButton" type="Button" parent="HUD/Root/TopLeftButtons"]
+[node name="EndRunButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=2053006386]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "提前结算"
 
-[node name="TopRightVBox" type="VBoxContainer" parent="HUD/Root"]
+[node name="TopRightVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
 layout_mode = 0
 offset_left = 480.0
 offset_top = 16.0
 offset_right = 720.0
 offset_bottom = 220.0
 
-[node name="ScoreLabel" type="Label" parent="HUD/Root/TopRightVBox"]
+[node name="ScoreLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=268481878]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Score: 0"
 
-[node name="ComboLabel" type="Label" parent="HUD/Root/TopRightVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-
-[node name="DpsLabel" type="Label" parent="HUD/Root/TopRightVBox"]
+[node name="DpsLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=1153599571]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "DPS: 0  Max: 0"
 
-[node name="GameOver" type="CanvasLayer" parent="."]
+[node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 403.0
+offset_top = 216.0
+offset_right = 718.0
+offset_bottom = 294.0
+theme_override_font_sizes/font_size = 48
+text = "Combo: XXX"
+
+[node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
 script = ExtResource("5_game_over")
 player_path = NodePath("../Player")
 
-[node name="Root" type="Control" parent="GameOver"]
+[node name="Root" type="Control" parent="GameOver" unique_id=222543225]
+unique_name_in_owner = true
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -121,7 +137,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Panel" type="ColorRect" parent="GameOver/Root"]
+[node name="Panel" type="ColorRect" parent="GameOver/Root" unique_id=2095839253]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -130,7 +146,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
-[node name="Center" type="CenterContainer" parent="GameOver/Root"]
+[node name="Center" type="CenterContainer" parent="GameOver/Root" unique_id=2119442220]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -138,29 +154,35 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="GameOver/Root/Center"]
+[node name="VBox" type="VBoxContainer" parent="GameOver/Root/Center" unique_id=646404208]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="GameOver/Root/Center/VBox"]
+[node name="Label" type="Label" parent="GameOver/Root/Center/VBox" unique_id=121312298]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 40
 layout_mode = 2
 text = "You Dead!"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox"]
+[node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963160]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+theme_override_font_sizes/font_size = 32
 layout_mode = 2
 text = "重新开始"
 
-[node name="UpgradeUI" type="CanvasLayer" parent="."]
+[node name="UpgradeUI" type="CanvasLayer" parent="." unique_id=1043995664]
 process_mode = 3
 script = ExtResource("7_upgrade_ui")
 
-[node name="SettingsUI" type="CanvasLayer" parent="."]
+[node name="SettingsUI" type="CanvasLayer" parent="." unique_id=317848371]
 process_mode = 3
 script = ExtResource("8_settings_ui")
 
-[node name="BossHUD" type="CanvasLayer" parent="."]
+[node name="BossHUD" type="CanvasLayer" parent="." unique_id=426736218]
 process_mode = 3
 script = ExtResource("10_boss_hud")
 
