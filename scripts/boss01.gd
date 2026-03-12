@@ -10,6 +10,7 @@ var _hp: int
 var _phase_b: bool = false
 var _fire_timer: float = 0.0
 var _move_time: float = 0.0
+var _phase_transition_timer: float = 0.0
 
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
@@ -23,6 +24,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _phase_transition_timer > 0.0:
+		_phase_transition_timer = maxf(0.0, _phase_transition_timer - delta)
+		return
+
 	_move_time += delta
 	# 在屏幕上半区域左右缓慢移动，首段从屏幕外缓慢驶入
 	var viewport_rect := get_viewport_rect()
@@ -97,7 +102,7 @@ func apply_damage(amount: int) -> void:
 	# 进入阶段 B：HP 低于 50% 时
 	if not _phase_b and float(_hp) <= float(max_hp) * 0.5:
 		_phase_b = true
-		# 简化阶段切换演出：清弹 + 短暂停顿由 Main 负责，这里只切换阶段状态
+		_trigger_phase_transition()
 	_update_boss_hud()
 
 
@@ -122,6 +127,18 @@ func _update_boss_hud() -> void:
 	var hud := get_tree().get_first_node_in_group("boss_hud")
 	if hud != null and hud.has_method("set_boss_hp"):
 		hud.set_boss_hp(_hp, max_hp)
+
+
+func _trigger_phase_transition() -> void:
+	# 阶段切换演出：清弹 + 短暂停顿 + 招式名提示
+	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(bullet):
+			bullet.queue_free()
+	_phase_transition_timer = 0.3
+	_fire_timer = 0.8
+	var hud := get_tree().get_first_node_in_group("boss_hud")
+	if hud != null and hud.has_method("show_spell_name"):
+		hud.show_spell_name("符：星屑环舞", 1.2)
 
 
 func _get_audio_manager() -> Node:

@@ -11,6 +11,12 @@ var _continue_used: bool = false
 var _exp_multiplier: float = 1.0
 var _wave: int = 1
 var _boss_spawned: bool = false
+var best_score: int = 0
+var best_dps: float = 0.0
+var _score_multiplier: float = 1.0
+var _flat_score_bonus: int = 0
+var _combo_gain_per_hit: int = 1
+var _combo_guard_charges: int = 0
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -21,6 +27,7 @@ var max_dps: float = 0.0
 
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
+const _RECORDS_FILE_PATH: String = "user://records.cfg"
 
 var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
 @onready var _spawner: Node = null
@@ -29,6 +36,9 @@ var _pending_boss_spawn: bool = false
 var _debug_skip_to_boss_used: bool = false
 var _debug_skip_to_boss_active: bool = false
 var _debug_upgrades_needed: int = 0
+var _bomb_cooldown_remaining: float = 0.0
+
+const _BOMB_COOLDOWN_SECONDS: float = 12.0
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
@@ -42,6 +52,7 @@ func _ready() -> void:
 	add_to_group("experience_listener")
 	add_to_group("battle_stats_manager")
 	level_up.connect(_on_level_up)
+	_load_records()
 
 	_spawner = get_node_or_null("EnemySpawner")
 	_start_wave()
@@ -50,6 +61,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_update_combo(delta)
 	_update_dps()
+	_update_bomb(delta)
 
 
 func _start_wave() -> void:
@@ -114,9 +126,22 @@ func _on_level_up() -> void:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
-	if upgrade_id == "exp_up":
-		_exp_multiplier += 0.2
-		return
+	match upgrade_id:
+		"exp_up":
+			_exp_multiplier += 0.2
+			return
+		"score_up":
+			_score_multiplier += 0.15
+			return
+		"score_flat":
+			_flat_score_bonus += 5
+			return
+		"combo_boost":
+			_combo_gain_per_hit += 1
+			return
+		"combo_guard":
+			_combo_guard_charges += 1
+			return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
 		p.apply_upgrade(upgrade_id)
@@ -161,6 +186,43 @@ func get_max_dps() -> float:
 	return max_dps
 
 
+func get_bomb_cooldown_total() -> float:
+	return _BOMB_COOLDOWN_SECONDS
+
+
+func get_bomb_cooldown_remaining() -> float:
+	return _bomb_cooldown_remaining
+
+
+func try_use_bomb() -> bool:
+	if _bomb_cooldown_remaining > 0.0:
+		return false
+	_bomb_cooldown_remaining = _BOMB_COOLDOWN_SECONDS
+	_trigger_bomb_effect()
+	return true
+
+
+func get_best_score() -> int:
+	return best_score
+
+
+func get_best_dps() -> float:
+	return best_dps
+
+
+func finalize_battle_records() -> bool:
+	var changed := false
+	if score > best_score:
+		best_score = score
+		changed = true
+	if max_dps > best_dps:
+		best_dps = max_dps
+		changed = true
+	if changed:
+		_save_records()
+	return changed
+
+
 func record_player_damage(amount: int, _target: Node) -> void:
 	if amount <= 0:
 		return
@@ -176,13 +238,16 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 	if base_score <= 0:
 		return
 	var multiplier := _get_combo_multiplier()
-	var gained := int(round(float(base_score) * multiplier))
+	var gained := int(round(float(base_score) * multiplier * _score_multiplier)) + _flat_score_bonus
 	if gained < 0:
 		gained = 0
 	score += gained
 
 
 func on_player_hit() -> void:
+	if _combo_guard_charges > 0:
+		_combo_guard_charges -= 1
+		return
 	if combo > 0:
 		combo = 0
 
@@ -190,9 +255,9 @@ func on_player_hit() -> void:
 func _on_successful_hit() -> void:
 	# 命中敌人时提升连击，不再因超时自动清空
 	if combo <= 0:
-		combo = 1
+		combo = _combo_gain_per_hit
 	else:
-		combo += 1
+		combo += _combo_gain_per_hit
 	if combo > max_combo:
 		max_combo = combo
 
@@ -224,6 +289,25 @@ func _update_dps() -> void:
 		max_dps = current_dps
 
 
+func _update_bomb(delta: float) -> void:
+	if _bomb_cooldown_remaining <= 0.0:
+		return
+	_bomb_cooldown_remaining = maxf(0.0, _bomb_cooldown_remaining - delta)
+
+
+func _trigger_bomb_effect() -> void:
+	# 符卡效果：清空敌弹，并对场上敌人造成高额伤害（用于休闲兜底）
+	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(bullet):
+			bullet.queue_free()
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy) and enemy.has_method("apply_damage"):
+			enemy.apply_damage(9999)
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_enemy_explosion"):
+		audio.play_enemy_explosion()
+
+
 func _get_combo_multiplier() -> float:
 	if combo < 10:
 		return 1.0
@@ -235,6 +319,22 @@ func _get_combo_multiplier() -> float:
 		return 2.0
 	else:
 		return 3.0
+
+
+func _load_records() -> void:
+	var cfg := ConfigFile.new()
+	var err := cfg.load(_RECORDS_FILE_PATH)
+	if err != OK:
+		return
+	best_score = int(cfg.get_value("records", "best_score", 0))
+	best_dps = float(cfg.get_value("records", "best_dps", 0.0))
+
+
+func _save_records() -> void:
+	var cfg := ConfigFile.new()
+	cfg.set_value("records", "best_score", best_score)
+	cfg.set_value("records", "best_dps", best_dps)
+	cfg.save(_RECORDS_FILE_PATH)
 
 
 func is_boss_spawned() -> bool:

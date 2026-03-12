@@ -51,6 +51,8 @@ func _ready() -> void:
 func show_game_over() -> void:
 	# 更新结算信息：以评分与表现为核心
 	if _label != null and _main != null:
+		if _main.has_method("finalize_battle_records"):
+			_main.finalize_battle_records()
 		var lines: Array[String] = []
 		if _main.has_method("get_score"):
 			lines.append("Score: %d" % _main.get_score())
@@ -58,6 +60,10 @@ func show_game_over() -> void:
 			lines.append("Max Combo: %d" % _main.get_max_combo())
 		if _main.has_method("get_max_dps"):
 			lines.append("Max DPS: %.0f" % _main.get_max_dps())
+		if _main.has_method("get_best_score"):
+			lines.append("Best Score: %d" % _main.get_best_score())
+		if _main.has_method("get_best_dps"):
+			lines.append("Best DPS: %.0f" % _main.get_best_dps())
 		if lines.is_empty():
 			lines.append("Battle Summary")
 		_label.text = "\n".join(lines)

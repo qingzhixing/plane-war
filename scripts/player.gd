@@ -10,9 +10,11 @@ var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
 var bullet_damage: int = 1
+var bullet_speed: float = 1200.0
 var _bullet_count: int = 1
 const _max_bullet_count: int = 6
-const _spread_rad_per_bullet: float = 0.12
+var _spread_rad_per_bullet: float = 0.12
+var _boss_damage_multiplier: float = 1.0
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -96,8 +98,12 @@ func _spawn_bullet() -> void:
 		bullet.global_position = global_position + Vector2(0, -20)
 		if "damage" in bullet:
 			bullet.damage = bullet_damage
+		if "speed" in bullet:
+			bullet.speed = bullet_speed
 		if bullet.has_method("set_direction"):
 			bullet.set_direction(dir)
+		if bullet.has_method("set_boss_damage_multiplier"):
+			bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
 		scene.add_child(bullet)
 
 func apply_damage(_amount: int) -> void:
@@ -120,3 +126,11 @@ func apply_upgrade(upgrade_id: String) -> void:
 			bullet_damage += 1
 		"multi_shot":
 			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
+		"move_speed":
+			move_speed *= 1.1
+		"bullet_speed":
+			bullet_speed *= 1.12
+		"spread_focus":
+			_spread_rad_per_bullet = maxf(0.05, _spread_rad_per_bullet * 0.9)
+		"boss_hunter":
+			_boss_damage_multiplier += 0.2

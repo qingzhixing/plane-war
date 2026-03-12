@@ -8,6 +8,10 @@ var _is_paused: bool = false
 var _combo_base_color: Color = Color.WHITE
 var _combo_base_scale: Vector2 = Vector2.ONE
 var _last_combo_value: int = 0
+var _last_combo_feedback_value: int = 0
+var _combo_notice_timer: float = 0.0
+var _combo_break_timer: float = 0.0
+var _combo_notice_label: Label = null
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _exp_bar: ProgressBar = %ExpBar
@@ -17,6 +21,7 @@ var _last_combo_value: int = 0
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
+var _bomb_button: Button = null
 
 
 func _ready() -> void:
@@ -31,6 +36,7 @@ func _ready() -> void:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
+	_ensure_combo_notice_label()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -53,8 +59,9 @@ func _ready() -> void:
 	# 提前结算按钮（可选）
 	if _end_run_button != null:
 		_end_run_button.pressed.connect(_on_end_run_pressed)
+	_ensure_bomb_button()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_exp") and _main.has_method("get_exp_to_next"):
 		var exp_next: int = _main.get_exp_to_next()
 		if exp_next > 0:
@@ -84,8 +91,10 @@ func _process(_delta: float) -> void:
 			_score_label.text = "Score: %d" % s
 		if _combo_label != null:
 			_update_combo_visual(c)
+			_update_combo_feedback(c, delta)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
+		_update_bomb_button()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -127,8 +136,12 @@ func _update_combo_visual(combo: int) -> void:
 	if _combo_label == null:
 		return
 	if combo <= 0:
-		_combo_label.text = ""
-		_combo_label.modulate = _combo_base_color
+		if _combo_break_timer > 0.0:
+			_combo_label.text = "Combo Break"
+			_combo_label.modulate = Color(1.0, 0.35, 0.35)
+		else:
+			_combo_label.text = ""
+			_combo_label.modulate = _combo_base_color
 		_combo_label.scale = _combo_base_scale
 		_last_combo_value = 0
 		return
@@ -156,3 +169,100 @@ func _update_combo_visual(combo: int) -> void:
 		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 	_last_combo_value = combo
+
+
+func _update_combo_feedback(combo: int, delta: float) -> void:
+	if _combo_break_timer > 0.0:
+		_combo_break_timer = maxf(0.0, _combo_break_timer - delta)
+	if _combo_notice_timer > 0.0:
+		_combo_notice_timer = maxf(0.0, _combo_notice_timer - delta)
+
+	if _last_combo_feedback_value > 0 and combo <= 0:
+		_combo_break_timer = 0.6
+		_play_combo_break_sfx()
+
+	for threshold in [10, 25, 50, 100]:
+		if _last_combo_feedback_value < threshold and combo >= threshold:
+			_show_combo_notice("%d Combo!" % threshold)
+			break
+
+	_last_combo_feedback_value = combo
+
+	if _combo_notice_label != null:
+		if _combo_notice_timer > 0.0:
+			_combo_notice_label.visible = true
+		else:
+			_combo_notice_label.visible = false
+
+
+func _show_combo_notice(text: String) -> void:
+	if _combo_notice_label == null:
+		return
+	_combo_notice_label.text = text
+	_combo_notice_timer = 0.8
+	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
+	var tween := create_tween()
+	_combo_notice_label.scale = Vector2.ONE
+	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE * 1.15, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _ensure_combo_notice_label() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null:
+		return
+	_combo_notice_label = Label.new()
+	_combo_notice_label.text = ""
+	_combo_notice_label.visible = false
+	_combo_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_combo_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_combo_notice_label.add_theme_font_size_override("font_size", 34)
+	_combo_notice_label.anchor_left = 0.2
+	_combo_notice_label.anchor_right = 0.8
+	_combo_notice_label.anchor_top = 0.20
+	_combo_notice_label.anchor_bottom = 0.26
+	root.add_child(_combo_notice_label)
+
+
+func _play_combo_break_sfx() -> void:
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_enemy_injured"):
+		audio.play_enemy_injured()
+
+
+func _ensure_bomb_button() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null:
+		return
+	_bomb_button = Button.new()
+	_bomb_button.text = "符卡"
+	_bomb_button.custom_minimum_size = Vector2(120, 56)
+	_bomb_button.add_theme_font_size_override("font_size", 22)
+	_bomb_button.anchor_left = 0.82
+	_bomb_button.anchor_right = 0.98
+	_bomb_button.anchor_top = 0.86
+	_bomb_button.anchor_bottom = 0.94
+	_bomb_button.pressed.connect(_on_bomb_button_pressed)
+	root.add_child(_bomb_button)
+
+
+func _update_bomb_button() -> void:
+	if _bomb_button == null or not is_instance_valid(_main):
+		return
+	if not _main.has_method("get_bomb_cooldown_remaining"):
+		return
+	var cd := float(_main.get_bomb_cooldown_remaining())
+	if cd > 0.0:
+		_bomb_button.disabled = true
+		_bomb_button.text = "符卡 %.1fs" % cd
+	else:
+		_bomb_button.disabled = false
+		_bomb_button.text = "符卡"
+
+
+func _on_bomb_button_pressed() -> void:
+	if not is_instance_valid(_main):
+		return
+	if _main.has_method("try_use_bomb"):
+		_main.try_use_bomb()

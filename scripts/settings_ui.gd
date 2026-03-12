@@ -7,8 +7,11 @@ var _sfx_slider: HSlider
 var _bgm_mute_check: CheckBox
 var _sfx_mute_check: CheckBox
 var _close_button: Button
+var _vibration_check: CheckBox
+var _scale_option: OptionButton
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
+const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
 
 
 func _ready() -> void:
@@ -102,11 +105,30 @@ func _ready() -> void:
 	_sfx_mute_check.toggled.connect(_on_sfx_mute_toggled)
 	sfx_row.add_child(_sfx_mute_check)
 
-	# 预留震动与画面设置占位
-	var vibration_label := Label.new()
-	vibration_label.text = "震动 / 画面设置：MVP 阶段预留"
-	vibration_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(vibration_label)
+	# 震动开关
+	_vibration_check = CheckBox.new()
+	_vibration_check.text = "震动"
+	_vibration_check.button_pressed = true
+	_vibration_check.toggled.connect(_on_vibration_toggled)
+	vbox.add_child(_vibration_check)
+
+	# 画面缩放（内容缩放系数）
+	var scale_row := HBoxContainer.new()
+	scale_row.mouse_filter = Control.MOUSE_FILTER_STOP
+	scale_row.add_theme_constant_override("separation", 12)
+	vbox.add_child(scale_row)
+
+	var scale_label := Label.new()
+	scale_label.text = "画面缩放"
+	scale_label.custom_minimum_size = Vector2(120, 0)
+	scale_row.add_child(scale_label)
+
+	_scale_option = OptionButton.new()
+	_scale_option.add_item("100%", 100)
+	_scale_option.add_item("90%", 90)
+	_scale_option.add_item("80%", 80)
+	_scale_option.item_selected.connect(_on_scale_selected)
+	scale_row.add_child(_scale_option)
 
 	# 关闭按钮
 	_close_button = Button.new()
@@ -134,6 +156,8 @@ func _ready() -> void:
 	skip_boss_button.add_theme_font_size_override("font_size", 24)
 	skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
 	vbox.add_child(skip_boss_button)
+
+	_load_extra_settings()
 
 
 func show_settings() -> void:
@@ -199,4 +223,50 @@ func _on_sfx_mute_toggled(pressed: bool) -> void:
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("set_sfx_muted"):
 		audio.set_sfx_muted(pressed)
+
+
+func _on_vibration_toggled(_pressed: bool) -> void:
+	_save_extra_settings()
+
+
+func _on_scale_selected(_index: int) -> void:
+	var value := _scale_option.get_selected_id()
+	_apply_scale_percent(value)
+	_save_extra_settings()
+
+
+func _load_extra_settings() -> void:
+	var cfg := ConfigFile.new()
+	var err := cfg.load(_SETTINGS_FILE_PATH)
+	var vibration_enabled := true
+	var scale_percent := 100
+	if err == OK:
+		vibration_enabled = bool(cfg.get_value("settings", "vibration_enabled", true))
+		scale_percent = int(cfg.get_value("settings", "scale_percent", 100))
+	if _vibration_check != null:
+		_vibration_check.button_pressed = vibration_enabled
+	if _scale_option != null:
+		var idx := _scale_option.get_item_index(scale_percent)
+		if idx >= 0:
+			_scale_option.select(idx)
+		else:
+			_scale_option.select(0)
+	_apply_scale_percent(scale_percent)
+
+
+func _save_extra_settings() -> void:
+	var cfg := ConfigFile.new()
+	cfg.set_value("settings", "vibration_enabled", _vibration_check != null and _vibration_check.button_pressed)
+	var scale_percent := 100
+	if _scale_option != null:
+		scale_percent = _scale_option.get_selected_id()
+	cfg.set_value("settings", "scale_percent", scale_percent)
+	cfg.save(_SETTINGS_FILE_PATH)
+
+
+func _apply_scale_percent(scale_percent: int) -> void:
+	var p := clampi(scale_percent, 50, 100)
+	var root_window := get_tree().root
+	if root_window is Window:
+		(root_window as Window).content_scale_factor = float(p) / 100.0
 

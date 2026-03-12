@@ -4,10 +4,14 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
-	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
-	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
+	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +10%"},
+	{"id": "bullet_speed", "name": "弹速提升", "desc": "子弹飞行速度 +12%"},
+	{"id": "spread_focus", "name": "火力聚焦", "desc": "弹道更集中，提升有效命中"},
+	{"id": "boss_hunter", "name": "破甲弹头", "desc": "对 Boss 伤害 +20%"},
+	{"id": "score_up", "name": "评分增幅", "desc": "击杀得分乘区 +15%"},
+	{"id": "score_flat", "name": "战果奖金", "desc": "每次击杀额外 +5 分"},
+	{"id": "combo_boost", "name": "连击推进", "desc": "每次命中额外 +1 连击"},
+	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
 	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
 ]
 
