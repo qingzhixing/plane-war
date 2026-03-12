@@ -27,6 +27,7 @@ var combo: int = 0
 var max_combo: int = 0
 var current_dps: float = 0.0
 var max_dps: float = 0.0
+var best_combo: int = 0
 
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
@@ -197,6 +198,10 @@ func get_max_dps() -> float:
 	return max_dps
 
 
+func get_best_combo() -> int:
+	return best_combo
+
+
 func get_bomb_cooldown_total() -> float:
 	return _BOMB_COOLDOWN_SECONDS * _bomb_cooldown_scale
 
@@ -229,6 +234,9 @@ func finalize_battle_records() -> bool:
 		changed = true
 	if max_dps > best_dps:
 		best_dps = max_dps
+		changed = true
+	if max_combo > best_combo:
+		best_combo = max_combo
 		changed = true
 	if changed:
 		_save_records()
@@ -382,15 +390,16 @@ func _get_combo_multiplier() -> float:
 
 
 func _get_combo_buff_tier(current_combo: int) -> int:
-	if current_combo >= 100:
-		return 4
-	if current_combo >= 50:
-		return 3
-	if current_combo >= 25:
-		return 2
-	if current_combo >= 10:
+	if current_combo < 10:
+		return 0
+	if current_combo < 25:
 		return 1
-	return 0
+	if current_combo < 50:
+		return 2
+	if current_combo < 100:
+		return 3
+	# 100 连以上：每 100 连提升一档，从 4 开始递增
+	return 4 + int(floor((current_combo - 100) / 100.0))
 
 
 func _load_records() -> void:
@@ -400,12 +409,14 @@ func _load_records() -> void:
 		return
 	best_score = int(cfg.get_value("records", "best_score", 0))
 	best_dps = float(cfg.get_value("records", "best_dps", 0.0))
+	best_combo = int(cfg.get_value("records", "best_combo", 0))
 
 
 func _save_records() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("records", "best_score", best_score)
 	cfg.set_value("records", "best_dps", best_dps)
+	cfg.set_value("records", "best_combo", best_combo)
 	cfg.save(_RECORDS_FILE_PATH)
 
 
