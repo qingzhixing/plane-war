@@ -1,8 +1,8 @@
 extends "res://scripts/bullets/BulletBase.gd"
 
-@export var forward_distance: float = 520.0
+@export var forward_distance: float = 720.0
 @export var return_speed_multiplier: float = 1.0
-@export var spin_speed_deg: float = 420.0
+@export var spin_speed_deg: float = 720.0
 
 var _travelled: float = 0.0
 var _returning: bool = false
