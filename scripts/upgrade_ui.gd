@@ -4,27 +4,27 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 
 const UPGRADES: Array[Dictionary] = [
 	# 主武器：基础子弹
-	{"id": "fire_rate", "name": "主武器射速 +15%", "desc": "主武器射击间隔缩短 15%"},
-	{"id": "damage_percent", "name": "主武器伤害 +20%", "desc": "主武器伤害提高 20%"},
-	{"id": "multi_shot", "name": "主武器弹数 +1", "desc": "主武器每次射击多 1 发"},
-	{"id": "bullet_speed", "name": "主武器弹速 +12%", "desc": "主武器子弹飞行速度 +12%"},
-	{"id": "spread_focus", "name": "主武器弹道聚焦", "desc": "需要多弹：显著收束主武器弹道"},
-	{"id": "boss_hunter", "name": "主武器对 Boss 伤害 +20%", "desc": "主武器对 Boss 伤害 +20%"},
+	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器射速 +15%"},
+	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
+	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
+	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
+	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
+	{"id": "boss_hunter", "name": "要害瞄准", "desc": "主武器对 Boss 伤害 +20%"},
 
 	# 副武器：弓箭（由 arrow_multi 首次解锁）
-	{"id": "arrow_cooldown", "name": "弓箭冷却 -20%", "desc": "弓箭自动射击冷却缩短 20%"},
-	{"id": "arrow_multi", "name": "弓箭齐射数量 +1", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁弓箭"},
+	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
+	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁"},
 
 	# 副武器：回旋镖（由 boomerang_multi 首次解锁）
-	{"id": "boomerang_cooldown", "name": "回旋镖冷却 -20%", "desc": "回旋镖自动射击冷却缩短 20%"},
-	{"id": "boomerang_multi", "name": "回旋镖齐射数量 +1", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁回旋镖"},
+	{"id": "boomerang_cooldown", "name": "回旋加速", "desc": "回旋镖冷却 -20%"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁"},
 
 	# 通用 / 生存 / 表现
-	{"id": "move_speed", "name": "移动速度 +12%", "desc": "移动速度 +12%"},
-	{"id": "combo_boost", "name": "每次命中连击 +1", "desc": "每次命中额外 +1 连击"},
-	{"id": "combo_guard", "name": "保留一次连击", "desc": "抵消一次受击导致的连击中断"},
-	{"id": "bomb_cooldown", "name": "符卡冷却 -15%", "desc": "符卡冷却缩短 15%"},
-	{"id": "score_up", "name": "评分乘区 +15%", "desc": "击杀得分乘区 +15%"},
+	{"id": "move_speed", "name": "高机动机体", "desc": "移动速度 +12%"},
+	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
+	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
+	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
+	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
 var _root: Control
