@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b80x7galq5xb7"
-path="res://.godot/imported/Gun.png-a5b36b8baa80cb9c4c372fc8e73a96b8.ctex"
+uid="uid://cyw4slfnau0mf"
+path="res://.godot/imported/Sickle.png-d793a2806a8920d4c484514cf7085ab2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/bullets/Gun.png"
-dest_files=["res://.godot/imported/Gun.png-a5b36b8baa80cb9c4c372fc8e73a96b8.ctex"]
+source_file="res://assets/sprites/bullets/Sickle.png"
+dest_files=["res://.godot/imported/Sickle.png-d793a2806a8920d4c484514cf7085ab2.ctex"]
 
 [params]
 

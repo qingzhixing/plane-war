@@ -187,4 +187,3 @@ func _apply_sfx_volume() -> void:
 			_shoot_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
 		if _ui_sfx_player != null:
 			_ui_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
-

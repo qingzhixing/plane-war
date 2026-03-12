@@ -108,7 +108,6 @@ vertical_alignment = 1
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
 script = ExtResource("5_game_over")
-player_path = NodePath("../Player")
 
 [node name="Root" type="Control" parent="GameOver" unique_id=222543225]
 unique_name_in_owner = true
