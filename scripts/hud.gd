@@ -28,6 +28,7 @@ var _bomb_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
+var _hp_label: Label = null
 var _bomb_button: Button = null
 
 
@@ -47,6 +48,7 @@ func _ready() -> void:
 		_combo_base_scale = _combo_label.scale
 	_ensure_combo_notice_label()
 	_ensure_combo_screen_vfx_nodes()
+	_ensure_hp_label()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -103,6 +105,7 @@ func _process(delta: float) -> void:
 		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
+		_update_hp_label()
 		_update_bomb_button()
 
 
@@ -282,6 +285,33 @@ func _ensure_combo_screen_vfx_nodes() -> void:
 	_combo_full_tint.set_offsets_preset(Control.PRESET_FULL_RECT)
 	_combo_full_tint.color = Color(1, 1, 1, 0.0)
 	root.add_child(_combo_full_tint)
+
+
+func _ensure_hp_label() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null:
+		return
+	_hp_label = Label.new()
+	_hp_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_hp_label.anchor_left = 0.68
+	_hp_label.anchor_right = 0.98
+	_hp_label.anchor_top = 0.12
+	_hp_label.anchor_bottom = 0.17
+	_hp_label.text = "HP: 0.0/0.0"
+	if _pixel_bold_font != null:
+		_hp_label.add_theme_font_override("font", _pixel_bold_font)
+	_hp_label.add_theme_font_size_override("font_size", 24)
+	root.add_child(_hp_label)
+
+
+func _update_hp_label() -> void:
+	if _hp_label == null or _player == null:
+		return
+	if _player.has_method("get_hp") and _player.has_method("get_max_hp"):
+		var hp := float(_player.get_hp())
+		var max_hp := float(_player.get_max_hp())
+		_hp_label.text = "HP: %.1f/%.1f" % [hp, max_hp]
 
 
 func _update_combo_screen_vfx(combo: int) -> void:

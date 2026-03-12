@@ -7,7 +7,7 @@ extends Area2D
 @export var fire_interval: float = 2.0
 @export var bullet_scene: PackedScene
 
-var _hp: int
+var _hp: float
 var _time: float = 0.0
 var _fire_timer: float = 0.0
 @export var pre_fire_delay: float = 0.7
@@ -69,7 +69,7 @@ func _give_exp() -> void:
 	get_tree().call_group("experience_listener", "add_exp", exp_value)
 
 
-func apply_damage(amount: int) -> void:
+func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
 		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)

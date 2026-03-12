@@ -1,9 +1,13 @@
 extends CharacterBody2D
 
+signal died
+
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
+@export var max_hp: float = 12.0
+@export var hit_invulnerable_seconds: float = 0.35
 
 var _fire_timer: float = 0.0
 var _shoot_sfx_timer: float = 0.0
@@ -21,6 +25,14 @@ var _combo_fire_rate_mult: float = 1.0
 var _combo_move_speed_mult: float = 1.0
 var _combo_bullet_speed_mult: float = 1.0
 var _combo_damage_bonus: int = 0
+var _weapon_mode: String = "bullet"
+var _weapon_unlocked: Dictionary = {
+	"arrow": false,
+	"boomerang": false,
+}
+var _hp: float = 0.0
+var _hit_invulnerable_timer: float = 0.0
+var _damage_multiplier: float = 1.0
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -28,6 +40,7 @@ func _ready() -> void:
 	add_to_group("player")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
+	_hp = max_hp
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -65,6 +78,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
+	if _hit_invulnerable_timer > 0.0:
+		_hit_invulnerable_timer = maxf(0.0, _hit_invulnerable_timer - delta)
 
 func _update_movement(delta: float) -> void:
 	var dir := Vector2.ZERO
@@ -94,31 +109,76 @@ func _update_shooting(delta: float) -> void:
 	_shoot_sfx_timer -= delta
 	if _fire_timer <= 0.0:
 		_fire_timer = effective_interval
-		_spawn_bullet()
+		_spawn_weapon_shot()
 		_play_shoot_sfx()
 
-func _spawn_bullet() -> void:
-	if bullet_scene == null:
-		return
-	var scene := get_tree().current_scene
+func _spawn_weapon_shot() -> void:
+	match _weapon_mode:
+		"arrow":
+			_spawn_arrow_shot()
+		"boomerang":
+			_spawn_boomerang_shot()
+		_:
+			_spawn_default_shot()
+
+
+func _spawn_default_shot() -> void:
 	var n: int = clampi(_bullet_count, 1, _max_bullet_count)
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
 		var dir := Vector2(sin(angle), -cos(angle))
-		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position + Vector2(0, -20)
-		if "damage" in bullet:
-			bullet.damage = bullet_damage + _combo_damage_bonus
-		if "speed" in bullet:
-			bullet.speed = bullet_speed * _combo_bullet_speed_mult
-		if bullet.has_method("set_direction"):
-			bullet.set_direction(dir)
-		if bullet.has_method("set_boss_damage_multiplier"):
-			bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
-		scene.add_child(bullet)
+		_spawn_configured_bullet(dir, 0.0, 1.0, 0, "bullet", "straight")
 
-func apply_damage(_amount: int) -> void:
+
+func _spawn_arrow_shot() -> void:
+	var n := clampi(max(1, _bullet_count - 1), 1, 3)
+	var spread := 0.05
+	for i in n:
+		var angle: float = (i - (n - 1) * 0.5) * spread
+		var dir := Vector2(sin(angle), -cos(angle))
+		_spawn_configured_bullet(dir, 0.0, 1.35, 1, "arrow", "straight")
+
+
+func _spawn_boomerang_shot() -> void:
+	var n := clampi(max(1, _bullet_count - 1), 1, 2)
+	var spread := 0.22
+	for i in n:
+		var angle: float = (i - (n - 1) * 0.5) * spread
+		var dir := Vector2(sin(angle), -cos(angle))
+		_spawn_configured_bullet(dir, 0.35, 0.95, 2, "bullet", "boomerang")
+
+
+func _spawn_configured_bullet(dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String) -> void:
+	if bullet_scene == null:
+		return
+	var scene := get_tree().current_scene
+	var bullet := bullet_scene.instantiate()
+	bullet.global_position = global_position + dir * 20.0
+	if "damage" in bullet:
+		var combo_bonus_damage := float(_combo_damage_bonus)
+		bullet.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
+	if "speed" in bullet:
+		bullet.speed = bullet_speed * _combo_bullet_speed_mult * speed_mult
+	if bullet.has_method("set_direction"):
+		bullet.set_direction(dir)
+	if bullet.has_method("set_visual_type"):
+		bullet.set_visual_type(visual_type)
+	if bullet.has_method("set_motion_mode"):
+		bullet.set_motion_mode(bullet_motion_mode, self)
+	if bullet.has_method("set_boss_damage_multiplier"):
+		bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
+	if penetration > 0 and bullet.has_method("set_penetration"):
+		bullet.set_penetration(penetration)
+	scene.add_child(bullet)
+
+func apply_damage(amount: float) -> void:
+	if _hit_invulnerable_timer > 0.0:
+		return
+	_hit_invulnerable_timer = hit_invulnerable_seconds
+	_hp = maxf(0.0, _hp - amount)
 	get_tree().call_group("battle_stats_manager", "on_player_hit")
+	if _hp <= 0.0:
+		emit_signal("died")
 
 func get_bullet_count() -> int:
 	return _bullet_count
@@ -133,6 +193,22 @@ func get_bullet_damage() -> int:
 
 func get_boss_damage_multiplier() -> float:
 	return _boss_damage_multiplier
+
+
+func get_hp() -> float:
+	return _hp
+
+
+func get_max_hp() -> float:
+	return max_hp
+
+
+func has_weapon_unlocked(weapon_id: String) -> bool:
+	return _weapon_unlocked.has(weapon_id) and bool(_weapon_unlocked[weapon_id])
+
+
+func get_weapon_mode() -> String:
+	return _weapon_mode
 
 
 func set_combo_buff_tier(tier: int) -> void:
@@ -173,12 +249,28 @@ func apply_upgrade(upgrade_id: String) -> void:
 			move_speed *= 1.1
 		"bullet_speed":
 			bullet_speed *= 1.12
+		"damage_percent":
+			_damage_multiplier *= 1.2
+		"hp_up":
+			max_hp += 2.0
+			_hp = minf(max_hp, _hp + 2.0)
 		"spread_focus":
 			# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
 			if _bullet_count > 1:
 				_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
 		"boss_hunter":
 			_boss_damage_multiplier += 0.2
+		"weapon_arrow_unlock":
+			_unlock_weapon("arrow")
+		"weapon_boomerang_unlock":
+			_unlock_weapon("boomerang")
+
+
+func _unlock_weapon(weapon_id: String) -> void:
+	if not _weapon_unlocked.has(weapon_id):
+		return
+	_weapon_unlocked[weapon_id] = true
+	_weapon_mode = weapon_id
 
 
 func _play_shoot_sfx() -> void:

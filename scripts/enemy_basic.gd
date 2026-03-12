@@ -5,7 +5,7 @@ extends Area2D
 @export var exp_value: int = 5
 @export var score_value: int = 10
 
-var _hp: int
+var _hp: float
 
 func _ready() -> void:
 	_hp = max_hp
@@ -20,7 +20,7 @@ func _process(delta: float) -> void:
 func _give_exp() -> void:
 	get_tree().call_group("experience_listener", "add_exp", exp_value)
 
-func apply_damage(amount: int) -> void:
+func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
 		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)

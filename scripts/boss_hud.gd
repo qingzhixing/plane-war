@@ -67,7 +67,7 @@ func _ready() -> void:
 	visible = false
 
 
-func set_boss_hp(hp: int, max_hp: int) -> void:
+func set_boss_hp(hp: float, max_hp: float) -> void:
 	if max_hp <= 0:
 		visible = false
 		return

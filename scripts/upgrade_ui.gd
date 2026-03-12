@@ -4,17 +4,19 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 
 const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
+	{"id": "damage_percent", "name": "伤害强化", "desc": "伤害提高 20%（支持小数）"},
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
-	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +10%"},
+	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +12%"},
 	{"id": "bullet_speed", "name": "弹速提升", "desc": "子弹飞行速度 +12%"},
 	{"id": "spread_focus", "name": "火力聚焦", "desc": "需要多弹：显著收束弹道"},
 	{"id": "boss_hunter", "name": "破甲弹头", "desc": "对 Boss 伤害 +20%"},
-	{"id": "score_up", "name": "评分增幅", "desc": "击杀得分乘区 +15%"},
-	{"id": "score_flat", "name": "战果奖金", "desc": "每次击杀额外 +5 分"},
 	{"id": "combo_boost", "name": "连击推进", "desc": "每次命中额外 +1 连击"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
-	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
+	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却缩短 15%"},
+	{"id": "hp_up", "name": "机体修复", "desc": "最大 HP +2，并回复 2 HP"},
+	{"id": "weapon_arrow_unlock", "name": "解锁武器：弓箭", "desc": "切换为高速穿透箭矢"},
+	{"id": "weapon_boomerang_unlock", "name": "解锁武器：回旋镖", "desc": "切换为可回返的回旋镖"},
+	{"id": "score_up", "name": "评分增幅", "desc": "击杀得分乘区 +15%"},
 ]
 
 var _root: Control
@@ -142,10 +144,32 @@ func show_pick() -> void:
 			continue
 		if u["id"] == "spread_focus" and bullet_count <= 1:
 			continue
+		if u["id"] == "weapon_arrow_unlock" and player != null and player.has_method("has_weapon_unlocked") and player.has_weapon_unlocked("arrow"):
+			continue
+		if u["id"] == "weapon_boomerang_unlock" and player != null and player.has_method("has_weapon_unlocked") and player.has_weapon_unlocked("boomerang"):
+			continue
 		pool.append(u)
 	pool.shuffle()
-	for i in min(3, pool.size()):
-		var u: Dictionary = pool[i]
+	var pick_count: int = min(3, pool.size())
+	var chosen: Array[Dictionary] = []
+	for i in pick_count:
+		chosen.append(pool[i])
+	# 保证至少出现 1 张直接战斗收益词条，避免鸡肋三选
+	var has_combat_card := false
+	for c in chosen:
+		if _is_direct_combat_upgrade(c["id"]):
+			has_combat_card = true
+			break
+	if not has_combat_card:
+		for c in pool:
+			if _is_direct_combat_upgrade(c["id"]):
+				if chosen.is_empty():
+					chosen.append(c)
+				else:
+					chosen[0] = c
+				break
+	for i in chosen.size():
+		var u: Dictionary = chosen[i]
 		var card: Dictionary = _cards[i]
 		var title_label := card["title_label"] as Label
 		var desc_label := card["desc_label"] as Label
@@ -159,7 +183,7 @@ func show_pick() -> void:
 			btn.set_meta("upgrade_id", u["id"])
 		if root != null:
 			root.visible = true
-	for i in range(min(3, pool.size()), 3):
+	for i in range(chosen.size(), 3):
 		var card_hidden: Dictionary = _cards[i]
 		var root_hidden := card_hidden["root"] as Control
 		if root_hidden != null:
@@ -184,3 +208,21 @@ func _on_card_pressed(card_index: int) -> void:
 	get_tree().paused = false
 	if _main.has_method("on_upgrade_selected"):
 		_main.on_upgrade_selected()
+
+
+func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
+	return upgrade_id in [
+		"fire_rate",
+		"damage_percent",
+		"multi_shot",
+		"move_speed",
+		"bullet_speed",
+		"spread_focus",
+		"boss_hunter",
+		"combo_boost",
+		"combo_guard",
+		"bomb_cooldown",
+		"hp_up",
+		"weapon_arrow_unlock",
+		"weapon_boomerang_unlock",
+	]

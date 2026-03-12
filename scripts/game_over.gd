@@ -80,8 +80,7 @@ func show_game_over() -> void:
 	get_tree().paused = true
 
 func _on_player_died() -> void:
-	# 新评分制下，玩家 HP 归零不再直接触发 Game Over/结算界面
-	pass
+	show_game_over()
 
 func _on_continue_pressed() -> void:
 	# 旧的“继续游玩 + 回复 HP + 无敌”机制已移除，本函数保留占位以兼容旧场景结构，不再执行任何逻辑。

@@ -6,7 +6,7 @@ extends Area2D
 @export var bullet_scene: PackedScene
 @export var score_value: int = 500
 
-var _hp: int
+var _hp: float
 var _phase_b: bool = false
 var _fire_timer: float = 0.0
 var _move_time: float = 0.0
@@ -116,7 +116,7 @@ func _fire_phase_b() -> void:
 		get_tree().current_scene.add_child(bullet)
 
 
-func apply_damage(amount: int) -> void:
+func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
 		_on_dead()
@@ -140,7 +140,7 @@ func _on_dead() -> void:
 	queue_free()
 
 
-func get_hp() -> int:
+func get_hp() -> float:
 	return _hp
 
 

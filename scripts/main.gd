@@ -19,6 +19,7 @@ var _flat_score_bonus: int = 0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
+var _bomb_cooldown_scale: float = 1.0
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -31,7 +32,7 @@ const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
 
-var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
+var _damage_events: Array = [] # 每项为 { "time": float, "amount": float }
 @onready var _spawner: Node = null
 var _waiting_upgrade_choice: bool = false
 var _pending_boss_spawn: bool = false
@@ -149,6 +150,9 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"combo_guard":
 			_combo_guard_charges += 1
 			return
+		"bomb_cooldown":
+			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
+			return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
 		p.apply_upgrade(upgrade_id)
@@ -194,7 +198,7 @@ func get_max_dps() -> float:
 
 
 func get_bomb_cooldown_total() -> float:
-	return _BOMB_COOLDOWN_SECONDS
+	return _BOMB_COOLDOWN_SECONDS * _bomb_cooldown_scale
 
 
 func get_bomb_cooldown_remaining() -> float:
@@ -204,7 +208,7 @@ func get_bomb_cooldown_remaining() -> float:
 func try_use_bomb() -> bool:
 	if _bomb_cooldown_remaining > 0.0:
 		return false
-	_bomb_cooldown_remaining = _BOMB_COOLDOWN_SECONDS
+	_bomb_cooldown_remaining = get_bomb_cooldown_total()
 	_trigger_bomb_effect()
 	emit_signal("bomb_used")
 	return true
@@ -231,7 +235,7 @@ func finalize_battle_records() -> bool:
 	return changed
 
 
-func record_player_damage(amount: int, _target: Node) -> void:
+func record_player_damage(amount: float, _target: Node) -> void:
 	if amount <= 0:
 		return
 	var now: float = float(Time.get_ticks_msec()) / 1000.0
@@ -324,7 +328,7 @@ func _trigger_bomb_effect() -> void:
 
 	var player := get_node_or_null(player_path)
 	var origin := get_viewport().get_visible_rect().size * 0.5
-	var player_damage := 1
+	var player_damage := 1.0
 	var boss_damage_multiplier := 1.0
 	if player != null:
 		origin = player.global_position
@@ -344,7 +348,7 @@ func _trigger_bomb_effect() -> void:
 		audio.play_power_up()
 
 
-func _fire_bomb_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: int, boss_damage_multiplier: float) -> void:
+func _fire_bomb_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
 	for wave in _BOMB_BURST_WAVE_COUNT:
 		var phase_offset := (TAU / float(_BOMB_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
 		var radius := 12.0 + 6.0 * float(wave)
