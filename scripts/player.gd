@@ -3,7 +3,9 @@ extends CharacterBody2D
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
-@export var bullet_scene: PackedScene
+@export var bullet_scene_basic: PackedScene
+@export var bullet_scene_arrow: PackedScene
+@export var bullet_scene_boomerang: PackedScene
 @export var hit_invulnerable_seconds: float = 0.35
 
 var _fire_timer: float = 0.0
@@ -29,13 +31,19 @@ var _weapon_unlocked: Dictionary = {
 }
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
-@onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
+@onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBulletBasic.tscn")
+@onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrowBullet.tscn")
+@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerangBullet.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	add_to_group("player")
-	if bullet_scene == null and _fallback_bullet_scene != null:
-		bullet_scene = _fallback_bullet_scene
+	if bullet_scene_basic == null and _fallback_bullet_scene_basic != null:
+		bullet_scene_basic = _fallback_bullet_scene_basic
+	if bullet_scene_arrow == null and _fallback_bullet_scene_arrow != null:
+		bullet_scene_arrow = _fallback_bullet_scene_arrow
+	if bullet_scene_boomerang == null and _fallback_bullet_scene_boomerang != null:
+		bullet_scene_boomerang = _fallback_bullet_scene_boomerang
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -143,11 +151,22 @@ func _spawn_boomerang_shot() -> void:
 		_spawn_configured_bullet(dir, 0.35, 0.95, 2, "bullet", "boomerang")
 
 
+func _get_bullet_scene_for_mode(mode: String) -> PackedScene:
+	match mode:
+		"arrow":
+			return bullet_scene_arrow if bullet_scene_arrow != null else _fallback_bullet_scene_arrow
+		"boomerang":
+			return bullet_scene_boomerang if bullet_scene_boomerang != null else _fallback_bullet_scene_boomerang
+		_:
+			return bullet_scene_basic if bullet_scene_basic != null else _fallback_bullet_scene_basic
+
+
 func _spawn_configured_bullet(dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String) -> void:
-	if bullet_scene == null:
+	var scene_res := _get_bullet_scene_for_mode(_weapon_mode)
+	if scene_res == null:
 		return
 	var scene := get_tree().current_scene
-	var bullet := bullet_scene.instantiate()
+	var bullet := scene_res.instantiate()
 	bullet.global_position = global_position + dir * 20.0
 	if "damage" in bullet:
 		var combo_bonus_damage := float(_combo_damage_bonus)
@@ -156,10 +175,8 @@ func _spawn_configured_bullet(dir: Vector2, damage_bonus: float, speed_mult: flo
 		bullet.speed = bullet_speed * _combo_bullet_speed_mult * speed_mult
 	if bullet.has_method("set_direction"):
 		bullet.set_direction(dir)
-	if bullet.has_method("set_visual_type"):
-		bullet.set_visual_type(visual_type)
-	if bullet.has_method("set_motion_mode"):
-		bullet.set_motion_mode(bullet_motion_mode, self)
+	if bullet.has_method("set_boomerang_owner") and bullet_motion_mode == "boomerang":
+		bullet.set_boomerang_owner(self)
 	if bullet.has_method("set_boss_damage_multiplier"):
 		bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
 	if penetration > 0 and bullet.has_method("set_penetration"):
