@@ -77,4 +77,3 @@ func _is_at_screen_edge() -> bool:
 	return global_position.x <= rect.position.x + margin \
 		or global_position.x >= rect.position.x + rect.size.x - margin \
 		or global_position.y <= rect.position.y + margin
-
