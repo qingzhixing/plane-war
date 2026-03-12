@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/bullets/PlayerArrow.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bullets/Arrow.png" id="2_tex"]
+
+[sub_resource type="CapsuleShape2D" id="1_shape"]
+radius = 5.0
+height = 63.333332
+
+[node name="PlayerArrow" type="Area2D"]
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-1.6666667, -1.1368684e-13)
+rotation = -1.5707964
+scale = Vector2(4.4408226, 4.4408226)
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("1_shape")
+

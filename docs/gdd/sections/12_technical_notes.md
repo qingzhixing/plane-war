@@ -16,9 +16,9 @@
   - 脚本：`res://scripts/player.gd`
 - 子弹：
   - 基类脚本：`res://scripts/bullets/BulletBase.gd`（提供 `damage/speed/direction` 等通用属性与基础移动逻辑）。
-  - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBulletBasic.tscn`，脚本 `res://scripts/bullets/player_bullet_basic.gd`（直线向上、不穿透）。
-  - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrowBullet.tscn`，脚本 `res://scripts/bullets/player_arrow_bullet.gd`（在基类基础上加入轻微追踪逻辑）。
-  - 玩家回旋镖子弹：场景 `res://scenes/bullets/PlayerBoomerangBullet.tscn`，脚本 `res://scripts/bullets/player_boomerang_bullet.gd`（在基类基础上加入往返与穿透逻辑，并在实现层面限制场上同屏仅 1 发）。
+  - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBullet.tscn`，脚本 `res://scripts/bullets/PlayerBullet.gd`（直线向上、不穿透）。
+  - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrow.tscn`，脚本 `res://scripts/bullets/PlayerArrow.gd`。
+  - 玩家回旋镖子弹：场景 `res://scenes/bullets/PlayerBoomerang.tscn`，脚本 `res://scripts/bullets/PlayerBoomerang.gd`。
   - 技能/炸弹相关弹幕可以复用 `BulletBase`，使用单独场景（如 `PlayerBombBullet.tscn`）与脚本按需扩展。
 - 敌人：
   - 基类脚本：`res://scripts/enemies/EnemyBase.gd`（提供 `max_hp/hp` 与 `apply_damage/_on_dead` 等统一接口）。

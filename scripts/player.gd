@@ -35,9 +35,9 @@ var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
 var _boomerang_auto_timer: float = 0.0
-@onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBulletBasic.tscn")
-@onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrowBullet.tscn")
-@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerangBullet.tscn")
+@onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
+@onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
+@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

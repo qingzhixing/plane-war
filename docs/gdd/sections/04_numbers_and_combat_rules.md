@@ -15,16 +15,16 @@
 
 - **基础子弹（主武器 1）**
   - 行为：直线向上飞行，不带追踪与穿透。
-  - 使用独立场景：`res://scenes/bullets/PlayerBulletBasic.tscn`。
+  - 使用独立场景：`res://scenes/bullets/PlayerBullet.tscn`。
   - 主要用于前几波清理小怪，数值上偏稳定、泛用。
 - **弓箭（主武器 2）**
   - 行为：飞行过程中对最近敌人做**轻微追踪**（缓慢修正方向，而非瞬间转向），命中后消失。
-  - 使用独立场景：`res://scenes/bullets/PlayerArrowBullet.tscn`。
+  - 使用独立场景：`res://scenes/bullets/PlayerArrow.tscn`。
   - 相比基础子弹，射速略慢但更易命中移动目标，适合作为“半自动瞄准”体验。
 - **回旋镖（主武器 3）**
   - 行为：沿玩家当前朝向飞出，经过一段距离后折返，整体形成**往返轨迹**。
   - 具备**穿透效果**：在往返路径上可以命中多个敌人，不会在首次命中后立刻消失。
-  - 使用独立场景：`res://scenes/bullets/PlayerBoomerangBullet.tscn`。
+  - 使用独立场景：`res://scenes/bullets/PlayerBoomerang.tscn`。
   - 同一时间场上**最多只存在 1 枚回旋镖**（即新的回旋镖发射前，要么等待冷却结束，要么上一枚已完成往返并离场），以保持画面可读性与路线规划感。
 
 ### 伤害精度（玩家无 HP）
