@@ -114,8 +114,11 @@ func _unhandled_input(event: InputEvent) -> void:
 					_main.try_use_bomb()
 			KEY_ESCAPE:
 				var settings := get_tree().get_first_node_in_group("settings_menu")
-				if settings != null and settings.has_method("show_settings"):
-					settings.show_settings()
+				if settings != null:
+					if settings.visible and settings.has_method("_on_close_pressed"):
+						settings._on_close_pressed()
+					elif not settings.visible and settings.has_method("show_settings"):
+						settings.show_settings()
 
 func _on_pause_button_pressed() -> void:
 	_is_paused = not _is_paused
