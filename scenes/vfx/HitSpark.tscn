@@ -1,21 +1,14 @@
-[gd_scene format=3 load_steps=2]
+[gd_scene format=3 uid="uid://bkmiuhtlokt3c"]
 
-[sub_resource type="Curve" id="Curve_1"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-
-[node name="HitSpark" type="CPUParticles2D"]
-emitting = true
-amount = 12
-lifetime = 0.18
+[node name="HitSpark" type="CPUParticles2D" unique_id=987760217]
+emitting = false
+amount = 10
+lifetime = 0.09999999999999999
 one_shot = true
-explosiveness = 1.0
-spread = 0.9
-gravity = Vector2(0, 0)
-initial_velocity_min = 180.0
-initial_velocity_max = 260.0
-scale_amount_min = 0.4
-scale_amount_max = 0.7
-direction = Vector2(0, -1)
-color = Color(1, 0.85, 0.55, 1)
-color_ramp = SubResource("Curve_1")
-
+preprocess = 0.02
+direction = Vector2(0, 1)
+initial_velocity_min = 700.0
+initial_velocity_max = 1000.0
+scale_amount_min = 10.0
+scale_amount_max = 20.0
+color = Color(0.8872627, 0.26378766, 3.2343865e-05, 1)

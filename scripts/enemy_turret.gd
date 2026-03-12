@@ -89,7 +89,6 @@ func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
 		_play_enemy_explosion_sfx()
-		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 	else:
@@ -101,7 +100,6 @@ func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
 		_play_enemy_explosion_sfx()
-		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 
@@ -159,17 +157,3 @@ func _update_hit_material() -> void:
 		strength = _hit_flash_timer / _HIT_FLASH_DURATION
 	_hit_material.set_shader_parameter("hit_strength", strength)
 
-
-func _spawn_explosion_vfx(is_big: bool) -> void:
-	var scene_path := "res://scenes/vfx/EnemyExplodeSmall.tscn"
-	if is_big:
-		scene_path = "res://scenes/vfx/EnemyExplodeBig.tscn"
-	var packed := load(scene_path)
-	if packed == null:
-		return
-	var vfx: Node2D = packed.instantiate()
-	vfx.global_position = global_position
-	var tree := get_tree()
-	if tree == null or tree.current_scene == null:
-		return
-	tree.current_scene.add_child(vfx)

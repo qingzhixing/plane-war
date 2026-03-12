@@ -34,7 +34,6 @@ func apply_damage(amount: float) -> void:
 	if _hp <= 0:
 		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_play_enemy_explosion_sfx()
-		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 	else:
@@ -46,7 +45,6 @@ func _on_body_entered(body: Node) -> void:
 		body.apply_damage(1)
 		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_play_enemy_explosion_sfx()
-		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 
@@ -104,18 +102,4 @@ func _update_hit_material() -> void:
 		strength = _hit_flash_timer / _HIT_FLASH_DURATION
 	_hit_material.set_shader_parameter("hit_strength", strength)
 
-
-func _spawn_explosion_vfx(is_big: bool) -> void:
-	var scene_path := "res://scenes/vfx/EnemyExplodeSmall.tscn"
-	if is_big:
-		scene_path = "res://scenes/vfx/EnemyExplodeBig.tscn"
-	var packed := load(scene_path)
-	if packed == null:
-		return
-	var vfx: Node2D = packed.instantiate()
-	vfx.global_position = global_position
-	var tree := get_tree()
-	if tree == null or tree.current_scene == null:
-		return
-	tree.current_scene.add_child(vfx)
 
