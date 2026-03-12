@@ -61,17 +61,17 @@ func _is_out_of_bounds() -> bool:
 	return global_position.y < rect.position.y - margin or global_position.y > rect.size.y + margin
 
 
-func _spawn_hit_vfx(area: Node) -> void:
+func _spawn_hit_vfx(_area: Node) -> void:
 	if _HitSparkScene == null:
 		return
 	var vfx := _HitSparkScene.instantiate()
 	if not (vfx is Node2D):
 		return
 	var vfx2d := vfx as Node2D
-	if area is Node2D:
-		vfx2d.global_position = (area as Node2D).global_position
-	else:
-		vfx2d.global_position = global_position
+	# 使用子弹当前 global_position 作为命中点，更贴近实际碰撞位置
+	vfx2d.global_position = global_position
+	if "emitting" in vfx2d:
+		vfx2d.emitting = true
 	var tree := get_tree()
 	if tree == null or tree.current_scene == null:
 		return
