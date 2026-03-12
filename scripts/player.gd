@@ -143,7 +143,7 @@ func _spawn_default_shot() -> void:
 
 
 func _spawn_arrow_shot() -> void:
-	var n := max(1, _arrow_shot_count)
+	var n: int = max(1, _arrow_shot_count)
 	var spread := 0.12
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
@@ -153,7 +153,7 @@ func _spawn_arrow_shot() -> void:
 
 
 func _spawn_boomerang_shot() -> void:
-	var n := max(1, _boomerang_shot_count)
+	var n: int = max(1, _boomerang_shot_count)
 	var spread := 0.18
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
