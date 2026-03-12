@@ -75,17 +75,42 @@ func _fire_phase_a() -> void:
 
 
 func _fire_phase_b() -> void:
-	# 简化版大范围技能：带预警的直线激光/弹雨，这里实现为多条直线弹道
+	# 阶段 B：朝玩家方向的扇形压制 + Boss 周身旋转环弹
 	if bullet_scene == null:
 		return
-	var viewport_rect := get_viewport_rect()
-	var lanes := 4
-	for i in lanes:
-		var x := viewport_rect.size.x * (0.2 + 0.2 * float(i))
-		var spawn_pos := Vector2(x, global_position.y + 40.0)
-		var dir := Vector2(0, 1)
+
+	var target_dir := Vector2(0, 1)
+	var player := get_tree().get_first_node_in_group("player")
+	if player != null and player is Node2D:
+		var to_player := (player as Node2D).global_position - global_position
+		if to_player.length() > 0.001:
+			target_dir = to_player.normalized()
+
+	# 1) 定向扇形压制（更像 Boss 大招，而非玩家符卡）
+	var fan_count := 9
+	var fan_half_angle := 0.55
+	for i in fan_count:
+		var t := float(i) / float(max(1, fan_count - 1))
+		var angle_offset: float = lerp(-fan_half_angle, fan_half_angle, t)
+		var dir := target_dir.rotated(angle_offset)
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = spawn_pos
+		bullet.global_position = global_position + dir * 34.0
+		if "speed" in bullet:
+			bullet.speed = 380.0
+		if bullet.has_method("setup_direction"):
+			bullet.setup_direction(dir)
+		get_tree().current_scene.add_child(bullet)
+
+	# 2) 周身旋转环弹（提供持续走位压力）
+	var ring_count := 14
+	var base_angle := _move_time * 1.4
+	for i in ring_count:
+		var angle := base_angle + TAU * float(i) / float(ring_count)
+		var dir := Vector2.RIGHT.rotated(angle)
+		var bullet := bullet_scene.instantiate()
+		bullet.global_position = global_position + dir * 44.0
+		if "speed" in bullet:
+			bullet.speed = 280.0
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
@@ -130,10 +155,7 @@ func _update_boss_hud() -> void:
 
 
 func _trigger_phase_transition() -> void:
-	# 阶段切换演出：清弹 + 短暂停顿 + 招式名提示
-	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(bullet):
-			bullet.queue_free()
+	# 阶段切换演出：短暂停顿 + 招式名提示（不清除敌方子弹）
 	_phase_transition_timer = 0.3
 	_fire_timer = 0.8
 	var hud := get_tree().get_first_node_in_group("boss_hud")

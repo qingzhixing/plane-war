@@ -20,7 +20,6 @@ var _bomb_notice_label: Label = null
 @onready var _exp_bar: ProgressBar = %ExpBar
 @onready var _pause_button: Button = %PauseButton
 @onready var _settings_button: Button = %SettingsButton
-@onready var _end_run_button: Button = %EndRunButton
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
@@ -61,9 +60,6 @@ func _ready() -> void:
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
 	
-	# 提前结算按钮（可选）
-	if _end_run_button != null:
-		_end_run_button.pressed.connect(_on_end_run_pressed)
 	_ensure_bomb_button()
 	_ensure_bomb_vfx_nodes()
 
@@ -123,12 +119,6 @@ func _on_settings_button_pressed() -> void:
 	var settings := _main.get_node_or_null("SettingsUI")
 	if settings != null and settings.has_method("show_settings"):
 		settings.show_settings()
-
-
-func _on_end_run_pressed() -> void:
-	var game_over := get_tree().get_first_node_in_group("game_over_ui")
-	if game_over != null and game_over.has_method("show_game_over"):
-		game_over.show_game_over()
 
 
 func _update_pause_button_text() -> void:
@@ -308,25 +298,36 @@ func _ensure_bomb_vfx_nodes() -> void:
 
 
 func _on_bomb_used() -> void:
+	_play_bomb_burst_vfx()
+
+
+func _play_bomb_burst_vfx() -> void:
 	if _bomb_flash_rect != null:
 		_bomb_flash_rect.visible = true
-		_bomb_flash_rect.modulate = Color(1, 1, 1, 1)
-		_bomb_flash_rect.color.a = 0.42
-		var flash_tween := create_tween()
-		flash_tween.tween_property(_bomb_flash_rect, "color:a", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		flash_tween.finished.connect(func() -> void:
-			_bomb_flash_rect.visible = false
-		)
 
 	if _bomb_notice_label != null:
 		_bomb_notice_label.visible = true
+		_bomb_notice_label.text = "符卡爆发!"
 		_bomb_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
-		_bomb_notice_label.scale = Vector2.ONE
-		var text_tween := create_tween()
-		text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE * 1.12, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		text_tween.tween_interval(0.10)
-		text_tween.tween_property(_bomb_notice_label, "modulate:a", 0.0, 0.22)
-		text_tween.finished.connect(func() -> void:
-			_bomb_notice_label.visible = false
-			_bomb_notice_label.modulate = Color(1, 1, 1, 1)
-		)
+
+	for i in 4:
+		var alpha := 0.52 - 0.08 * float(i)
+		if _bomb_flash_rect != null:
+			_bomb_flash_rect.modulate = Color(1, 1, 1, 1)
+			_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
+			var flash_tween := create_tween()
+			flash_tween.tween_property(_bomb_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		if _bomb_notice_label != null:
+			_bomb_notice_label.scale = Vector2.ONE
+			_bomb_notice_label.modulate.a = 1.0
+			var text_tween := create_tween()
+			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE * 1.18, 0.06).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		if i < 3:
+			await get_tree().create_timer(0.10).timeout
+
+	if _bomb_flash_rect != null:
+		_bomb_flash_rect.visible = false
+	if _bomb_notice_label != null:
+		_bomb_notice_label.visible = false
+		_bomb_notice_label.modulate = Color(1, 1, 1, 1)

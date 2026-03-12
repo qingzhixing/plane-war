@@ -40,7 +40,9 @@ var _debug_upgrades_needed: int = 0
 var _bomb_cooldown_remaining: float = 0.0
 
 const _BOMB_COOLDOWN_SECONDS: float = 12.0
-const _BOMB_BURST_BULLET_COUNT: int = 48
+const _BOMB_BURST_WAVE_COUNT: int = 4
+const _BOMB_BURST_WAVE_INTERVAL: float = 0.10
+const _BOMB_BURST_BULLET_COUNT: int = 40
 const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
 
 func _ready() -> void:
@@ -321,11 +323,24 @@ func _trigger_bomb_effect() -> void:
 
 	var bomb_bullet_scene := load(_BOMB_BULLET_SCENE_PATH) as PackedScene
 	if bomb_bullet_scene != null:
+		_fire_bomb_burst_waves(bomb_bullet_scene, origin, player_damage, boss_damage_multiplier)
+
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_enemy_explosion"):
+		audio.play_enemy_explosion()
+	if audio != null and audio.has_method("play_power_up"):
+		audio.play_power_up()
+
+
+func _fire_bomb_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: int, boss_damage_multiplier: float) -> void:
+	for wave in _BOMB_BURST_WAVE_COUNT:
+		var phase_offset := (TAU / float(_BOMB_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
+		var radius := 12.0 + 6.0 * float(wave)
 		for i in _BOMB_BURST_BULLET_COUNT:
-			var angle := TAU * float(i) / float(_BOMB_BURST_BULLET_COUNT)
+			var angle := TAU * float(i) / float(_BOMB_BURST_BULLET_COUNT) + phase_offset
 			var dir := Vector2.RIGHT.rotated(angle)
-			var bomb_bullet := bomb_bullet_scene.instantiate()
-			bomb_bullet.global_position = origin + dir * 12.0
+			var bomb_bullet := bullet_scene.instantiate()
+			bomb_bullet.global_position = origin + dir * radius
 			if "damage" in bomb_bullet:
 				bomb_bullet.damage = player_damage
 			if bomb_bullet.has_method("set_direction"):
@@ -333,12 +348,8 @@ func _trigger_bomb_effect() -> void:
 			if bomb_bullet.has_method("set_boss_damage_multiplier"):
 				bomb_bullet.set_boss_damage_multiplier(boss_damage_multiplier)
 			get_tree().current_scene.add_child(bomb_bullet)
-
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_enemy_explosion"):
-		audio.play_enemy_explosion()
-	if audio != null and audio.has_method("play_power_up"):
-		audio.play_power_up()
+		if wave < _BOMB_BURST_WAVE_COUNT - 1:
+			await get_tree().create_timer(_BOMB_BURST_WAVE_INTERVAL).timeout
 
 
 func _get_combo_multiplier() -> float:
