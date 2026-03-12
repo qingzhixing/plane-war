@@ -11,15 +11,13 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "spread_focus", "name": "火力聚焦", "desc": "需要多弹：显著收束主武器弹道"},
 	{"id": "boss_hunter", "name": "破甲弹头", "desc": "主武器对 Boss 伤害 +20%"},
 
-	# 副武器：弓箭
-	{"id": "weapon_arrow_unlock", "name": "解锁副武器：弓箭", "desc": "获得自动射出的弓箭，预先瞄准最近敌人"},
+	# 副武器：弓箭（由 arrow_multi 首次解锁）
 	{"id": "arrow_cooldown", "name": "弓箭装填加速", "desc": "弓箭自动射击冷却缩短 20%"},
-	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1，子弹略向两侧展开"},
+	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1，未解锁时首次获得会解锁弓箭"},
 
-	# 副武器：回旋镖
-	{"id": "weapon_boomerang_unlock", "name": "解锁副武器：回旋镖", "desc": "获得自动射出的回旋镖，飞到屏幕边缘后回收"},
+	# 副武器：回旋镖（由 boomerang_multi 首次解锁）
 	{"id": "boomerang_cooldown", "name": "回旋镖装填加速", "desc": "回旋镖自动射击冷却缩短 20%"},
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1，起始位置左右错开"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1，未解锁时首次获得会解锁回旋镖"},
 
 	# 通用 / 生存 / 表现
 	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +12%"},
