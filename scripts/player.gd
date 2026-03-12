@@ -148,7 +148,7 @@ func _spawn_arrow_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		var side_offset := Vector2(-dir.y, dir.x) * 12.0 * (i - (n - 1) * 0.5)
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 12.0 * (i - (n - 1) * 0.5)
 		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight", side_offset)
 
 
@@ -161,7 +161,7 @@ func _spawn_boomerang_shot() -> void:
 		# 限制回旋镖只向屏幕上方发射
 		if dir.y > 0.0:
 			dir.y = -dir.y
-		var side_offset := Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
 		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, 0.95, 2, "bullet", "boomerang", side_offset)
 
 
