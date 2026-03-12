@@ -24,6 +24,22 @@
   - 基类脚本：`res://scripts/enemies/EnemyBase.gd`（提供 `max_hp/hp` 与 `apply_damage/_on_dead` 等统一接口）。
   - 基础敌人场景可继续使用如 `res://scenes/enemies/EnemyBasic01.tscn`、`EnemyBasic02.tscn` 等，脚本统一继承 `EnemyBase` 来实现各自的移动与攻击逻辑。
 
+## 视觉反馈与 Shader 约定
+
+- 敌人受击 Shader：
+  - 统一使用 2D `CanvasItem` Shader，实现受击时的变红效果。
+  - Shader 参数约定：
+    - `uniform float hit_strength`：受击强度（0–1），由代码控制；0 为正常状态，1 为全红。
+    - `uniform vec4 hit_tint`：受击染色颜色，默认红色（如 `vec4(1.0, 0.2, 0.2, 1.0)`）。
+  - `EnemyBase` 在 `apply_damage()` 中触发一个短暂的 hit 动画（可用 Tween 或 Process 插值），不改变碰撞逻辑。
+
+- 玩家闪烁与护盾：
+  - 玩家受击后的闪烁使用简单方式实现（Shader 或 `modulate`/`visible` 控制），重点是节奏感与可读性。
+  - 护盾使用独立场景（例如 `res://scenes/vfx/PlayerShield.tscn`），包含：
+    - 护盾 `Sprite2D` + Shader（外圈光晕、轻微扭曲）。
+    - 控制脚本暴露方法：`show_shield() / hide_shield() / play_block_effect()`。
+  - 玩家脚本持有护盾节点引用，在获得护盾时显示，在护盾抵消一次伤害时调用 `play_block_effect()` 并视规则决定是否隐藏。
+
 ## 第一阶段实现目标（代码）
 
 - 在 `Main.tscn` 中实例化玩家：
