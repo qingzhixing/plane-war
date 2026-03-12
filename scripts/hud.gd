@@ -373,9 +373,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey:
 		var e := event as InputEventKey
-		if e.pressed and not e.echo and e.keycode == KEY_SPACE:
-			if _main.has_method("try_use_bomb"):
-				_main.try_use_bomb()
+		if e.pressed and not e.echo:
+			if e.keycode == KEY_SPACE:
+				if _main.has_method("try_use_bomb"):
+					_main.try_use_bomb()
+			elif e.keycode == KEY_ESCAPE:
+				var settings := get_tree().get_first_node_in_group("settings_menu")
+				if settings != null and settings.has_method("show_settings"):
+					settings.show_settings()
 
 
 func _ensure_bomb_vfx_nodes() -> void:
