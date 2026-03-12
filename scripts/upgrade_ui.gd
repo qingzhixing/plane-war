@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+
 const UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
 	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
@@ -34,6 +36,7 @@ func _build_ui() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
+	_root.theme = _DEFAULT_UI_THEME
 	add_child(_root)
 
 	_panel = ColorRect.new()

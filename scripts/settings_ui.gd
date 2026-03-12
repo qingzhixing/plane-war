@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+
 var _root: Control
 var _panel: Panel
 var _bgm_slider: HSlider
@@ -20,6 +22,7 @@ func _ready() -> void:
 
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.theme = _DEFAULT_UI_THEME
 	add_child(_root)
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)

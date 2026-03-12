@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=2 format=3]
 
-[ext_resource type="FontFile" path="res://assets/font/JetBrainsMono[wght].ttf" id="1"]
+[ext_resource type="FontFile" path="res://assets/font/pixelFont-7-8x14-sproutLands.ttf" id="1"]
 
 [resource]
 default_font = ExtResource("1")

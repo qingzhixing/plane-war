@@ -249,9 +249,6 @@ func _ensure_bomb_button() -> void:
 	_bomb_button.add_theme_font_size_override("font_size", 22)
 	if _pixel_bold_font != null:
 		_bomb_button.add_theme_font_override("font", _pixel_bold_font)
-	var icon_tex := load("res://assets/sprites/bullets/Bomb.png") as Texture2D
-	if icon_tex != null:
-		_bomb_button.icon = icon_tex
 	_bomb_button.anchor_left = 0.82
 	_bomb_button.anchor_right = 0.98
 	_bomb_button.anchor_top = 0.86

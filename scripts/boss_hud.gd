@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+
 var _root: Control
 var _name_label: Label
 var _hp_bar: ProgressBar
@@ -10,6 +12,7 @@ func _ready() -> void:
 
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.theme = _DEFAULT_UI_THEME
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_root)

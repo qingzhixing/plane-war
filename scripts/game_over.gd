@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+
 @export var player_path: NodePath
 @export var main_path: NodePath = NodePath("..")
 
@@ -25,6 +27,7 @@ func _ready() -> void:
 	# 复用场景中已有的 GameOver UI 结构：GameOver/Root/... 节点
 	var root := get_node_or_null("Root")
 	if root is Control:
+		(root as Control).theme = _DEFAULT_UI_THEME
 		root.mouse_filter = Control.MOUSE_FILTER_STOP
 		root.visible = false
 		_panel = root.get_node_or_null("Panel") as ColorRect
