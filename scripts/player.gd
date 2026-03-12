@@ -35,6 +35,8 @@ var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
 var _boomerang_auto_timer: float = 0.0
+var _arrow_shot_count: int = 1
+var _boomerang_shot_count: int = 1
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
@@ -141,24 +143,26 @@ func _spawn_default_shot() -> void:
 
 
 func _spawn_arrow_shot() -> void:
-	var n := clampi(max(1, _bullet_count - 1), 1, 3)
-	var spread := 0.05
+	var n := max(1, _arrow_shot_count)
+	var spread := 0.12
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight")
+		var side_offset := Vector2(-dir.y, dir.x) * 12.0 * (i - (n - 1) * 0.5)
+		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight", side_offset)
 
 
 func _spawn_boomerang_shot() -> void:
-	var n := clampi(max(1, _bullet_count - 1), 1, 2)
-	var spread := 0.22
+	var n := max(1, _boomerang_shot_count)
+	var spread := 0.18
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
 		# 限制回旋镖只向屏幕上方发射
 		if dir.y > 0.0:
 			dir.y = -dir.y
-		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, 0.95, 2, "bullet", "boomerang")
+		var side_offset := Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, 0.95, 2, "bullet", "boomerang", side_offset)
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -174,12 +178,12 @@ func _update_side_weapons(delta: float) -> void:
 			_spawn_boomerang_shot()
 
 
-func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String) -> void:
+func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2 = Vector2.ZERO) -> void:
 	if scene_res == null:
 		return
 	var scene := get_tree().current_scene
 	var bullet := scene_res.instantiate()
-	bullet.global_position = global_position + dir * 20.0
+	bullet.global_position = global_position + dir * 20.0 + side_offset
 	if "damage" in bullet:
 		var combo_bonus_damage := float(_combo_damage_bonus)
 		bullet.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
