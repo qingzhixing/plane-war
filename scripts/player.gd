@@ -236,22 +236,22 @@ func set_combo_buff_tier(tier: int) -> void:
 
 	if tier <= 0:
 		return
-	# 前几档保持原设计：轻微叠加移动/伤害
+	# 前几档：明显提升射速，略带移速/伤害加成
 	if tier == 1:
-		_combo_fire_rate_mult = 1.08
+		_combo_fire_rate_mult = 1.15
 	elif tier == 2:
-		_combo_fire_rate_mult = 1.16
+		_combo_fire_rate_mult = 1.30
 		_combo_move_speed_mult = 1.10
 	elif tier == 3:
-		_combo_fire_rate_mult = 1.24
+		_combo_fire_rate_mult = 1.45
 		_combo_move_speed_mult = 1.10
 		_combo_damage_bonus = 1
 	else:
-		# 100 连以上：在第三档基础上，每多一档主要继续提升射速
+		# 100 连以上：在第三档基础上，每多一档继续强化射速
 		var extra_tiers := tier - 3
-		var fire_bonus := 1.24 + 0.04 * float(extra_tiers)
-		# 限制一个上限，避免失控
-		_combo_fire_rate_mult = min(1.80, fire_bonus)
+		var fire_bonus := 1.45 + 0.06 * float(extra_tiers)
+		# 限制一个上限，避免完全失控
+		_combo_fire_rate_mult = min(2.10, fire_bonus)
 		_combo_move_speed_mult = 1.10
 		_combo_bullet_speed_mult = 1.15
 		_combo_damage_bonus = 1
