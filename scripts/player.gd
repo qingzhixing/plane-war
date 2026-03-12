@@ -1,12 +1,9 @@
 extends CharacterBody2D
 
-signal died
-
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
 @export var bullet_scene: PackedScene
-@export var max_hp: float = 12.0
 @export var hit_invulnerable_seconds: float = 0.35
 
 var _fire_timer: float = 0.0
@@ -30,7 +27,6 @@ var _weapon_unlocked: Dictionary = {
 	"arrow": false,
 	"boomerang": false,
 }
-var _hp: float = 0.0
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
@@ -40,7 +36,6 @@ func _ready() -> void:
 	add_to_group("player")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
-	_hp = max_hp
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -171,14 +166,11 @@ func _spawn_configured_bullet(dir: Vector2, damage_bonus: float, speed_mult: flo
 		bullet.set_penetration(penetration)
 	scene.add_child(bullet)
 
-func apply_damage(amount: float) -> void:
+func apply_damage(_amount: float) -> void:
 	if _hit_invulnerable_timer > 0.0:
 		return
 	_hit_invulnerable_timer = hit_invulnerable_seconds
-	_hp = maxf(0.0, _hp - amount)
 	get_tree().call_group("battle_stats_manager", "on_player_hit")
-	if _hp <= 0.0:
-		emit_signal("died")
 
 func get_bullet_count() -> int:
 	return _bullet_count
@@ -193,14 +185,6 @@ func get_bullet_damage() -> int:
 
 func get_boss_damage_multiplier() -> float:
 	return _boss_damage_multiplier
-
-
-func get_hp() -> float:
-	return _hp
-
-
-func get_max_hp() -> float:
-	return max_hp
 
 
 func has_weapon_unlocked(weapon_id: String) -> bool:
@@ -251,9 +235,6 @@ func apply_upgrade(upgrade_id: String) -> void:
 			bullet_speed *= 1.12
 		"damage_percent":
 			_damage_multiplier *= 1.2
-		"hp_up":
-			max_hp += 2.0
-			_hp = minf(max_hp, _hp + 2.0)
 		"spread_focus":
 			# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
 			if _bullet_count > 1:

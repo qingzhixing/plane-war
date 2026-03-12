@@ -2,10 +2,8 @@ extends CanvasLayer
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
-@export var player_path: NodePath
 @export var main_path: NodePath = NodePath("..")
 
-var _player: Node = null
 var _main: Node = null
 var _panel: ColorRect
 var _label: Label
@@ -15,10 +13,6 @@ var _main_menu_btn: Button
 
 func _ready() -> void:
 	add_to_group("game_over_ui")
-	if player_path != NodePath(""):
-		_player = get_node(player_path)
-		if _player != null and _player.has_signal("died"):
-			_player.died.connect(_on_player_died)
 	if main_path != NodePath(""):
 		_main = get_node(main_path)
 
@@ -78,9 +72,6 @@ func show_game_over() -> void:
 		root.visible = true
 	visible = true
 	get_tree().paused = true
-
-func _on_player_died() -> void:
-	show_game_over()
 
 func _on_continue_pressed() -> void:
 	# 旧的“继续游玩 + 回复 HP + 无敌”机制已移除，本函数保留占位以兼容旧场景结构，不再执行任何逻辑。
