@@ -20,10 +20,12 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 
 const _DPS_WINDOW_SECONDS: float = 5.0
-const _COMBO_WINDOW_SECONDS: float = 2.5
+const _BOSS_WAVE_START: int = 8
 
 var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
-var _combo_time_left: float = 0.0
+@onready var _spawner: Node = null
+var _waiting_upgrade_choice: bool = false
+var _pending_boss_spawn: bool = false
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
@@ -37,27 +39,48 @@ func _ready() -> void:
 	add_to_group("experience_listener")
 	add_to_group("battle_stats_manager")
 	level_up.connect(_on_level_up)
-	var wave_timer := Timer.new()
-	wave_timer.wait_time = 12.0
-	wave_timer.timeout.connect(_on_wave_timeout)
-	add_child(wave_timer)
-	wave_timer.start()
+
+	_spawner = get_node_or_null("EnemySpawner")
+	_start_wave()
 
 
 func _process(delta: float) -> void:
 	_update_combo(delta)
 	_update_dps()
 
-func _on_wave_timeout() -> void:
-	_wave += 1
-	# 按波次触发升级，而非经验条
-	emit_signal("level_up")
-	# 第 4 波后尝试生成 Boss，一次性
-	if _wave >= 4 and not _boss_spawned:
-		_spawn_boss()
+
+func _start_wave() -> void:
+	if _boss_spawned:
+		return
+	if _spawner != null and _spawner.has_method("start_wave"):
+		_spawner.start_wave(_wave)
+
 
 func get_wave() -> int:
 	return _wave
+
+
+func on_wave_cleared() -> void:
+	# 一波结束：先触发升级，等玩家选完再进入下一波/Boss
+	if _waiting_upgrade_choice:
+		return
+	_waiting_upgrade_choice = true
+	emit_signal("level_up")
+	_wave += 1
+	# 波次更多：第 8 波后才开始 Boss
+	if _wave >= _BOSS_WAVE_START and not _boss_spawned:
+		_pending_boss_spawn = true
+	else:
+		_pending_boss_spawn = false
+
+
+func on_upgrade_selected() -> void:
+	_waiting_upgrade_choice = false
+	if _pending_boss_spawn and not _boss_spawned:
+		_pending_boss_spawn = false
+		_spawn_boss()
+		return
+	_start_wave()
 
 func _on_level_up() -> void:
 	var p := get_node_or_null(player_path)
@@ -139,27 +162,21 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 func on_player_hit() -> void:
 	if combo > 0:
 		combo = 0
-		_combo_time_left = 0.0
 
 
 func _on_successful_hit() -> void:
-	# 命中敌人时刷新或提升连击
+	# 命中敌人时提升连击，不再因超时自动清空
 	if combo <= 0:
 		combo = 1
 	else:
 		combo += 1
-	_combo_time_left = _COMBO_WINDOW_SECONDS
 	if combo > max_combo:
 		max_combo = combo
 
 
-func _update_combo(delta: float) -> void:
-	if combo <= 0:
-		return
-	_combo_time_left -= delta
-	if _combo_time_left <= 0.0:
-		combo = 0
-		_combo_time_left = 0.0
+func _update_combo(_delta: float) -> void:
+	# 连击由命中累加，被击中时清空；不做超时衰减
+	pass
 
 
 func _update_dps() -> void:

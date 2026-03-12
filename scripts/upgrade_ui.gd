@@ -168,3 +168,5 @@ func _on_card_pressed(card_index: int) -> void:
 		_main.apply_upgrade(upgrade_id)
 	visible = false
 	get_tree().paused = false
+	if _main.has_method("on_upgrade_selected"):
+		_main.on_upgrade_selected()
