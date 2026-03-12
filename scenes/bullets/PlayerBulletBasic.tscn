@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://ci8f61xum8s0h"]
 
-[ext_resource type="Script" uid="uid://ckdxvgbd46ebj" path="res://scripts/bullets/PlayerBulletBasic.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ckdxvgbd46ebj" path="res://scripts/bullets/PlayerBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://w478a7uockj4" path="res://assets/sprites/bullets/bullet_player_basic.png" id="2_tex"]
 
 [sub_resource type="CapsuleShape2D" id="1_shape"]
 radius = 11.666666
 height = 63.333332
 
-[node name="PlayerBulletBasic" type="Area2D" unique_id=1056321540]
+[node name="PlayerBullet" type="Area2D" unique_id=1056321540]
 scale = Vector2(0.7, 0.7)
 script = ExtResource("1_script")
 
