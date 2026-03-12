@@ -38,7 +38,7 @@ func _ready() -> void:
 	add_to_group("battle_stats_manager")
 	level_up.connect(_on_level_up)
 	var wave_timer := Timer.new()
-	wave_timer.wait_time = 28.0
+	wave_timer.wait_time = 12.0
 	wave_timer.timeout.connect(_on_wave_timeout)
 	add_child(wave_timer)
 	wave_timer.start()
@@ -50,6 +50,8 @@ func _process(delta: float) -> void:
 
 func _on_wave_timeout() -> void:
 	_wave += 1
+	# 按波次触发升级，而非经验条
+	emit_signal("level_up")
 	# 第 4 波后尝试生成 Boss，一次性
 	if _wave >= 4 and not _boss_spawned:
 		_spawn_boss()
@@ -74,12 +76,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 		p.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
+	# 经验值仅用于统计，不再直接驱动升级；保留接口以兼容现有代码
 	_exp += int(amount * _exp_multiplier)
-	while _exp >= _exp_to_next:
-		_exp -= _exp_to_next
-		_level += 1
-		_exp_to_next = 10 + (_level - 1) * 3
-		emit_signal("level_up")
 
 func get_exp() -> int:
 	return _exp

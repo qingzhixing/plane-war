@@ -54,3 +54,11 @@ func _play_enemy_explosion_sfx() -> void:
 	if audio != null and audio.has_method("play_enemy_explosion"):
 		audio.play_enemy_explosion()
 
+
+func apply_wave_scaling(wave: int) -> void:
+	if wave <= 1:
+		return
+	var factor := 1.0 + 0.25 * float(wave - 1)
+	max_hp = int(round(float(max_hp) * factor))
+	_hp = max_hp
+

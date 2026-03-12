@@ -32,6 +32,9 @@ func _on_spawn_timeout() -> void:
 		return
 
 	var enemy := scene_to_use.instantiate()
+	# 根据当前波次对敌人耐久度等进行逐波提升
+	if enemy != null and enemy.has_method("apply_wave_scaling"):
+		enemy.apply_wave_scaling(wave)
 	var viewport_rect := get_viewport().get_visible_rect()
 	var x := randf_range(50.0, viewport_rect.size.x - 50.0)
 	enemy.global_position = Vector2(x, -50.0)

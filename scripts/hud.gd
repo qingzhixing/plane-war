@@ -6,6 +6,8 @@ var _player: Node = null
 var _main: Node = null
 var _is_paused: bool = false
 var _combo_base_color: Color = Color.WHITE
+var _combo_base_scale: Vector2 = Vector2.ONE
+var _last_combo_value: int = 0
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _exp_bar: ProgressBar = %ExpBar
@@ -28,6 +30,7 @@ func _ready() -> void:
 	if _combo_label != null:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_combo_base_color = _combo_label.modulate
+		_combo_base_scale = _combo_label.scale
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -126,14 +129,30 @@ func _update_combo_visual(combo: int) -> void:
 	if combo <= 0:
 		_combo_label.text = ""
 		_combo_label.modulate = _combo_base_color
+		_combo_label.scale = _combo_base_scale
+		_last_combo_value = 0
 		return
 
 	_combo_label.text = "Combo: %d" % combo
 
 	var color := _combo_base_color
-	if combo >= 50:
+	if combo >= 100:
+		# 极高连击：彩色变换效果（随时间循环 Hue）
+		var t := float(Time.get_ticks_msec()) / 1000.0
+		var hue := fmod(t * 0.6, 1.0)
+		color = Color.from_hsv(hue, 0.9, 1.0)
+	elif combo >= 50:
 		color = Color(1.0, 0.35, 0.2) # 高连击：偏红橙
 	elif combo >= 10:
 		color = Color(1.0, 0.85, 0.3) # 中连击：偏亮黄
 
 	_combo_label.modulate = color
+
+	# Combo 增加时的瞬间放大效果
+	if combo > _last_combo_value:
+		var tween := create_tween()
+		_combo_label.scale = _combo_base_scale
+		tween.tween_property(_combo_label, "scale", _combo_base_scale * 1.2, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+	_last_combo_value = combo
