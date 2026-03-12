@@ -12,6 +12,11 @@ var _last_combo_feedback_value: int = 0
 var _combo_notice_timer: float = 0.0
 var _combo_break_timer: float = 0.0
 var _combo_notice_label: Label = null
+var _combo_edge_top: ColorRect = null
+var _combo_edge_bottom: ColorRect = null
+var _combo_edge_left: ColorRect = null
+var _combo_edge_right: ColorRect = null
+var _combo_full_tint: ColorRect = null
 var _bomb_flash_rect: ColorRect = null
 var _bomb_notice_label: Label = null
 @onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
@@ -41,6 +46,7 @@ func _ready() -> void:
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
 	_ensure_combo_notice_label()
+	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -94,6 +100,7 @@ func _process(delta: float) -> void:
 		if _combo_label != null:
 			_update_combo_visual(c)
 			_update_combo_feedback(c, delta)
+		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 		_update_bomb_button()
@@ -221,6 +228,108 @@ func _ensure_combo_notice_label() -> void:
 	_combo_notice_label.anchor_top = 0.20
 	_combo_notice_label.anchor_bottom = 0.26
 	root.add_child(_combo_notice_label)
+
+
+func _ensure_combo_screen_vfx_nodes() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null:
+		return
+	# 边缘流光层：用于高 combo 的全屏氛围反馈
+	_combo_edge_top = ColorRect.new()
+	_combo_edge_top.visible = false
+	_combo_edge_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_edge_top.anchor_left = 0.0
+	_combo_edge_top.anchor_right = 1.0
+	_combo_edge_top.anchor_top = 0.0
+	_combo_edge_top.anchor_bottom = 0.0
+	_combo_edge_top.offset_bottom = 16.0
+	root.add_child(_combo_edge_top)
+
+	_combo_edge_bottom = ColorRect.new()
+	_combo_edge_bottom.visible = false
+	_combo_edge_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_edge_bottom.anchor_left = 0.0
+	_combo_edge_bottom.anchor_right = 1.0
+	_combo_edge_bottom.anchor_top = 1.0
+	_combo_edge_bottom.anchor_bottom = 1.0
+	_combo_edge_bottom.offset_top = -16.0
+	root.add_child(_combo_edge_bottom)
+
+	_combo_edge_left = ColorRect.new()
+	_combo_edge_left.visible = false
+	_combo_edge_left.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_edge_left.anchor_left = 0.0
+	_combo_edge_left.anchor_right = 0.0
+	_combo_edge_left.anchor_top = 0.0
+	_combo_edge_left.anchor_bottom = 1.0
+	_combo_edge_left.offset_right = 16.0
+	root.add_child(_combo_edge_left)
+
+	_combo_edge_right = ColorRect.new()
+	_combo_edge_right.visible = false
+	_combo_edge_right.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_edge_right.anchor_left = 1.0
+	_combo_edge_right.anchor_right = 1.0
+	_combo_edge_right.anchor_top = 0.0
+	_combo_edge_right.anchor_bottom = 1.0
+	_combo_edge_right.offset_left = -16.0
+	root.add_child(_combo_edge_right)
+
+	_combo_full_tint = ColorRect.new()
+	_combo_full_tint.visible = false
+	_combo_full_tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_combo_full_tint.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_combo_full_tint.set_offsets_preset(Control.PRESET_FULL_RECT)
+	_combo_full_tint.color = Color(1, 1, 1, 0.0)
+	root.add_child(_combo_full_tint)
+
+
+func _update_combo_screen_vfx(combo: int) -> void:
+	if _combo_edge_top == null or _combo_edge_bottom == null or _combo_edge_left == null or _combo_edge_right == null:
+		return
+	if combo < 10:
+		_set_combo_edge_visibility(false)
+		if _combo_full_tint != null:
+			_combo_full_tint.visible = false
+		return
+
+	_set_combo_edge_visibility(true)
+
+	var t := float(Time.get_ticks_msec()) / 1000.0
+	var edge_alpha := 0.10
+	var speed := 0.9
+	if combo >= 25:
+		edge_alpha = 0.16
+		speed = 1.2
+	if combo >= 50:
+		edge_alpha = 0.24
+		speed = 1.6
+
+	if combo >= 100:
+		var hue := fmod(t * 0.35, 1.0)
+		_combo_edge_top.color = Color.from_hsv(hue, 0.85, 1.0, edge_alpha + 0.05)
+		_combo_edge_right.color = Color.from_hsv(fmod(hue + 0.25, 1.0), 0.85, 1.0, edge_alpha + 0.05)
+		_combo_edge_bottom.color = Color.from_hsv(fmod(hue + 0.50, 1.0), 0.85, 1.0, edge_alpha + 0.05)
+		_combo_edge_left.color = Color.from_hsv(fmod(hue + 0.75, 1.0), 0.85, 1.0, edge_alpha + 0.05)
+		if _combo_full_tint != null:
+			_combo_full_tint.visible = true
+			_combo_full_tint.color = Color.from_hsv(fmod(hue + 0.12, 1.0), 0.35, 0.95, 0.12)
+	else:
+		var pulse := 0.5 + 0.5 * sin(t * speed * TAU * 0.35)
+		var warm := Color(1.0, 0.55, 0.25, edge_alpha * (0.75 + 0.25 * pulse))
+		_combo_edge_top.color = warm
+		_combo_edge_right.color = warm
+		_combo_edge_bottom.color = warm
+		_combo_edge_left.color = warm
+		if _combo_full_tint != null:
+			_combo_full_tint.visible = false
+
+
+func _set_combo_edge_visibility(is_enabled: bool) -> void:
+	_combo_edge_top.visible = is_enabled
+	_combo_edge_bottom.visible = is_enabled
+	_combo_edge_left.visible = is_enabled
+	_combo_edge_right.visible = is_enabled
 
 
 func _play_combo_break_sfx() -> void:
