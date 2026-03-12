@@ -5,6 +5,6 @@ func _ready() -> void:
 	super._ready()
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
-		sprite.texture = preload("res://assets/sprites/bullets/bullet_player_basic.png")
-		sprite.scale = Vector2(0.04, 0.04)
+		# 贴图和尺寸完全由 PlayerBombBullet.tscn 场景控制，这里不再改动
+		pass
 

@@ -45,7 +45,7 @@ const _BOMB_COOLDOWN_SECONDS: float = 12.0
 const _BOMB_BURST_WAVE_COUNT: int = 4
 const _BOMB_BURST_WAVE_INTERVAL: float = 0.10
 const _BOMB_BURST_BULLET_COUNT: int = 40
-const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBombBullet.tscn"
+const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBulletBasic.tscn"
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围

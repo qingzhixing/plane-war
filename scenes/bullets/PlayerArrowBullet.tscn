@@ -8,7 +8,6 @@ radius = 5.0
 height = 63.333332
 
 [node name="PlayerArrowBullet" type="Area2D" unique_id=1261596071]
-scale = Vector2(3, 3)
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1385904890]

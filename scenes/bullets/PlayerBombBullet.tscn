@@ -7,7 +7,7 @@
 radius = 5.7142854
 
 [node name="PlayerBombBullet" type="Area2D" unique_id=1603350073]
-scale = Vector2(2, 2)
+scale = Vector2(3, 3)
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=913872009]

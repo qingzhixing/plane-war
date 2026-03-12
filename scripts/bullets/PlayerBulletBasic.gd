@@ -6,5 +6,4 @@ func _ready() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
 		sprite.texture = preload("res://assets/sprites/bullets/bullet_player_basic.png")
-		sprite.scale = Vector2(0.04, 0.04)
 
