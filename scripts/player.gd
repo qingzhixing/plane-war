@@ -17,6 +17,10 @@ const _max_bullet_count: int = 6
 var _spread_rad_per_bullet: float = 0.12
 const _min_spread_rad_per_bullet: float = 0.015
 var _boss_damage_multiplier: float = 1.0
+var _combo_fire_rate_mult: float = 1.0
+var _combo_move_speed_mult: float = 1.0
+var _combo_bullet_speed_mult: float = 1.0
+var _combo_damage_bonus: int = 0
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
 func _ready() -> void:
@@ -73,7 +77,7 @@ func _update_movement(delta: float) -> void:
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
 		dir.x += 1.0
 	if dir != Vector2.ZERO:
-		global_position += dir.normalized() * move_speed * keyboard_speed_multiplier * delta
+		global_position += dir.normalized() * move_speed * _combo_move_speed_mult * keyboard_speed_multiplier * delta
 
 	var viewport_rect := get_viewport_rect()
 	var margin := 16.0
@@ -83,10 +87,13 @@ func _update_movement(delta: float) -> void:
 	global_position = clamped
 
 func _update_shooting(delta: float) -> void:
+	var effective_interval := fire_interval / maxf(0.1, _combo_fire_rate_mult)
+	if _fire_timer > effective_interval:
+		_fire_timer = effective_interval
 	_fire_timer -= delta
 	_shoot_sfx_timer -= delta
 	if _fire_timer <= 0.0:
-		_fire_timer = fire_interval
+		_fire_timer = effective_interval
 		_spawn_bullet()
 		_play_shoot_sfx()
 
@@ -101,9 +108,9 @@ func _spawn_bullet() -> void:
 		var bullet := bullet_scene.instantiate()
 		bullet.global_position = global_position + Vector2(0, -20)
 		if "damage" in bullet:
-			bullet.damage = bullet_damage
+			bullet.damage = bullet_damage + _combo_damage_bonus
 		if "speed" in bullet:
-			bullet.speed = bullet_speed
+			bullet.speed = bullet_speed * _combo_bullet_speed_mult
 		if bullet.has_method("set_direction"):
 			bullet.set_direction(dir)
 		if bullet.has_method("set_boss_damage_multiplier"):
@@ -126,6 +133,29 @@ func get_bullet_damage() -> int:
 
 func get_boss_damage_multiplier() -> float:
 	return _boss_damage_multiplier
+
+
+func set_combo_buff_tier(tier: int) -> void:
+	_combo_fire_rate_mult = 1.0
+	_combo_move_speed_mult = 1.0
+	_combo_bullet_speed_mult = 1.0
+	_combo_damage_bonus = 0
+
+	match tier:
+		1:
+			_combo_fire_rate_mult = 1.08
+		2:
+			_combo_fire_rate_mult = 1.08
+			_combo_move_speed_mult = 1.10
+		3:
+			_combo_fire_rate_mult = 1.08
+			_combo_move_speed_mult = 1.10
+			_combo_damage_bonus = 1
+		4:
+			_combo_fire_rate_mult = 1.35
+			_combo_move_speed_mult = 1.20
+			_combo_bullet_speed_mult = 1.15
+			_combo_damage_bonus = 1
 
 
 func release_pointer() -> void:

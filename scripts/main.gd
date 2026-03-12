@@ -18,6 +18,7 @@ var _score_multiplier: float = 1.0
 var _flat_score_bonus: int = 0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
+var _last_combo_buff_tier: int = -1
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -65,6 +66,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_update_combo(delta)
+	_update_combo_buffs()
 	_update_dps()
 	_update_bomb(delta)
 
@@ -276,6 +278,16 @@ func _update_combo(_delta: float) -> void:
 	pass
 
 
+func _update_combo_buffs() -> void:
+	var tier := _get_combo_buff_tier(combo)
+	if tier == _last_combo_buff_tier:
+		return
+	_last_combo_buff_tier = tier
+	var p := get_node_or_null(player_path)
+	if p != null and p.has_method("set_combo_buff_tier"):
+		p.set_combo_buff_tier(tier)
+
+
 func _update_dps() -> void:
 	var now: float = float(Time.get_ticks_msec()) / 1000.0
 	var cutoff := now - _DPS_WINDOW_SECONDS
@@ -363,6 +375,18 @@ func _get_combo_multiplier() -> float:
 		return 2.0
 	else:
 		return 3.0
+
+
+func _get_combo_buff_tier(current_combo: int) -> int:
+	if current_combo >= 100:
+		return 4
+	if current_combo >= 50:
+		return 3
+	if current_combo >= 25:
+		return 2
+	if current_combo >= 10:
+		return 1
+	return 0
 
 
 func _load_records() -> void:

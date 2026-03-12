@@ -107,11 +107,11 @@ text = "DPS: 0  Max: 0"
 [node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 195.0
-offset_top = 385.0
-offset_right = 534.0
+offset_left = 1.0
+offset_top = 350.0
+offset_right = 721.0
 offset_bottom = 476.0
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 74
 text = "Combo: XXX"
 horizontal_alignment = 1
 vertical_alignment = 1
