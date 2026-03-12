@@ -48,19 +48,40 @@ func _ready() -> void:
 func show_game_over() -> void:
 	# 更新结算信息：以评分与表现为核心
 	if _label != null and _main != null:
+		var diff := {}
 		if _main.has_method("finalize_battle_records"):
-			_main.finalize_battle_records()
+			diff = _main.finalize_battle_records()
 		var lines: Array[String] = []
+		var highlights: Array[String] = []
 		if _main.has_method("get_score"):
-			lines.append("Score: %d" % _main.get_score())
+			var s := _main.get_score()
+			lines.append("Score: %d" % s)
+			if "score" in diff and diff["score"].get("is_new", false):
+				var old_s := int(diff["score"].get("old", 0))
+				highlights.append("New Best Score: %d → %d" % [old_s, s])
 		if _main.has_method("get_max_combo"):
-			lines.append("Max Combo: %d" % _main.get_max_combo())
+			var mc := _main.get_max_combo()
+			lines.append("Max Combo: %d" % mc)
+			if "combo" in diff and diff["combo"].get("is_new", false):
+				var old_c := int(diff["combo"].get("old", 0))
+				highlights.append("New Best Combo: %d → %d" % [old_c, mc])
 		if _main.has_method("get_max_dps"):
-			lines.append("Max DPS: %.0f" % _main.get_max_dps())
+			var md := _main.get_max_dps()
+			lines.append("Max DPS: %.0f" % md)
+			if "dps" in diff and diff["dps"].get("is_new", false):
+				var old_d := float(diff["dps"].get("old", 0.0))
+				highlights.append("New Best DPS: %.0f → %.0f" % [old_d, md])
 		if _main.has_method("get_best_score"):
 			lines.append("Best Score: %d" % _main.get_best_score())
 		if _main.has_method("get_best_dps"):
 			lines.append("Best DPS: %.0f" % _main.get_best_dps())
+		if _main.has_method("get_best_combo"):
+			lines.append("Best Combo: %d" % _main.get_best_combo())
+		if not highlights.is_empty():
+			lines.append("")
+			lines.append("New Records:")
+			for h in highlights:
+				lines.append(" - " + h)
 		if lines.is_empty():
 			lines.append("Battle Summary")
 		_label.text = "\n".join(lines)

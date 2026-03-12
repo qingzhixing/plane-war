@@ -227,20 +227,42 @@ func get_best_dps() -> float:
 	return best_dps
 
 
-func finalize_battle_records() -> bool:
+func finalize_battle_records() -> Dictionary:
+	var diff := {
+		"score": {
+			"old": best_score,
+			"new": score,
+			"is_new": false,
+		},
+		"dps": {
+			"old": best_dps,
+			"new": max_dps,
+			"is_new": false,
+		},
+		"combo": {
+			"old": best_combo,
+			"new": max_combo,
+			"is_new": false,
+		},
+	}
+
 	var changed := false
 	if score > best_score:
 		best_score = score
 		changed = true
+		diff["score"]["is_new"] = true
 	if max_dps > best_dps:
 		best_dps = max_dps
 		changed = true
+		diff["dps"]["is_new"] = true
 	if max_combo > best_combo:
 		best_combo = max_combo
 		changed = true
+		diff["combo"]["is_new"] = true
 	if changed:
 		_save_records()
-	return changed
+	diff["any_new"] = changed
+	return diff
 
 
 func record_player_damage(amount: float, _target: Node) -> void:
