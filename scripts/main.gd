@@ -40,6 +40,8 @@ var _debug_upgrades_needed: int = 0
 var _bomb_cooldown_remaining: float = 0.0
 
 const _BOMB_COOLDOWN_SECONDS: float = 12.0
+const _BOMB_BURST_BULLET_COUNT: int = 48
+const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
@@ -301,13 +303,37 @@ func _update_bomb(delta: float) -> void:
 
 
 func _trigger_bomb_effect() -> void:
-	# 符卡效果：清空敌弹，并对场上敌人造成高额伤害（用于休闲兜底）
+	# 符卡效果：清空敌弹，并以玩家为中心发射 360° 大量我方子弹
 	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(bullet):
 			bullet.queue_free()
-	for enemy in get_tree().get_nodes_in_group("enemy"):
-		if is_instance_valid(enemy) and enemy.has_method("apply_damage"):
-			enemy.apply_damage(9999)
+
+	var player := get_node_or_null(player_path)
+	var origin := get_viewport().get_visible_rect().size * 0.5
+	var player_damage := 1
+	var boss_damage_multiplier := 1.0
+	if player != null:
+		origin = player.global_position
+		if player.has_method("get_bullet_damage"):
+			player_damage = int(player.get_bullet_damage())
+		if player.has_method("get_boss_damage_multiplier"):
+			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
+
+	var bomb_bullet_scene := load(_BOMB_BULLET_SCENE_PATH) as PackedScene
+	if bomb_bullet_scene != null:
+		for i in _BOMB_BURST_BULLET_COUNT:
+			var angle := TAU * float(i) / float(_BOMB_BURST_BULLET_COUNT)
+			var dir := Vector2.RIGHT.rotated(angle)
+			var bomb_bullet := bomb_bullet_scene.instantiate()
+			bomb_bullet.global_position = origin + dir * 12.0
+			if "damage" in bomb_bullet:
+				bomb_bullet.damage = player_damage
+			if bomb_bullet.has_method("set_direction"):
+				bomb_bullet.set_direction(dir)
+			if bomb_bullet.has_method("set_boss_damage_multiplier"):
+				bomb_bullet.set_boss_damage_multiplier(boss_damage_multiplier)
+			get_tree().current_scene.add_child(bomb_bullet)
+
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_enemy_explosion"):
 		audio.play_enemy_explosion()

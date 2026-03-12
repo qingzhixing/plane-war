@@ -119,6 +119,15 @@ func get_bullet_count() -> int:
 func get_max_bullet_count() -> int:
 	return _max_bullet_count
 
+
+func get_bullet_damage() -> int:
+	return bullet_damage
+
+
+func get_boss_damage_multiplier() -> float:
+	return _boss_damage_multiplier
+
+
 func release_pointer() -> void:
 	_has_pointer = false
 
