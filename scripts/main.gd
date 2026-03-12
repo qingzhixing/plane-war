@@ -273,14 +273,7 @@ func _debug_skip_to_boss() -> void:
 		if is_instance_valid(b):
 			b.queue_free()
 
-	# 模拟前几波的升级（这里简单采用固定升级：交替提升射速与伤害）
-	var simulated_waves := _BOSS_WAVE_START - 1
-	for i in simulated_waves:
-		if i % 2 == 0:
-			apply_upgrade("fire_rate")
-		else:
-			apply_upgrade("damage")
-
+	# 不再自动模拟前几波的升级，保留玩家当前构筑，方便手动体验不同成长路线
 	_wave = _BOSS_WAVE_START
 	_waiting_upgrade_choice = false
 	_pending_boss_spawn = false
