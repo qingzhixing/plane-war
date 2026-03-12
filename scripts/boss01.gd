@@ -92,6 +92,8 @@ func apply_damage(amount: int) -> void:
 		_on_dead()
 		return
 
+	_play_boss_injured_sfx()
+
 	# 进入阶段 B：HP 低于 50% 时
 	if not _phase_b and float(_hp) <= float(max_hp) * 0.5:
 		_phase_b = true
@@ -102,6 +104,7 @@ func apply_damage(amount: int) -> void:
 func _on_dead() -> void:
 	_hp = 0
 	_update_boss_hud()
+	_play_boss_explosion_sfx()
 	get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 	get_tree().call_group("game_over_ui", "show_game_over")
 	queue_free()
@@ -119,3 +122,19 @@ func _update_boss_hud() -> void:
 	var hud := get_tree().get_first_node_in_group("boss_hud")
 	if hud != null and hud.has_method("set_boss_hp"):
 		hud.set_boss_hp(_hp, max_hp)
+
+
+func _get_audio_manager() -> Node:
+	return get_tree().get_first_node_in_group("audio_manager")
+
+
+func _play_boss_injured_sfx() -> void:
+	var audio := _get_audio_manager()
+	if audio != null and audio.has_method("play_enemy_injured"):
+		audio.play_enemy_injured()
+
+
+func _play_boss_explosion_sfx() -> void:
+	var audio := _get_audio_manager()
+	if audio != null and audio.has_method("play_enemy_explosion"):
+		audio.play_enemy_explosion()

@@ -8,12 +8,14 @@ func _ready() -> void:
 	add_to_group("boss_hud")
 
 	_root = Control.new()
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_root)
 
 	var panel := ColorRect.new()
 	panel.color = Color(0, 0, 0, 0.4)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.custom_minimum_size = Vector2(0, 40)
 	panel.anchor_left = 0.0
 	panel.anchor_top = 0.0
