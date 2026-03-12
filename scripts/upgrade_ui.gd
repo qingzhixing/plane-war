@@ -1,14 +1,30 @@
 extends CanvasLayer
 
+const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+
 const UPGRADES: Array[Dictionary] = [
-	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
-	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
-	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage", "name": "伤害+1", "desc": "每发子弹伤害 +1"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
-	{"id": "exp_up", "name": "经验加成", "desc": "获得经验 +20%"},
+	# 主武器：基础子弹
+	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器射速 +15%"},
+	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
+	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
+	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
+	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
+	{"id": "boss_hunter", "name": "要害瞄准", "desc": "主武器对 Boss 伤害 +20%"},
+
+	# 副武器：弓箭（由 arrow_multi 首次解锁）
+	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
+	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁"},
+
+	# 副武器：回旋镖（由 boomerang_multi 首次解锁）
+	{"id": "boomerang_cooldown", "name": "回旋加速", "desc": "回旋镖冷却 -20%"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁"},
+
+	# 通用 / 生存 / 表现
+	{"id": "move_speed", "name": "高机动机体", "desc": "移动速度 +12%"},
+	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
+	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
+	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
+	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
 var _root: Control
@@ -30,6 +46,7 @@ func _build_ui() -> void:
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
+	_root.theme = _DEFAULT_UI_THEME
 	add_child(_root)
 
 	_panel = ColorRect.new()
@@ -126,15 +143,46 @@ func show_pick() -> void:
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
+	var bullet_count: int = 1
+	var arrow_unlocked: bool = false
+	var boomerang_unlocked: bool = false
 	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
-		at_max_bullets = player.get_bullet_count() >= player.get_max_bullet_count()
+		bullet_count = player.get_bullet_count()
+		at_max_bullets = bullet_count >= player.get_max_bullet_count()
+	if player != null and player.has_method("has_weapon_unlocked"):
+		arrow_unlocked = player.has_weapon_unlocked("arrow")
+		boomerang_unlocked = player.has_weapon_unlocked("boomerang")
 	for u in UPGRADES:
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
+		if u["id"] == "spread_focus" and bullet_count <= 1:
+			continue
+		if u["id"] == "arrow_cooldown" and not arrow_unlocked:
+			continue
+		if u["id"] == "boomerang_cooldown" and not boomerang_unlocked:
+			continue
 		pool.append(u)
 	pool.shuffle()
-	for i in min(3, pool.size()):
-		var u: Dictionary = pool[i]
+	var pick_count: int = min(3, pool.size())
+	var chosen: Array[Dictionary] = []
+	for i in pick_count:
+		chosen.append(pool[i])
+	# 保证至少出现 1 张直接战斗收益词条，避免鸡肋三选
+	var has_combat_card := false
+	for c in chosen:
+		if _is_direct_combat_upgrade(c["id"]):
+			has_combat_card = true
+			break
+	if not has_combat_card:
+		for c in pool:
+			if _is_direct_combat_upgrade(c["id"]):
+				if chosen.is_empty():
+					chosen.append(c)
+				else:
+					chosen[0] = c
+				break
+	for i in chosen.size():
+		var u: Dictionary = chosen[i]
 		var card: Dictionary = _cards[i]
 		var title_label := card["title_label"] as Label
 		var desc_label := card["desc_label"] as Label
@@ -148,7 +196,7 @@ func show_pick() -> void:
 			btn.set_meta("upgrade_id", u["id"])
 		if root != null:
 			root.visible = true
-	for i in range(min(3, pool.size()), 3):
+	for i in range(chosen.size(), 3):
 		var card_hidden: Dictionary = _cards[i]
 		var root_hidden := card_hidden["root"] as Control
 		if root_hidden != null:
@@ -166,5 +214,29 @@ func _on_card_pressed(card_index: int) -> void:
 	var upgrade_id: String = btn.get_meta("upgrade_id")
 	if _main.has_method("apply_upgrade"):
 		_main.apply_upgrade(upgrade_id)
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_power_up"):
+		audio.play_power_up()
 	visible = false
 	get_tree().paused = false
+	if _main.has_method("on_upgrade_selected"):
+		_main.on_upgrade_selected()
+
+
+func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
+	return upgrade_id in [
+		"fire_rate",
+		"damage_percent",
+		"multi_shot",
+		"bullet_speed",
+		"spread_focus",
+		"boss_hunter",
+		"arrow_cooldown",
+		"arrow_multi",
+		"boomerang_cooldown",
+		"boomerang_multi",
+		"move_speed",
+		"combo_boost",
+		"combo_guard",
+		"bomb_cooldown",
+	]

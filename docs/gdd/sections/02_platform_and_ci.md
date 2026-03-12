@@ -19,21 +19,19 @@
     - Demo 阶段：可先使用调试签名
     - 需要稳定升级/安装时：CI 注入 keystore（推荐），避免每次签名变化导致无法覆盖安装
 
-## 当前工程与 CI 约定（已落地）
+## 当前工程与 CI 约定（仅保留约定，不写死实现）
 
-- **Godot 版本**：4.5（`project.godot` 中 `config/features` 已包含 `"4.5"`）。
-- **主场景**：`res://scenes/Main.tscn`（在 `project.godot` 中通过 UID 引用）。
-- **窗口分辨率**：竖屏 720×1280，`renderer/rendering_method="mobile"`。
+- **Godot 版本约定**：统一使用同一大版本（4.x），具体子版本由工程配置与 CI 工作流保持一致。
+- **主场景约定**：游戏有一个固定的主场景入口（例如 `Main`），在项目配置与 CI 中应保持一致引用。
+- **分辨率与渲染约定**：竖屏 720×1280 为目标设计分辨率，渲染采用适合移动端的模式（如移动优化管线），具体开关由工程配置决定。
 
-### GitHub Actions CI 约定
+### GitHub Actions CI 约定（抽象）
 
-- **导出模板获取**：在 CI 中下载安装 Godot 4.5 对应的导出模板（使用官方提供的 Linux headless + export templates 包）。
+- **导出模板获取**：CI 需要自动安装对应 Godot 版本的导出模板（headless + export templates），避免手动干预。
 - **Windows 导出**：
-  - 使用 `godot --headless --export-release "Windows Desktop" build/plane-war-windows.exe`。
-  - 将生成的 exe 与必要资源打包为 zip，作为 Actions artifact。
+  - CI 中应导出一个可在 Windows 上直接运行的构建产物（例如 exe + 必要资源的压缩包）。
 - **Android 导出**：
-  - 使用调试签名导出 APK：`godot --headless --export-release "Android" build/plane-war-android.apk`。
-  - 后续如需稳定升级，再在 CI 中注入 keystore 与签名配置。
-- **工作流触发**：`push` 与 `pull_request` 时自动运行构建，产物通过 Actions artifacts 提供下载验证。
+  - CI 中应能生成可安装到设备上的 APK（或后续 AAB），并预留可替换签名配置的能力。
+- **工作流触发**：`push` 与 `pull_request` 时自动运行构建，将产物作为 CI artifacts 提供下载验证。
 
 
