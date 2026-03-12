@@ -5,6 +5,7 @@ extends CanvasLayer
 var _player: Node = null
 var _main: Node = null
 var _is_paused: bool = false
+var _combo_base_color: Color = Color.WHITE
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _exp_bar: ProgressBar = %ExpBar
@@ -26,6 +27,7 @@ func _ready() -> void:
 		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _combo_label != null:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_combo_base_color = _combo_label.modulate
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -78,10 +80,7 @@ func _process(_delta: float) -> void:
 		if _score_label != null:
 			_score_label.text = "Score: %d" % s
 		if _combo_label != null:
-			if c > 0:
-				_combo_label.text = "Combo: %d" % c
-			else:
-				_combo_label.text = ""
+			_update_combo_visual(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 
@@ -119,3 +118,22 @@ func _update_pause_button_text() -> void:
 		_pause_button.text = "继续"
 	else:
 		_pause_button.text = "暂停"
+
+
+func _update_combo_visual(combo: int) -> void:
+	if _combo_label == null:
+		return
+	if combo <= 0:
+		_combo_label.text = ""
+		_combo_label.modulate = _combo_base_color
+		return
+
+	_combo_label.text = "Combo: %d" % combo
+
+	var color := _combo_base_color
+	if combo >= 50:
+		color = Color(1.0, 0.35, 0.2) # 高连击：偏红橙
+	elif combo >= 10:
+		color = Color(1.0, 0.85, 0.3) # 中连击：偏亮黄
+
+	_combo_label.modulate = color
