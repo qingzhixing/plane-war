@@ -39,9 +39,9 @@
 ## 本轮新增资源接入约定（MVP）
 
 - 子弹贴图：
-  - 玩家子弹优先使用 `res://assets/sprites/bullets/Gun.png`
-  - 敌方基础子弹优先使用 `res://assets/sprites/bullets/Arrow.png`
-  - 符卡/炸弹相关 UI 与演出可使用 `res://assets/sprites/bullets/Bomb.png`
+  - 玩家子弹优先使用 `res://assets/sprites/bullets/bullet_player_basic.png`
+  - 敌方基础子弹优先使用 `res://assets/sprites/bullets/bullet_enemy_basic.png`
+  - 符卡/炸弹 UI 默认使用文字或独立单帧图，不直接使用多帧 sprite sheet
 - 玩家反馈音效：
   - 开火：`res://assets/SFX/player/Shoot.wav`
   - 受击/失误：`res://assets/SFX/player/hurt.wav`
@@ -52,6 +52,6 @@
   - `res://assets/font/pixelFont-7-8x14-sproutLands.ttf`
 
 > 新增资源应优先沿用上述目录，避免散落在 `assets/` 根目录导致后续维护困难。
-
+>
 > 如需在极早期阶段临时用占位图，只作为开发便捷手段使用，尽快由正式资源替换。
 >
