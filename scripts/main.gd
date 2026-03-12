@@ -26,6 +26,7 @@ var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
 @onready var _spawner: Node = null
 var _waiting_upgrade_choice: bool = false
 var _pending_boss_spawn: bool = false
+var _debug_skip_to_boss_used: bool = false
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
@@ -227,6 +228,9 @@ func _spawn_boss() -> void:
 		return
 	_boss_spawned = true
 
+	# 确保进入 Boss 关时游戏不处于暂停状态
+	get_tree().paused = false
+
 	# 停止刷普通敌人
 	var spawner := get_node_or_null("EnemySpawner")
 	if spawner != null:
@@ -250,3 +254,34 @@ func _spawn_boss() -> void:
 	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
 	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
 	get_tree().current_scene.add_child(boss)
+
+
+func _debug_skip_to_boss() -> void:
+	# 调试工具：一键跳到 Boss 关，并模拟前几波的升级效果
+	if _debug_skip_to_boss_used:
+		return
+	_debug_skip_to_boss_used = true
+
+	# 防止在暂停状态下跳关导致无法触控
+	get_tree().paused = false
+
+	# 清理当前敌人和敌方子弹
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+	for b in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(b):
+			b.queue_free()
+
+	# 模拟前几波的升级（这里简单采用固定升级：交替提升射速与伤害）
+	var simulated_waves := _BOSS_WAVE_START - 1
+	for i in simulated_waves:
+		if i % 2 == 0:
+			apply_upgrade("fire_rate")
+		else:
+			apply_upgrade("damage")
+
+	_wave = _BOSS_WAVE_START
+	_waiting_upgrade_choice = false
+	_pending_boss_spawn = false
+	_spawn_boss()

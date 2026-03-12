@@ -1,8 +1,8 @@
 extends Area2D
 
 @export var max_hp: int = 180
-@export var fire_interval_phase_a: float = 2.0
-@export var fire_interval_phase_b: float = 4.0
+@export var fire_interval_phase_a: float = 2.8
+@export var fire_interval_phase_b: float = 5.0
 @export var bullet_scene: PackedScene
 @export var score_value: int = 500
 
@@ -53,7 +53,8 @@ func _fire_phase_a() -> void:
 	# 规律散射 + 可预判扇形
 	if bullet_scene == null:
 		return
-	var count: int = 12
+	# 子弹更稀疏：减少数量，拉开角度间隔
+	var count: int = 8
 	# 朝下（玩家方向）发射：约 90° 扇形，中心向下
 	var start_angle := PI * 0.25
 	var end_angle := PI * 0.75

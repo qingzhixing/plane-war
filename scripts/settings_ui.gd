@@ -126,6 +126,15 @@ func _ready() -> void:
 	end_run_button.pressed.connect(_on_end_run_pressed)
 	vbox.add_child(end_run_button)
 
+	# 跳到 Boss 关（调试用）
+	var skip_boss_button := Button.new()
+	skip_boss_button.text = "跳到 Boss（调试）"
+	skip_boss_button.custom_minimum_size = Vector2(220, 64)
+	skip_boss_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	skip_boss_button.add_theme_font_size_override("font_size", 24)
+	skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
+	vbox.add_child(skip_boss_button)
+
 
 func show_settings() -> void:
 	_is_from_menu = false
@@ -153,6 +162,15 @@ func _on_end_run_pressed() -> void:
 	if game_over != null and game_over.has_method("show_game_over"):
 		visible = false
 		game_over.show_game_over()
+
+
+func _on_skip_to_boss_pressed() -> void:
+	# 从设置面板触发跳关到 Boss（仅调试使用）
+	var main := get_tree().current_scene
+	if main != null and main.has_method("_debug_skip_to_boss"):
+		visible = false
+		get_tree().paused = false
+		main._debug_skip_to_boss()
 
 
 func _get_audio_manager() -> Node:
