@@ -98,12 +98,24 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not is_instance_valid(_main):
+		return
 	if event is InputEventKey:
 		var e := event as InputEventKey
-		if e.keycode == KEY_P and e.pressed and not e.echo:
-			var ui := _main.get_node_or_null("UpgradeUI")
-			if ui == null or not ui.visible:
-				_on_pause_button_pressed()
+		if not e.pressed or e.echo:
+			return
+		match e.keycode:
+			KEY_P:
+				var ui := _main.get_node_or_null("UpgradeUI")
+				if ui == null or not ui.visible:
+					_on_pause_button_pressed()
+			KEY_SPACE:
+				if _main.has_method("try_use_bomb"):
+					_main.try_use_bomb()
+			KEY_ESCAPE:
+				var settings := get_tree().get_first_node_in_group("settings_menu")
+				if settings != null and settings.has_method("show_settings"):
+					settings.show_settings()
 
 func _on_pause_button_pressed() -> void:
 	_is_paused = not _is_paused
@@ -366,21 +378,6 @@ func _on_bomb_button_pressed() -> void:
 		return
 	if _main.has_method("try_use_bomb"):
 		_main.try_use_bomb()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not is_instance_valid(_main):
-		return
-	if event is InputEventKey:
-		var e := event as InputEventKey
-		if e.pressed and not e.echo:
-			if e.keycode == KEY_SPACE:
-				if _main.has_method("try_use_bomb"):
-					_main.try_use_bomb()
-			elif e.keycode == KEY_ESCAPE:
-				var settings := get_tree().get_first_node_in_group("settings_menu")
-				if settings != null and settings.has_method("show_settings"):
-					settings.show_settings()
 
 
 func _ensure_bomb_vfx_nodes() -> void:
