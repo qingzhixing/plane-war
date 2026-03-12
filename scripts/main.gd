@@ -27,6 +27,8 @@ var _damage_events: Array = [] # 每项为 { "time": float, "amount": int }
 var _waiting_upgrade_choice: bool = false
 var _pending_boss_spawn: bool = false
 var _debug_skip_to_boss_used: bool = false
+var _debug_skip_to_boss_active: bool = false
+var _debug_upgrades_needed: int = 0
 
 func _ready() -> void:
 	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
@@ -81,6 +83,22 @@ func on_wave_cleared() -> void:
 
 func on_upgrade_selected() -> void:
 	_waiting_upgrade_choice = false
+
+	if _debug_skip_to_boss_active:
+		_debug_upgrades_needed -= 1
+		if _debug_upgrades_needed > 0:
+			# 继续下一次升级选择，不推进波次，也不刷怪
+			_waiting_upgrade_choice = true
+			emit_signal("level_up")
+			return
+
+		# 所有调试升级已完成，直接跳转到 Boss 波
+		_debug_skip_to_boss_active = false
+		_wave = _BOSS_WAVE_START
+		_pending_boss_spawn = false
+		_spawn_boss()
+		return
+
 	if _pending_boss_spawn and not _boss_spawned:
 		_pending_boss_spawn = false
 		_spawn_boss()
@@ -261,6 +279,7 @@ func _debug_skip_to_boss() -> void:
 	if _debug_skip_to_boss_used:
 		return
 	_debug_skip_to_boss_used = true
+	_debug_skip_to_boss_active = true
 
 	# 防止在暂停状态下跳关导致无法触控
 	get_tree().paused = false
@@ -273,8 +292,13 @@ func _debug_skip_to_boss() -> void:
 		if is_instance_valid(b):
 			b.queue_free()
 
-	# 不再自动模拟前几波的升级，保留玩家当前构筑，方便手动体验不同成长路线
-	_wave = _BOSS_WAVE_START
-	_waiting_upgrade_choice = false
-	_pending_boss_spawn = false
-	_spawn_boss()
+	# 计算还需要多少次升级（当前波次到 Boss 波次之间）
+	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
+	if _debug_upgrades_needed <= 0:
+		_debug_skip_to_boss_active = false
+		_spawn_boss()
+		return
+
+	# 连续弹出升级界面，让玩家手动选择多次升级
+	_waiting_upgrade_choice = true
+	emit_signal("level_up")
