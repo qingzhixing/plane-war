@@ -40,6 +40,12 @@ var _boomerang_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
+@onready var _sprite: Node2D = get_node_or_null("Sprite2D")
+
+const _HIT_BLINK_FREQ := 20.0
+var _has_shield: bool = false
+var _shield_node: Node2D
+const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -52,6 +58,7 @@ func _ready() -> void:
 		bullet_scene_boomerang = _fallback_bullet_scene_boomerang
 	_arrow_auto_timer = arrow_auto_interval
 	_boomerang_auto_timer = boomerang_auto_interval
+	_init_shield()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -92,6 +99,7 @@ func _process(delta: float) -> void:
 	_update_side_weapons(delta)
 	if _hit_invulnerable_timer > 0.0:
 		_hit_invulnerable_timer = maxf(0.0, _hit_invulnerable_timer - delta)
+	_update_hit_blink()
 
 func _update_movement(delta: float) -> void:
 	var dir := Vector2.ZERO
@@ -178,6 +186,7 @@ func _update_side_weapons(delta: float) -> void:
 			_spawn_boomerang_shot()
 
 
+@warning_ignore("UNUSED_PARAMETER")
 func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2) -> void:
 	if scene_res == null:
 		return
@@ -201,6 +210,8 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 
 func apply_damage(_amount: float) -> void:
 	if _hit_invulnerable_timer > 0.0:
+		return
+	if _consume_shield_if_any():
 		return
 	_hit_invulnerable_timer = hit_invulnerable_seconds
 	get_tree().call_group("battle_stats_manager", "on_player_hit")
@@ -292,6 +303,60 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if not has_weapon_unlocked("boomerang"):
 				_weapon_unlocked["boomerang"] = true
 			_boomerang_shot_count = max(1, _boomerang_shot_count + 1)
+
+
+func set_shield_active(active: bool) -> void:
+	_has_shield = active
+	if _shield_node != null:
+		_shield_node.visible = active
+
+
+func _init_shield() -> void:
+	if _PlayerShieldScene == null:
+		return
+	var inst := _PlayerShieldScene.instantiate()
+	if not (inst is Node2D):
+		return
+	_shield_node = inst as Node2D
+	_shield_node.visible = false
+	add_child(_shield_node)
+
+
+func _consume_shield_if_any() -> bool:
+	if not _has_shield:
+		return false
+	_has_shield = false
+	if _shield_node != null:
+		_shield_node.visible = false
+		_play_shield_block_flash()
+	return true
+
+
+func _play_shield_block_flash() -> void:
+	if _shield_node == null:
+		return
+	_shield_node.visible = true
+	var tween := create_tween()
+	if tween == null:
+		return
+	_shield_node.modulate = Color(1, 1, 1, 1)
+	tween.tween_property(_shield_node, "modulate", Color(1, 1, 1, 0), 0.25)
+
+
+func _update_hit_blink() -> void:
+	if _sprite == null:
+		return
+	if _hit_invulnerable_timer > 0.0:
+		var phase := fmod(_hit_invulnerable_timer * _HIT_BLINK_FREQ, 1.0)
+		var alpha := 0.3 if phase > 0.5 else 1.0
+		var col: Color = _sprite.modulate
+		col.a = alpha
+		_sprite.modulate = col
+	else:
+		var reset_col: Color = _sprite.modulate
+		if reset_col.a != 1.0:
+			reset_col.a = 1.0
+			_sprite.modulate = reset_col
 
 
 func _play_shoot_sfx() -> void:

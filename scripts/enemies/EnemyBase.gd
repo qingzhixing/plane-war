@@ -6,10 +6,22 @@ extends Area2D
 
 var hp: float
 
+const _HIT_FLASH_DURATION := 0.12
+var _hit_flash_timer: float = 0.0
+var _hit_material: ShaderMaterial
+@onready var _sprite: Node2D = get_node_or_null("Sprite2D")
+
 
 func _ready() -> void:
 	hp = max_hp
 	add_to_group("enemy")
+	_init_hit_material()
+
+
+func _process(delta: float) -> void:
+	if _hit_flash_timer > 0.0:
+		_hit_flash_timer = maxf(0.0, _hit_flash_timer - delta)
+		_update_hit_material()
 
 
 func apply_damage(amount: float) -> void:
@@ -18,6 +30,7 @@ func apply_damage(amount: float) -> void:
 		_on_dead()
 	else:
 		_on_damaged()
+		_trigger_hit_flash()
 
 
 func apply_wave_scaling(wave: int) -> void:
@@ -43,6 +56,36 @@ func _on_player_collision() -> void:
 
 func _on_damaged() -> void:
 	_play_enemy_injured_sfx()
+
+
+func _trigger_hit_flash() -> void:
+	_hit_flash_timer = _HIT_FLASH_DURATION
+	_update_hit_material()
+
+
+func _init_hit_material() -> void:
+	if _sprite == null:
+		return
+	var mat: Material = _sprite.material
+	if mat == null or not (mat is ShaderMaterial):
+		var shader_res := load("res://shaders/enemy_hit.gdshader")
+		if shader_res == null:
+			return
+		var new_mat := ShaderMaterial.new()
+		new_mat.shader = shader_res
+		_sprite.material = new_mat
+		mat = new_mat
+	_hit_material = mat
+	_update_hit_material()
+
+
+func _update_hit_material() -> void:
+	if _hit_material == null:
+		return
+	var strength := 0.0
+	if _HIT_FLASH_DURATION > 0.0:
+		strength = _hit_flash_timer / _HIT_FLASH_DURATION
+	_hit_material.set_shader_parameter("hit_strength", strength)
 
 
 func _on_dead() -> void:

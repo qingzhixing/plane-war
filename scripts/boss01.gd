@@ -12,6 +12,11 @@ var _fire_timer: float = 0.0
 var _move_time: float = 0.0
 var _phase_transition_timer: float = 0.0
 
+const _HIT_FLASH_DURATION := 0.14
+var _hit_flash_timer: float = 0.0
+var _hit_material: ShaderMaterial
+@onready var _sprite: Node2D = get_node_or_null("Sprite2D")
+
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
 func _ready() -> void:
@@ -21,6 +26,7 @@ func _ready() -> void:
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
 	_update_boss_hud()
+	_init_hit_material()
 
 
 func _process(delta: float) -> void:
@@ -52,6 +58,10 @@ func _process(delta: float) -> void:
 			_fire_phase_b()
 		else:
 			_fire_phase_a()
+
+	if _hit_flash_timer > 0.0:
+		_hit_flash_timer = maxf(0.0, _hit_flash_timer - delta)
+		_update_hit_material()
 
 
 func _fire_phase_a() -> void:
@@ -123,6 +133,7 @@ func apply_damage(amount: float) -> void:
 		return
 
 	_play_boss_injured_sfx()
+	_trigger_hit_flash()
 
 	# 进入阶段 B：HP 低于 50% 时
 	if not _phase_b and float(_hp) <= float(max_hp) * 0.5:
@@ -177,3 +188,33 @@ func _play_boss_explosion_sfx() -> void:
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("play_enemy_explosion"):
 		audio.play_enemy_explosion()
+
+
+func _trigger_hit_flash() -> void:
+	_hit_flash_timer = _HIT_FLASH_DURATION
+	_update_hit_material()
+
+
+func _init_hit_material() -> void:
+	if _sprite == null:
+		return
+	var mat: Material = _sprite.material
+	if mat == null or not (mat is ShaderMaterial):
+		var shader_res := load("res://shaders/enemy_hit.gdshader")
+		if shader_res == null:
+			return
+		var new_mat := ShaderMaterial.new()
+		new_mat.shader = shader_res
+		_sprite.material = new_mat
+		mat = new_mat
+	_hit_material = mat
+	_update_hit_material()
+
+
+func _update_hit_material() -> void:
+	if _hit_material == null:
+		return
+	var strength := 0.0
+	if _HIT_FLASH_DURATION > 0.0:
+		strength = _hit_flash_timer / _HIT_FLASH_DURATION
+	_hit_material.set_shader_parameter("hit_strength", strength)

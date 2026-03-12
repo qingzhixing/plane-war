@@ -7,6 +7,8 @@ var direction: Vector2 = Vector2(0, -1)
 var _boss_damage_multiplier: float = 1.0
 var _penetration_left: int = 0
 
+const _HitSparkScene := preload("res://scenes/vfx/HitSpark.tscn")
+
 
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)
@@ -41,6 +43,7 @@ func _on_area_entered(area: Node) -> void:
 	if area.has_method("apply_damage"):
 		area.apply_damage(dealt_damage)
 		get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
+		_spawn_hit_vfx(area)
 
 	if _penetration_left > 0:
 		_penetration_left -= 1
@@ -56,4 +59,21 @@ func _is_out_of_bounds() -> bool:
 	var rect := viewport.get_visible_rect()
 	var margin := 100.0
 	return global_position.y < rect.position.y - margin or global_position.y > rect.size.y + margin
+
+
+func _spawn_hit_vfx(area: Node) -> void:
+	if _HitSparkScene == null:
+		return
+	var vfx := _HitSparkScene.instantiate()
+	if not (vfx is Node2D):
+		return
+	var vfx2d := vfx as Node2D
+	if area is Node2D:
+		vfx2d.global_position = (area as Node2D).global_position
+	else:
+		vfx2d.global_position = global_position
+	var tree := get_tree()
+	if tree == null or tree.current_scene == null:
+		return
+	tree.current_scene.add_child(vfx2d)
 

@@ -17,6 +17,11 @@ var _fire_timer: float = 0.0
 var _is_charging: bool = false
 var _charge_timer: float = 0.0
 
+const _HIT_FLASH_DURATION := 0.12
+var _hit_flash_timer: float = 0.0
+var _hit_material: ShaderMaterial
+@onready var _sprite: Node2D = get_node_or_null("Sprite2D")
+
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
 func _ready() -> void:
@@ -25,6 +30,7 @@ func _ready() -> void:
 	add_to_group("enemy")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
+	_init_hit_material()
 
 
 func _process(delta: float) -> void:
@@ -57,6 +63,10 @@ func _process(delta: float) -> void:
 			_is_charging = true
 			_charge_timer = pre_fire_delay
 
+	if _hit_flash_timer > 0.0:
+		_hit_flash_timer = maxf(0.0, _hit_flash_timer - delta)
+		_update_hit_material()
+
 
 func _fire_pattern() -> void:
 	if bullet_scene == null:
@@ -79,16 +89,19 @@ func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
 		_play_enemy_explosion_sfx()
+		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 	else:
 		_play_enemy_injured_sfx()
+		_trigger_hit_flash()
 
 
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
 		_play_enemy_explosion_sfx()
+		_spawn_explosion_vfx(false)
 		_give_exp()
 		queue_free()
 
@@ -115,3 +128,48 @@ func apply_wave_scaling(wave: int) -> void:
 	var factor := 1.0 + 0.25 * float(wave - 1)
 	max_hp = int(round(float(max_hp) * factor))
 	_hp = max_hp
+
+
+func _trigger_hit_flash() -> void:
+	_hit_flash_timer = _HIT_FLASH_DURATION
+	_update_hit_material()
+
+
+func _init_hit_material() -> void:
+	if _sprite == null:
+		return
+	var mat: Material = _sprite.material
+	if mat == null or not (mat is ShaderMaterial):
+		var shader_res := load("res://shaders/enemy_hit.gdshader")
+		if shader_res == null:
+			return
+		var new_mat := ShaderMaterial.new()
+		new_mat.shader = shader_res
+		_sprite.material = new_mat
+		mat = new_mat
+	_hit_material = mat
+	_update_hit_material()
+
+
+func _update_hit_material() -> void:
+	if _hit_material == null:
+		return
+	var strength := 0.0
+	if _HIT_FLASH_DURATION > 0.0:
+		strength = _hit_flash_timer / _HIT_FLASH_DURATION
+	_hit_material.set_shader_parameter("hit_strength", strength)
+
+
+func _spawn_explosion_vfx(is_big: bool) -> void:
+	var scene_path := "res://scenes/vfx/EnemyExplodeSmall.tscn"
+	if is_big:
+		scene_path = "res://scenes/vfx/EnemyExplodeBig.tscn"
+	var packed := load(scene_path)
+	if packed == null:
+		return
+	var vfx: Node2D = packed.instantiate()
+	vfx.global_position = global_position
+	var tree := get_tree()
+	if tree == null or tree.current_scene == null:
+		return
+	tree.current_scene.add_child(vfx)

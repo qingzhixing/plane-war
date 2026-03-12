@@ -12,7 +12,7 @@ var _restart_btn: Button
 var _main_menu_btn: Button
 
 func _ready() -> void:
-	add_to_group("game_over_ui")
+	add_to_group("game_over_ui") 
 	if main_path != NodePath(""):
 		_main = get_node(main_path)
 
