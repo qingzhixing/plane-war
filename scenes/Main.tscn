@@ -33,7 +33,6 @@ script = ExtResource("4_hud")
 player_path = NodePath("../Player")
 
 [node name="Root" type="Control" parent="HUD" unique_id=1325487772]
-theme = ExtResource("11_ui_theme")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,6 +40,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("11_ui_theme")
 
 [node name="ExpBar" type="ProgressBar" parent="HUD/Root" unique_id=1904624421]
 unique_name_in_owner = true
@@ -114,10 +114,10 @@ text = "DPS: 0  Max: 0"
 [node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 403.0
-offset_top = 216.0
-offset_right = 718.0
-offset_bottom = 294.0
+offset_left = 372.0
+offset_top = 223.0
+offset_right = 687.0
+offset_bottom = 296.0
 theme_override_font_sizes/font_size = 48
 text = "Combo: XXX"
 
@@ -162,16 +162,16 @@ alignment = 1
 
 [node name="Label" type="Label" parent="GameOver/Root/Center/VBox" unique_id=121312298]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 40
 layout_mode = 2
+theme_override_font_sizes/font_size = 40
 text = "You Dead!"
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963160]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
-theme_override_font_sizes/font_size = 32
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "重新开始"
 
 [node name="UpgradeUI" type="CanvasLayer" parent="." unique_id=1043995664]

@@ -1,7 +1,7 @@
 extends Area2D
 
 @export var speed: float = 250.0
-@export var max_hp: int = 2
+@export var max_hp: int = 4
 @export var exp_value: int = 5
 @export var score_value: int = 10
 
