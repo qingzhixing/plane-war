@@ -368,6 +368,16 @@ func _on_bomb_button_pressed() -> void:
 		_main.try_use_bomb()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_instance_valid(_main):
+		return
+	if event is InputEventKey:
+		var e := event as InputEventKey
+		if e.pressed and not e.echo and e.keycode == KEY_SPACE:
+			if _main.has_method("try_use_bomb"):
+				_main.try_use_bomb()
+
+
 func _ensure_bomb_vfx_nodes() -> void:
 	var root := get_node_or_null("Root") as Control
 	if root == null:
