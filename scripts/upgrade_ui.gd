@@ -146,13 +146,22 @@ func show_pick() -> void:
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
 	var bullet_count: int = 1
+	var arrow_unlocked: bool = false
+	var boomerang_unlocked: bool = false
 	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
 		bullet_count = player.get_bullet_count()
 		at_max_bullets = bullet_count >= player.get_max_bullet_count()
+	if player != null and player.has_method("has_weapon_unlocked"):
+		arrow_unlocked = player.has_weapon_unlocked("arrow")
+		boomerang_unlocked = player.has_weapon_unlocked("boomerang")
 	for u in UPGRADES:
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
 		if u["id"] == "spread_focus" and bullet_count <= 1:
+			continue
+		if u["id"] == "arrow_cooldown" and not arrow_unlocked:
+			continue
+		if u["id"] == "boomerang_cooldown" and not boomerang_unlocked:
 			continue
 		pool.append(u)
 	pool.shuffle()
