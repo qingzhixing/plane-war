@@ -146,8 +146,8 @@ alignment = 1
 [node name="Label" type="Label" parent="GameOver/Root/Center/VBox" unique_id=121312298]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
-text = "You Dead!"
+theme_override_font_sizes/font_size = 48
+text = "结算"
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963160]

@@ -28,14 +28,13 @@ func _ready() -> void:
 		var center := root.get_node_or_null("Center") as CenterContainer
 		var vbox := center.get_node_or_null("VBox") as VBoxContainer
 
-		# 尝试复用场景里的 Label；若类型不匹配则创建 RichTextLabel
-		_label = vbox.get_node_or_null("Label") as RichTextLabel
-		if _label == null:
-			_label = RichTextLabel.new()
-			_label.name = "SummaryLabel"
-			_label.bbcode_enabled = true
-			_label.fit_content = true
-			vbox.add_child(_label, true)
+		# 在标题 Label 下方创建一个 RichTextLabel，用于展示结算详情
+		_label = RichTextLabel.new()
+		_label.name = "SummaryLabel"
+		_label.bbcode_enabled = true
+		_label.fit_content = true
+		_label.add_theme_font_size_override("normal_font_size", 30)
+		vbox.add_child(_label, true)
 		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
 		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
 		_main_menu_btn = vbox.get_node_or_null("MainMenuButton") as Button
