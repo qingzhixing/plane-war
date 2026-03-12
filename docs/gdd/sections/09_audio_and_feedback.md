@@ -39,3 +39,13 @@
 - **失败/游戏结束音效**
   - 资源：`assets/SFX/game_state/Lose.ogg`
   - 用途：玩家 HP 归零并弹出死亡提示遮罩（“You Dead!”）时播放一次，提示局内失败
+
+- **玩家操作与反馈音效（新增）**
+  - 资源：
+    - `assets/SFX/player/Shoot.wav`
+    - `assets/SFX/player/hurt.wav`
+    - `assets/SFX/player/power_up.wav`
+  - 用途：
+    - `Shoot.wav`：玩家自动射击时按节奏播放，强化输出反馈
+    - `hurt.wav`：玩家受击或连击中断时播放，提示失误
+    - `power_up.wav`：升级三选一确认后播放，强化成长反馈

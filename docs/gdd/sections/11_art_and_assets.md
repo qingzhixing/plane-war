@@ -29,10 +29,29 @@
   - `res://assets/sprites/player/`
   - `res://assets/sprites/enemies/`
   - `res://assets/sprites/bullets/`
+  - `res://assets/SFX/player/`
+  - `res://assets/font/`
 - 资源命名建议：
   - 玩家：`player_ship_base.png`
   - 敌人：`enemy_basic_01.png` 等
   - 子弹：`bullet_basic_01.png`
+
+## 本轮新增资源接入约定（MVP）
+
+- 子弹贴图：
+  - 玩家子弹优先使用 `res://assets/sprites/bullets/Gun.png`
+  - 敌方基础子弹优先使用 `res://assets/sprites/bullets/Arrow.png`
+  - 符卡/炸弹相关 UI 与演出可使用 `res://assets/sprites/bullets/Bomb.png`
+- 玩家反馈音效：
+  - 开火：`res://assets/SFX/player/Shoot.wav`
+  - 受击/失误：`res://assets/SFX/player/hurt.wav`
+  - 升级/强化选择：`res://assets/SFX/player/power_up.wav`
+- 字体资源：
+  - `res://assets/font/PixelOperator8.ttf`
+  - `res://assets/font/PixelOperator8-Bold.ttf`
+  - `res://assets/font/pixelFont-7-8x14-sproutLands.ttf`
+
+> 新增资源应优先沿用上述目录，避免散落在 `assets/` 根目录导致后续维护困难。
 
 > 如需在极早期阶段临时用占位图，只作为开发便捷手段使用，尽快由正式资源替换。
 >
