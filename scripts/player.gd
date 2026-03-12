@@ -35,8 +35,8 @@ var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
 var _boomerang_auto_timer: float = 0.0
-var _arrow_shot_count: int = 1
-var _boomerang_shot_count: int = 1
+var _arrow_shot_count: int = 0
+var _boomerang_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
@@ -274,24 +274,18 @@ func apply_upgrade(upgrade_id: String) -> void:
 				_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
 		"boss_hunter":
 			_boss_damage_multiplier += 0.2
-		"weapon_arrow_unlock":
-			_unlock_weapon("arrow")
-		"weapon_boomerang_unlock":
-			_unlock_weapon("boomerang")
 		"arrow_cooldown":
 			arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
 		"arrow_multi":
-			_arrow_shot_count += 1
+			if not has_weapon_unlocked("arrow"):
+				_weapon_unlocked["arrow"] = true
+			_arrow_shot_count = max(1, _arrow_shot_count + 1)
 		"boomerang_cooldown":
 			boomerang_auto_interval = maxf(0.7, boomerang_auto_interval * 0.8)
 		"boomerang_multi":
-			_boomerang_shot_count += 1
-
-
-func _unlock_weapon(weapon_id: String) -> void:
-	if not _weapon_unlocked.has(weapon_id):
-		return
-	_weapon_unlocked[weapon_id] = true
+			if not has_weapon_unlocked("boomerang"):
+				_weapon_unlocked["boomerang"] = true
+			_boomerang_shot_count = max(1, _boomerang_shot_count + 1)
 
 
 func _play_shoot_sfx() -> void:

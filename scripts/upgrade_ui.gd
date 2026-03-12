@@ -154,10 +154,6 @@ func show_pick() -> void:
 			continue
 		if u["id"] == "spread_focus" and bullet_count <= 1:
 			continue
-		if u["id"] == "weapon_arrow_unlock" and player != null and player.has_method("has_weapon_unlocked") and player.has_weapon_unlocked("arrow"):
-			continue
-		if u["id"] == "weapon_boomerang_unlock" and player != null and player.has_method("has_weapon_unlocked") and player.has_weapon_unlocked("boomerang"):
-			continue
 		pool.append(u)
 	pool.shuffle()
 	var pick_count: int = min(3, pool.size())
@@ -228,10 +224,8 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"bullet_speed",
 		"spread_focus",
 		"boss_hunter",
-		"weapon_arrow_unlock",
 		"arrow_cooldown",
 		"arrow_multi",
-		"weapon_boomerang_unlock",
 		"boomerang_cooldown",
 		"boomerang_multi",
 		"move_speed",
