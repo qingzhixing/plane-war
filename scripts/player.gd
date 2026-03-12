@@ -139,7 +139,7 @@ func _spawn_arrow_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(dir, 0.0, 1.35, 1, "arrow", "straight")
+		_spawn_configured_bullet(dir, 0.0, 0.85, 0, "arrow", "straight")
 
 
 func _spawn_boomerang_shot() -> void:

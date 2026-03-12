@@ -1,8 +1,7 @@
 extends "res://scripts/bullets/BulletBase.gd"
 
-@export var turn_speed: float = 8.0
-
 var _target: Node2D = null
+var _initialized_direction: bool = false
 
 
 func _ready() -> void:
@@ -13,11 +12,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if not is_instance_valid(_target):
-		_target = _find_target()
-	if is_instance_valid(_target):
-		var to_target := (_target.global_position - global_position).normalized()
-		direction = direction.lerp(to_target, min(1.0, delta * turn_speed)).normalized()
+	if not _initialized_direction:
+		_initialized_direction = true
+		if not is_instance_valid(_target):
+			_target = _find_target()
+		if is_instance_valid(_target):
+			var to_target := (_target.global_position - global_position).normalized()
+			direction = to_target
+	# 之后按固定 direction 直线飞行，不再跟踪
 	super._process(delta)
 
 
