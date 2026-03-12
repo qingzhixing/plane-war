@@ -1,6 +1,6 @@
 extends Area2D
 
-@export var max_hp: int = 90
+@export var max_hp: int = 180
 @export var fire_interval_phase_a: float = 2.0
 @export var fire_interval_phase_b: float = 4.0
 @export var bullet_scene: PackedScene
@@ -24,15 +24,20 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_move_time += delta
-	# 在屏幕上半区域左右缓慢移动
+	# 在屏幕上半区域左右缓慢移动，首段从屏幕外缓慢驶入
 	var viewport_rect := get_viewport_rect()
 	var center_y := viewport_rect.size.y * 0.25
 	var center_x := viewport_rect.size.x * 0.5
 	var amplitude := viewport_rect.size.x * 0.3
-	global_position = Vector2(
+	var target := Vector2(
 		center_x + sin(_move_time * 0.5) * amplitude,
 		center_y
 	)
+	# 若当前还在屏幕上方，则用插值方式从屏幕外滑入中心位置
+	if global_position.y < center_y:
+		global_position = global_position.lerp(target, min(1.0, delta * 2.5))
+	else:
+		global_position = target
 
 	_fire_timer -= delta
 	var interval := fire_interval_phase_b if _phase_b else fire_interval_phase_a
@@ -49,8 +54,9 @@ func _fire_phase_a() -> void:
 	if bullet_scene == null:
 		return
 	var count: int = 12
-	var start_angle := -PI * 0.75
-	var end_angle := -PI * 0.25
+	# 朝下（玩家方向）发射：约 90° 扇形，中心向下
+	var start_angle := PI * 0.25
+	var end_angle := PI * 0.75
 	for i: int in range(count):
 		var t := float(i) / float(max(1, count - 1))
 		var angle: float = lerp(start_angle, end_angle, t)

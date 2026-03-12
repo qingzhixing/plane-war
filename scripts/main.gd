@@ -61,9 +61,13 @@ func get_wave() -> int:
 
 
 func on_wave_cleared() -> void:
-	# 一波结束：先触发升级，等玩家选完再进入下一波/Boss
+	# 一波结束：先清空敌方子弹，再触发升级，等玩家选完再进入下一波/Boss
 	if _waiting_upgrade_choice:
 		return
+	# 清空场上所有敌方子弹
+	for b in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(b):
+			b.queue_free()
 	_waiting_upgrade_choice = true
 	emit_signal("level_up")
 	_wave += 1
@@ -243,5 +247,6 @@ func _spawn_boss() -> void:
 	if boss == null:
 		return
 	var viewport_rect := get_viewport().get_visible_rect()
-	boss.global_position = Vector2(viewport_rect.size.x * 0.5, viewport_rect.size.y * 0.2)
+	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
+	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
 	get_tree().current_scene.add_child(boss)
