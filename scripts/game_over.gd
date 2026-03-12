@@ -54,19 +54,19 @@ func show_game_over() -> void:
 		var lines: Array[String] = []
 		var highlights: Array[String] = []
 		if _main.has_method("get_score"):
-			var s := _main.get_score()
+			var s: int = _main.get_score()
 			lines.append("Score: %d" % s)
 			if "score" in diff and diff["score"].get("is_new", false):
 				var old_s := int(diff["score"].get("old", 0))
 				highlights.append("New Best Score: %d → %d" % [old_s, s])
 		if _main.has_method("get_max_combo"):
-			var mc := _main.get_max_combo()
+			var mc: int = _main.get_max_combo()
 			lines.append("Max Combo: %d" % mc)
 			if "combo" in diff and diff["combo"].get("is_new", false):
 				var old_c := int(diff["combo"].get("old", 0))
 				highlights.append("New Best Combo: %d → %d" % [old_c, mc])
 		if _main.has_method("get_max_dps"):
-			var md := _main.get_max_dps()
+			var md: float = _main.get_max_dps()
 			lines.append("Max DPS: %.0f" % md)
 			if "dps" in diff and diff["dps"].get("is_new", false):
 				var old_d := float(diff["dps"].get("old", 0.0))
