@@ -7,6 +7,8 @@ extends CharacterBody2D
 @export var bullet_scene_arrow: PackedScene
 @export var bullet_scene_boomerang: PackedScene
 @export var hit_invulnerable_seconds: float = 0.35
+@export var arrow_auto_interval: float = 1.4
+@export var boomerang_auto_interval: float = 2.6
 
 var _fire_timer: float = 0.0
 var _shoot_sfx_timer: float = 0.0
@@ -31,6 +33,8 @@ var _weapon_unlocked: Dictionary = {
 }
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
+var _arrow_auto_timer: float = 0.0
+var _boomerang_auto_timer: float = 0.0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBulletBasic.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrowBullet.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerangBullet.tscn")
@@ -44,6 +48,8 @@ func _ready() -> void:
 		bullet_scene_arrow = _fallback_bullet_scene_arrow
 	if bullet_scene_boomerang == null and _fallback_bullet_scene_boomerang != null:
 		bullet_scene_boomerang = _fallback_bullet_scene_boomerang
+	_arrow_auto_timer = arrow_auto_interval
+	_boomerang_auto_timer = boomerang_auto_interval
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -81,6 +87,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
+	_update_side_weapons(delta)
 	if _hit_invulnerable_timer > 0.0:
 		_hit_invulnerable_timer = maxf(0.0, _hit_invulnerable_timer - delta)
 
@@ -130,7 +137,7 @@ func _spawn_default_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(dir, 0.0, 1.0, 0, "bullet", "straight")
+		_spawn_configured_bullet(bullet_scene_basic, dir, 0.0, 1.0, 0, "bullet", "straight")
 
 
 func _spawn_arrow_shot() -> void:
@@ -139,7 +146,7 @@ func _spawn_arrow_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(dir, 0.0, 0.85, 0, "arrow", "straight")
+		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight")
 
 
 func _spawn_boomerang_shot() -> void:
@@ -148,21 +155,26 @@ func _spawn_boomerang_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(dir, 0.35, 0.95, 2, "bullet", "boomerang")
+		# 限制回旋镖只向屏幕上方发射
+		if dir.y > 0.0:
+			dir.y = -dir.y
+		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, 0.95, 2, "bullet", "boomerang")
 
 
-func _get_bullet_scene_for_mode(mode: String) -> PackedScene:
-	match mode:
-		"arrow":
-			return bullet_scene_arrow if bullet_scene_arrow != null else _fallback_bullet_scene_arrow
-		"boomerang":
-			return bullet_scene_boomerang if bullet_scene_boomerang != null else _fallback_bullet_scene_boomerang
-		_:
-			return bullet_scene_basic if bullet_scene_basic != null else _fallback_bullet_scene_basic
+func _update_side_weapons(delta: float) -> void:
+	if has_weapon_unlocked("arrow"):
+		_arrow_auto_timer -= delta
+		if _arrow_auto_timer <= 0.0:
+			_arrow_auto_timer += arrow_auto_interval
+			_spawn_arrow_shot()
+	if has_weapon_unlocked("boomerang"):
+		_boomerang_auto_timer -= delta
+		if _boomerang_auto_timer <= 0.0:
+			_boomerang_auto_timer += boomerang_auto_interval
+			_spawn_boomerang_shot()
 
 
-func _spawn_configured_bullet(dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String) -> void:
-	var scene_res := _get_bullet_scene_for_mode(_weapon_mode)
+func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String) -> void:
 	if scene_res == null:
 		return
 	var scene := get_tree().current_scene
@@ -268,7 +280,6 @@ func _unlock_weapon(weapon_id: String) -> void:
 	if not _weapon_unlocked.has(weapon_id):
 		return
 	_weapon_unlocked[weapon_id] = true
-	_weapon_mode = weapon_id
 
 
 func _play_shoot_sfx() -> void:
