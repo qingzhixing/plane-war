@@ -139,7 +139,7 @@ func _spawn_default_shot() -> void:
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(bullet_scene_basic, dir, 0.0, 1.0, 0, "bullet", "straight")
+		_spawn_configured_bullet(bullet_scene_basic, dir, 0.0, 1.0, 0, "bullet", "straight", Vector2.ZERO)
 
 
 func _spawn_arrow_shot() -> void:
@@ -178,7 +178,7 @@ func _update_side_weapons(delta: float) -> void:
 			_spawn_boomerang_shot()
 
 
-func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2 = Vector2.ZERO) -> void:
+func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2) -> void:
 	if scene_res == null:
 		return
 	var scene := get_tree().current_scene
@@ -278,6 +278,14 @@ func apply_upgrade(upgrade_id: String) -> void:
 			_unlock_weapon("arrow")
 		"weapon_boomerang_unlock":
 			_unlock_weapon("boomerang")
+		"arrow_cooldown":
+			arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
+		"arrow_multi":
+			_arrow_shot_count += 1
+		"boomerang_cooldown":
+			boomerang_auto_interval = maxf(0.7, boomerang_auto_interval * 0.8)
+		"boomerang_multi":
+			_boomerang_shot_count += 1
 
 
 func _unlock_weapon(weapon_id: String) -> void:

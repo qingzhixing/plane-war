@@ -3,18 +3,29 @@ extends CanvasLayer
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 const UPGRADES: Array[Dictionary] = [
-	{"id": "fire_rate", "name": "射速提升", "desc": "射击间隔缩短 15%"},
-	{"id": "damage_percent", "name": "伤害强化", "desc": "伤害提高 20%"},
-	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
+	# 主武器：基础子弹
+	{"id": "fire_rate", "name": "射速提升", "desc": "主武器射击间隔缩短 15%"},
+	{"id": "damage_percent", "name": "伤害强化", "desc": "主武器伤害提高 20%"},
+	{"id": "multi_shot", "name": "弹数+1", "desc": "主武器每次射击多 1 发，弹道略分散"},
+	{"id": "bullet_speed", "name": "弹速提升", "desc": "主武器子弹飞行速度 +12%"},
+	{"id": "spread_focus", "name": "火力聚焦", "desc": "需要多弹：显著收束主武器弹道"},
+	{"id": "boss_hunter", "name": "破甲弹头", "desc": "主武器对 Boss 伤害 +20%"},
+
+	# 副武器：弓箭
+	{"id": "weapon_arrow_unlock", "name": "解锁副武器：弓箭", "desc": "获得自动射出的弓箭，预先瞄准最近敌人"},
+	{"id": "arrow_cooldown", "name": "弓箭装填加速", "desc": "弓箭自动射击冷却缩短 20%"},
+	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1，子弹略向两侧展开"},
+
+	# 副武器：回旋镖
+	{"id": "weapon_boomerang_unlock", "name": "解锁副武器：回旋镖", "desc": "获得自动射出的回旋镖，飞到屏幕边缘后回收"},
+	{"id": "boomerang_cooldown", "name": "回旋镖装填加速", "desc": "回旋镖自动射击冷却缩短 20%"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1，起始位置左右错开"},
+
+	# 通用 / 生存 / 表现
 	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +12%"},
-	{"id": "bullet_speed", "name": "弹速提升", "desc": "子弹飞行速度 +12%"},
-	{"id": "spread_focus", "name": "火力聚焦", "desc": "需要多弹：显著收束弹道"},
-	{"id": "boss_hunter", "name": "破甲弹头", "desc": "对 Boss 伤害 +20%"},
 	{"id": "combo_boost", "name": "连击推进", "desc": "每次命中额外 +1 连击"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却缩短 15%"},
-	{"id": "weapon_arrow_unlock", "name": "解锁武器：弓箭", "desc": "切换为高速穿透箭矢"},
-	{"id": "weapon_boomerang_unlock", "name": "解锁武器：回旋镖", "desc": "切换为可回返的回旋镖"},
 	{"id": "score_up", "name": "评分增幅", "desc": "击杀得分乘区 +15%"},
 ]
 
@@ -214,13 +225,17 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"fire_rate",
 		"damage_percent",
 		"multi_shot",
-		"move_speed",
 		"bullet_speed",
 		"spread_focus",
 		"boss_hunter",
+		"weapon_arrow_unlock",
+		"arrow_cooldown",
+		"arrow_multi",
+		"weapon_boomerang_unlock",
+		"boomerang_cooldown",
+		"boomerang_multi",
+		"move_speed",
 		"combo_boost",
 		"combo_guard",
 		"bomb_cooldown",
-		"weapon_arrow_unlock",
-		"weapon_boomerang_unlock",
 	]
