@@ -1,6 +1,7 @@
 extends Node2D
 
 signal level_up
+signal bomb_used
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -199,6 +200,7 @@ func try_use_bomb() -> bool:
 		return false
 	_bomb_cooldown_remaining = _BOMB_COOLDOWN_SECONDS
 	_trigger_bomb_effect()
+	emit_signal("bomb_used")
 	return true
 
 
@@ -245,6 +247,9 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 
 
 func on_player_hit() -> void:
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_player_hurt"):
+		audio.play_player_hurt()
 	if _combo_guard_charges > 0:
 		_combo_guard_charges -= 1
 		return
@@ -306,6 +311,8 @@ func _trigger_bomb_effect() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_enemy_explosion"):
 		audio.play_enemy_explosion()
+	if audio != null and audio.has_method("play_power_up"):
+		audio.play_power_up()
 
 
 func _get_combo_multiplier() -> float:

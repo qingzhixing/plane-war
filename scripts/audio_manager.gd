@@ -8,6 +8,9 @@ const BGM_STREAMS: Array[AudioStream] = [
 ]
 
 const ENEMY_INJURED_STREAM: AudioStream = preload("res://assets/SFX/enemy/EnemyInjured.ogg")
+const PLAYER_SHOOT_STREAM: AudioStream = preload("res://assets/SFX/player/Shoot.wav")
+const PLAYER_HURT_STREAM: AudioStream = preload("res://assets/SFX/player/hurt.wav")
+const PLAYER_POWER_UP_STREAM: AudioStream = preload("res://assets/SFX/player/power_up.wav")
 const ENEMY_EXPLOSION_STREAMS: Array[AudioStream] = [
 	preload("res://assets/SFX/explode/Explosion1.ogg"),
 	preload("res://assets/SFX/explode/Explosion2.ogg"),
@@ -19,6 +22,8 @@ const LOSE_STREAM: AudioStream = preload("res://assets/SFX/game_state/Lose.ogg")
 
 var _bgm_player: AudioStreamPlayer
 var _sfx_player: AudioStreamPlayer
+var _shoot_sfx_player: AudioStreamPlayer
+var _ui_sfx_player: AudioStreamPlayer
 
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
@@ -44,6 +49,16 @@ func _ready() -> void:
 	_sfx_player = AudioStreamPlayer.new()
 	_sfx_player.bus = "Master"
 	add_child(_sfx_player)
+	_apply_sfx_volume()
+
+	_shoot_sfx_player = AudioStreamPlayer.new()
+	_shoot_sfx_player.bus = "Master"
+	add_child(_shoot_sfx_player)
+	_apply_sfx_volume()
+
+	_ui_sfx_player = AudioStreamPlayer.new()
+	_ui_sfx_player.bus = "Master"
+	add_child(_ui_sfx_player)
 	_apply_sfx_volume()
 
 	_reset_playlist()
@@ -101,6 +116,33 @@ func play_lose() -> void:
 	_sfx_player.play()
 
 
+func play_shoot() -> void:
+	if _shoot_sfx_player == null:
+		return
+	if _sfx_muted:
+		return
+	_shoot_sfx_player.stream = PLAYER_SHOOT_STREAM
+	_shoot_sfx_player.play()
+
+
+func play_player_hurt() -> void:
+	if _ui_sfx_player == null:
+		return
+	if _sfx_muted:
+		return
+	_ui_sfx_player.stream = PLAYER_HURT_STREAM
+	_ui_sfx_player.play()
+
+
+func play_power_up() -> void:
+	if _ui_sfx_player == null:
+		return
+	if _sfx_muted:
+		return
+	_ui_sfx_player.stream = PLAYER_POWER_UP_STREAM
+	_ui_sfx_player.play()
+
+
 func set_bgm_volume_linear(value: float) -> void:
 	_bgm_volume_linear = clampf(value, 0.0, 1.0)
 	_apply_bgm_volume()
@@ -135,6 +177,14 @@ func _apply_sfx_volume() -> void:
 		return
 	if _sfx_muted or _sfx_volume_linear <= 0.001:
 		_sfx_player.volume_db = -80.0
+		if _shoot_sfx_player != null:
+			_shoot_sfx_player.volume_db = -80.0
+		if _ui_sfx_player != null:
+			_ui_sfx_player.volume_db = -80.0
 	else:
 		_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
+		if _shoot_sfx_player != null:
+			_shoot_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
+		if _ui_sfx_player != null:
+			_ui_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
 

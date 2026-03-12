@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var bullet_scene: PackedScene
 
 var _fire_timer: float = 0.0
+var _shoot_sfx_timer: float = 0.0
 var _has_pointer: bool = false
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
@@ -14,6 +15,7 @@ var bullet_speed: float = 1200.0
 var _bullet_count: int = 1
 const _max_bullet_count: int = 6
 var _spread_rad_per_bullet: float = 0.12
+const _min_spread_rad_per_bullet: float = 0.015
 var _boss_damage_multiplier: float = 1.0
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 
@@ -82,9 +84,11 @@ func _update_movement(delta: float) -> void:
 
 func _update_shooting(delta: float) -> void:
 	_fire_timer -= delta
+	_shoot_sfx_timer -= delta
 	if _fire_timer <= 0.0:
 		_fire_timer = fire_interval
 		_spawn_bullet()
+		_play_shoot_sfx()
 
 func _spawn_bullet() -> void:
 	if bullet_scene == null:
@@ -131,6 +135,17 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"bullet_speed":
 			bullet_speed *= 1.12
 		"spread_focus":
-			_spread_rad_per_bullet = maxf(0.05, _spread_rad_per_bullet * 0.9)
+			# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
+			if _bullet_count > 1:
+				_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
 		"boss_hunter":
 			_boss_damage_multiplier += 0.2
+
+
+func _play_shoot_sfx() -> void:
+	if _shoot_sfx_timer > 0.0:
+		return
+	_shoot_sfx_timer = 0.08
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_shoot"):
+		audio.play_shoot()

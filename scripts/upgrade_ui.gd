@@ -6,7 +6,7 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "multi_shot", "name": "弹数+1", "desc": "每次射击多 1 发，弹道略分散"},
 	{"id": "move_speed", "name": "机动强化", "desc": "移动速度 +10%"},
 	{"id": "bullet_speed", "name": "弹速提升", "desc": "子弹飞行速度 +12%"},
-	{"id": "spread_focus", "name": "火力聚焦", "desc": "弹道更集中，提升有效命中"},
+	{"id": "spread_focus", "name": "火力聚焦", "desc": "需要多弹：显著收束弹道"},
 	{"id": "boss_hunter", "name": "破甲弹头", "desc": "对 Boss 伤害 +20%"},
 	{"id": "score_up", "name": "评分增幅", "desc": "击杀得分乘区 +15%"},
 	{"id": "score_flat", "name": "战果奖金", "desc": "每次击杀额外 +5 分"},
@@ -130,10 +130,14 @@ func show_pick() -> void:
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
+	var bullet_count: int = 1
 	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
-		at_max_bullets = player.get_bullet_count() >= player.get_max_bullet_count()
+		bullet_count = player.get_bullet_count()
+		at_max_bullets = bullet_count >= player.get_max_bullet_count()
 	for u in UPGRADES:
 		if u["id"] == "multi_shot" and at_max_bullets:
+			continue
+		if u["id"] == "spread_focus" and bullet_count <= 1:
 			continue
 		pool.append(u)
 	pool.shuffle()
@@ -170,6 +174,9 @@ func _on_card_pressed(card_index: int) -> void:
 	var upgrade_id: String = btn.get_meta("upgrade_id")
 	if _main.has_method("apply_upgrade"):
 		_main.apply_upgrade(upgrade_id)
+	var audio := get_tree().get_first_node_in_group("audio_manager")
+	if audio != null and audio.has_method("play_power_up"):
+		audio.play_power_up()
 	visible = false
 	get_tree().paused = false
 	if _main.has_method("on_upgrade_selected"):

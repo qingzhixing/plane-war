@@ -12,6 +12,9 @@ var _last_combo_feedback_value: int = 0
 var _combo_notice_timer: float = 0.0
 var _combo_break_timer: float = 0.0
 var _combo_notice_label: Label = null
+var _bomb_flash_rect: ColorRect = null
+var _bomb_notice_label: Label = null
+@onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _exp_bar: ProgressBar = %ExpBar
@@ -28,6 +31,8 @@ func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 	_main = get_parent()
+	if is_instance_valid(_main) and _main.has_signal("bomb_used"):
+		_main.bomb_used.connect(_on_bomb_used)
 	
 	# HUD 文本仅展示信息，不拦截输入
 	if _score_label != null:
@@ -60,6 +65,7 @@ func _ready() -> void:
 	if _end_run_button != null:
 		_end_run_button.pressed.connect(_on_end_run_pressed)
 	_ensure_bomb_button()
+	_ensure_bomb_vfx_nodes()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_exp") and _main.has_method("get_exp_to_next"):
@@ -199,6 +205,8 @@ func _show_combo_notice(text: String) -> void:
 	if _combo_notice_label == null:
 		return
 	_combo_notice_label.text = text
+	if _pixel_bold_font != null:
+		_combo_notice_label.add_theme_font_override("font", _pixel_bold_font)
 	_combo_notice_timer = 0.8
 	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
 	var tween := create_tween()
@@ -227,8 +235,8 @@ func _ensure_combo_notice_label() -> void:
 
 func _play_combo_break_sfx() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_enemy_injured"):
-		audio.play_enemy_injured()
+	if audio != null and audio.has_method("play_player_hurt"):
+		audio.play_player_hurt()
 
 
 func _ensure_bomb_button() -> void:
@@ -239,6 +247,11 @@ func _ensure_bomb_button() -> void:
 	_bomb_button.text = "符卡"
 	_bomb_button.custom_minimum_size = Vector2(120, 56)
 	_bomb_button.add_theme_font_size_override("font_size", 22)
+	if _pixel_bold_font != null:
+		_bomb_button.add_theme_font_override("font", _pixel_bold_font)
+	var icon_tex := load("res://assets/sprites/bullets/Bomb.png") as Texture2D
+	if icon_tex != null:
+		_bomb_button.icon = icon_tex
 	_bomb_button.anchor_left = 0.82
 	_bomb_button.anchor_right = 0.98
 	_bomb_button.anchor_top = 0.86
@@ -266,3 +279,57 @@ func _on_bomb_button_pressed() -> void:
 		return
 	if _main.has_method("try_use_bomb"):
 		_main.try_use_bomb()
+
+
+func _ensure_bomb_vfx_nodes() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null:
+		return
+
+	_bomb_flash_rect = ColorRect.new()
+	_bomb_flash_rect.visible = false
+	_bomb_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
+	_bomb_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_bomb_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(_bomb_flash_rect)
+
+	_bomb_notice_label = Label.new()
+	_bomb_notice_label.visible = false
+	_bomb_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bomb_notice_label.text = "符卡发动!"
+	if _pixel_bold_font != null:
+		_bomb_notice_label.add_theme_font_override("font", _pixel_bold_font)
+	_bomb_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_bomb_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_bomb_notice_label.add_theme_font_size_override("font_size", 44)
+	_bomb_notice_label.anchor_left = 0.2
+	_bomb_notice_label.anchor_right = 0.8
+	_bomb_notice_label.anchor_top = 0.42
+	_bomb_notice_label.anchor_bottom = 0.52
+	root.add_child(_bomb_notice_label)
+
+
+func _on_bomb_used() -> void:
+	if _bomb_flash_rect != null:
+		_bomb_flash_rect.visible = true
+		_bomb_flash_rect.modulate = Color(1, 1, 1, 1)
+		_bomb_flash_rect.color.a = 0.42
+		var flash_tween := create_tween()
+		flash_tween.tween_property(_bomb_flash_rect, "color:a", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		flash_tween.finished.connect(func() -> void:
+			_bomb_flash_rect.visible = false
+		)
+
+	if _bomb_notice_label != null:
+		_bomb_notice_label.visible = true
+		_bomb_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
+		_bomb_notice_label.scale = Vector2.ONE
+		var text_tween := create_tween()
+		text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE * 1.12, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		text_tween.tween_interval(0.10)
+		text_tween.tween_property(_bomb_notice_label, "modulate:a", 0.0, 0.22)
+		text_tween.finished.connect(func() -> void:
+			_bomb_notice_label.visible = false
+			_bomb_notice_label.modulate = Color(1, 1, 1, 1)
+		)
