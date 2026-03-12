@@ -6,7 +6,7 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 
 var _main: Node = null
 var _panel: ColorRect
-var _label: Label
+var _label: RichTextLabel
 var _continue_btn: Button
 var _restart_btn: Button
 var _main_menu_btn: Button
@@ -27,7 +27,15 @@ func _ready() -> void:
 		_panel = root.get_node_or_null("Panel") as ColorRect
 		var center := root.get_node_or_null("Center") as CenterContainer
 		var vbox := center.get_node_or_null("VBox") as VBoxContainer
-		_label = vbox.get_node_or_null("Label") as Label
+
+		# 尝试复用场景里的 Label；若类型不匹配则创建 RichTextLabel
+		_label = vbox.get_node_or_null("Label") as RichTextLabel
+		if _label == null:
+			_label = RichTextLabel.new()
+			_label.name = "SummaryLabel"
+			_label.bbcode_enabled = true
+			_label.fit_content = true
+			vbox.add_child(_label, true)
 		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
 		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
 		_main_menu_btn = vbox.get_node_or_null("MainMenuButton") as Button
@@ -52,39 +60,31 @@ func show_game_over() -> void:
 		if _main.has_method("finalize_battle_records"):
 			diff = _main.finalize_battle_records()
 		var lines: Array[String] = []
-		var highlights: Array[String] = []
 		if _main.has_method("get_score"):
 			var s: int = _main.get_score()
-			lines.append("Score: %d" % s)
+			var best_s: int = _main.get_best_score() if _main.has_method("get_best_score") else s
+			var score_line := "Score %d(%d)" % [s, best_s]
 			if "score" in diff and diff["score"].get("is_new", false):
-				var old_s := int(diff["score"].get("old", 0))
-				highlights.append("New Best Score: %d → %d" % [old_s, s])
+				score_line = "[color=#ffd700]" + score_line + "[/color]"
+			lines.append(score_line)
 		if _main.has_method("get_max_combo"):
 			var mc: int = _main.get_max_combo()
-			lines.append("Max Combo: %d" % mc)
+			var best_c: int = _main.get_best_combo() if _main.has_method("get_best_combo") else mc
+			var combo_line := "Max Combo %d(%d)" % [mc, best_c]
 			if "combo" in diff and diff["combo"].get("is_new", false):
-				var old_c := int(diff["combo"].get("old", 0))
-				highlights.append("New Best Combo: %d → %d" % [old_c, mc])
+				combo_line = "[color=#ffd700]" + combo_line + "[/color]"
+			lines.append(combo_line)
 		if _main.has_method("get_max_dps"):
 			var md: float = _main.get_max_dps()
-			lines.append("Max DPS: %.0f" % md)
+			var best_d: float = _main.get_best_dps() if _main.has_method("get_best_dps") else md
+			var dps_line := "Max DPS %.0f(%.0f)" % [md, best_d]
 			if "dps" in diff and diff["dps"].get("is_new", false):
-				var old_d := float(diff["dps"].get("old", 0.0))
-				highlights.append("New Best DPS: %.0f → %.0f" % [old_d, md])
-		if _main.has_method("get_best_score"):
-			lines.append("Best Score: %d" % _main.get_best_score())
-		if _main.has_method("get_best_dps"):
-			lines.append("Best DPS: %.0f" % _main.get_best_dps())
-		if _main.has_method("get_best_combo"):
-			lines.append("Best Combo: %d" % _main.get_best_combo())
-		if not highlights.is_empty():
-			lines.append("")
-			lines.append("New Records:")
-			for h in highlights:
-				lines.append(" - " + h)
+				dps_line = "[color=#ffd700]" + dps_line + "[/color]"
+			lines.append(dps_line)
 		if lines.is_empty():
 			lines.append("Battle Summary")
-		_label.text = "\n".join(lines)
+		_label.bbcode_enabled = true
+		_label.bbcode_text = "\n".join(lines)
 	# 新规则下不再提供“继续游玩”
 	if _continue_btn != null:
 		_continue_btn.visible = false
