@@ -42,17 +42,6 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("11_ui_theme")
 
-[node name="ExpBar" type="ProgressBar" parent="HUD/Root" unique_id=1904624421]
-unique_name_in_owner = true
-layout_mode = 0
-anchor_left = 0.05
-anchor_top = 1.0
-anchor_right = 0.95
-anchor_bottom = 1.0
-offset_top = -48.0
-offset_bottom = -16.0
-max_value = 1.0
-
 [node name="WaveLabel" type="Label" parent="HUD/Root" unique_id=1566627949]
 unique_name_in_owner = true
 layout_mode = 0

@@ -22,7 +22,6 @@ var _bomb_notice_label: Label = null
 @onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
-@onready var _exp_bar: ProgressBar = %ExpBar
 @onready var _pause_button: Button = %PauseButton
 @onready var _settings_button: Button = %SettingsButton
 @onready var _score_label: Label = %ScoreLabel
@@ -53,10 +52,6 @@ func _ready() -> void:
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	if _exp_bar != null:
-		_exp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_exp_bar.max_value = 1.0
-	
 	# 暂停按钮：始终可点，用于切换树的暂停状态
 	if _pause_button != null:
 		_pause_button.pressed.connect(_on_pause_button_pressed)
@@ -70,10 +65,6 @@ func _ready() -> void:
 	_ensure_bomb_vfx_nodes()
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_main) and _main.has_method("get_exp") and _main.has_method("get_exp_to_next"):
-		var exp_next: int = _main.get_exp_to_next()
-		if exp_next > 0:
-			_exp_bar.value = float(_main.get_exp()) / float(exp_next)
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
 		var wave_text := "第 %d 波" % _main.get_wave()
 		if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
