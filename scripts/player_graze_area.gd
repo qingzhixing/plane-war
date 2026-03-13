@@ -37,7 +37,7 @@ func _physics_process(_delta: float) -> void:
 		var last_v: int = int(_last_vfx_ms.get(id, 0))
 		if now - last_v >= VFX_TICK_MS:
 			_last_vfx_ms[id] = now
-			_spawn_graze_vfx(area)
+			_spawn_graze_vfx(area.global_position)
 	# 清理已释放实例 id，避免字典膨胀
 	if _last_score_ms.size() > 400:
 		_trim_old_ids()
@@ -55,9 +55,8 @@ func _trim_old_ids() -> void:
 			_last_vfx_ms.erase(k)
 
 
-func _spawn_graze_vfx(target: Node2D) -> void:
-	if not is_instance_valid(target):
-		return
+## 特效从玩家擦弹环一侧发出：沿「玩家→敌弹/敌机」方向落在环边缘，避免从子弹中心冒出
+func _spawn_graze_vfx(toward_world: Vector2) -> void:
 	var parent := get_tree().current_scene
 	if parent == null:
 		return
@@ -65,6 +64,15 @@ func _spawn_graze_vfx(target: Node2D) -> void:
 	if vfx == null:
 		return
 	parent.add_child(vfx)
-	vfx.global_position = target.global_position
+	var rim_r: float = 96.0
+	var cs := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if cs != null and cs.shape is CircleShape2D:
+		rim_r = (cs.shape as CircleShape2D).radius
+	var offset := toward_world - global_position
+	if offset.length_squared() < 1.0:
+		offset = Vector2.RIGHT * rim_r
+	else:
+		offset = offset.normalized() * rim_r
+	vfx.global_position = global_position + offset
 	if vfx is CPUParticles2D:
 		(vfx as CPUParticles2D).emitting = true
