@@ -15,6 +15,9 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁"},
 
+	# 副武器：回旋镖（boomerang_multi 解锁 + 齐射 +1）
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖齐射 +1（全数回收后再射下一波）"},
+
 	# 副武器：炸弹（由 bomb_multi 首次解锁）
 	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机"},
 	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
@@ -235,6 +238,7 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"arrow_multi",
 		"combo_boost",
 		"combo_guard",
+		"boomerang_multi",
 		"bomb_cooldown",
 		"bomb_multi",
 		"bomb_side_cooldown",

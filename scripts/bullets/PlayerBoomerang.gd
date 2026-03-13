@@ -12,6 +12,20 @@ var _initialized_direction: bool = false
 func _ready() -> void:
 	super._ready()
 	add_to_group("player_boomerang")
+	# 不沿用 BulletBase 的穿透耗尽 queue_free，否则飞程中打满次数会消失
+
+
+func _on_area_entered(area: Node) -> void:
+	if not (area.is_in_group("enemy") or area.is_in_group("boss")):
+		return
+	var dealt_damage := damage
+	if area.is_in_group("boss"):
+		dealt_damage = max(1, int(round(float(damage) * _boss_damage_multiplier)))
+	if area.has_method("apply_damage"):
+		area.apply_damage(dealt_damage)
+		get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
+		_spawn_hit_vfx(area)
+	# 回旋镖不因命中销毁，仅回程触玩家或出界销毁
 
 
 func _process(delta: float) -> void:

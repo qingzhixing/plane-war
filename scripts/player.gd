@@ -33,13 +33,15 @@ var _combo_damage_bonus: int = 0
 var _weapon_mode: String = "bullet"
 var _weapon_unlocked: Dictionary = {
 	"arrow": false,
+	"boomerang": false,
 	"bomb": false,
 }
+var _boomerang_shot_count: int = 1
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
 var _arrow_shot_count: int = 0
-## 0 或 1：最多一枚在飞，回收后再发一枚
+## 当前在飞的回旋镖数量；归零后齐射下一波
 var _boomerang_airborne: int = 0
 var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
@@ -69,13 +71,14 @@ func _ready() -> void:
 	_bomb_auto_timer = bomb_auto_interval
 	if _weapon_mode == "boomerang":
 		_weapon_mode = "bullet"
+		_weapon_unlocked["boomerang"] = true
 	if _weapon_mode == "bomb":
 		_weapon_mode = "bullet"
 		_weapon_unlocked["bomb"] = true
 		_bomb_shot_count = maxi(_bomb_shot_count, 1)
 	_init_shield()
-	if _boomerang_airborne == 0:
-		call_deferred("_spawn_one_boomerang")
+	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
+		call_deferred("_spawn_boomerang_volley")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -187,18 +190,19 @@ func _spawn_bomb_shot() -> void:
 		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", side_offset)
 
 
-func _spawn_one_boomerang() -> void:
-	if bullet_scene_boomerang == null or _boomerang_airborne > 0:
+func _spawn_boomerang_volley() -> void:
+	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null or _boomerang_airborne > 0:
 		return
-	_boomerang_airborne = 1
-	var dir := Vector2(0, -1)
-	var target := _boomerang_aim_dir()
-	if target.length_squared() > 0.0001:
-		dir = target
-	if dir.y > 0.0:
-		dir.y = -absf(dir.y)
-	dir = dir.normalized()
-	_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 2, "bullet", "boomerang", Vector2.ZERO)
+	var n: int = maxi(1, _boomerang_shot_count)
+	_boomerang_airborne = n
+	var spread := 0.18
+	for i in n:
+		var angle: float = (i - (n - 1) * 0.5) * spread
+		var dir := Vector2(sin(angle), -cos(angle))
+		if dir.y > 0.0:
+			dir.y = -dir.y
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
 
 
 func _boomerang_aim_dir() -> Vector2:
@@ -215,8 +219,9 @@ func _boomerang_aim_dir() -> Vector2:
 
 
 func on_boomerang_returned() -> void:
-	_boomerang_airborne = 0
-	call_deferred("_spawn_one_boomerang")
+	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
+	if _boomerang_airborne == 0 and has_weapon_unlocked("boomerang"):
+		call_deferred("_spawn_boomerang_volley")
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -343,8 +348,14 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if not has_weapon_unlocked("arrow"):
 				_weapon_unlocked["arrow"] = true
 			_arrow_shot_count = max(1, _arrow_shot_count + 1)
-		"boomerang_speed", "boomerang_cooldown", "boomerang_multi":
+		"boomerang_speed", "boomerang_cooldown":
 			pass
+		"boomerang_multi":
+			if not has_weapon_unlocked("boomerang"):
+				_weapon_unlocked["boomerang"] = true
+				call_deferred("_spawn_boomerang_volley")
+			else:
+				_boomerang_shot_count = mini(6, _boomerang_shot_count + 1)
 		"bomb_multi", "bomb_weapon":
 			if not has_weapon_unlocked("bomb"):
 				_weapon_unlocked["bomb"] = true
