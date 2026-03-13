@@ -49,6 +49,8 @@ var _debug_skip_to_boss_used: bool = false
 var _debug_skip_to_boss_active: bool = false
 var _debug_upgrades_needed: int = 0
 var _bomb_cooldown_remaining: float = 0.0
+## 符卡区短按检测（按钮 IGNORE 后触摸全程未处理，与拖动共用）
+var _bomb_tap_start: Dictionary = {}
 
 const _BOMB_COOLDOWN_SECONDS: float = 12.0
 const _BOMB_BURST_WAVE_COUNT: int = 4
@@ -258,6 +260,41 @@ func try_use_bomb() -> bool:
 	_trigger_bomb_effect()
 	emit_signal("bomb_used")
 	return true
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var e := event as InputEventScreenTouch
+		var k := e.index + 100000
+		if e.pressed:
+			_bomb_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
+		else:
+			_try_bomb_short_tap(e.position, k)
+	elif event is InputEventMouseButton:
+		var e := event as InputEventMouseButton
+		if e.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if e.pressed:
+			_bomb_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
+		else:
+			_try_bomb_short_tap(e.position, -1)
+
+
+func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
+	var st: Variant = _bomb_tap_start.get(key, null)
+	_bomb_tap_start.erase(key)
+	if st == null or typeof(st) != TYPE_DICTIONARY:
+		return
+	var t0: int = int(st["t"])
+	var p0: Vector2 = st["p"]
+	if Time.get_ticks_msec() - t0 > 320:
+		return
+	if screen_pos.distance_to(p0) > 56.0:
+		return
+	var hud := get_node_or_null("HUD")
+	if hud != null and hud.has_method("get_bomb_screen_rect"):
+		if hud.get_bomb_screen_rect().has_point(screen_pos):
+			try_use_bomb()
 
 
 func get_best_score() -> int:
