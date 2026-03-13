@@ -150,6 +150,9 @@ func apply_upgrade(upgrade_id: String) -> void:
 			return
 		"combo_guard":
 			_combo_guard_charges += 1
+			var p_guard := get_node_or_null(player_path)
+			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+				p_guard.set_combo_guard_shield_visible(true)
 			return
 		"bomb_cooldown":
 			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
@@ -292,6 +295,12 @@ func on_player_hit() -> void:
 		audio.play_player_hurt()
 	if _combo_guard_charges > 0:
 		_combo_guard_charges -= 1
+		var p_hit := get_node_or_null(player_path)
+		if p_hit != null:
+			if p_hit.has_method("play_combo_guard_pulse"):
+				p_hit.play_combo_guard_pulse()
+			if p_hit.has_method("set_combo_guard_shield_visible"):
+				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
 	if combo > 0:
 		combo = 0

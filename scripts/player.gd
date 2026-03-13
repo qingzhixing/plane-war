@@ -311,6 +311,32 @@ func set_shield_active(active: bool) -> void:
 		_shield_node.visible = active
 
 
+## 仅显示「稳态护盾」光圈（不改变挡伤逻辑）；有 combo_guard 层数时调用。
+func set_combo_guard_shield_visible(active: bool) -> void:
+	if _shield_node != null:
+		_shield_node.visible = active
+		if active:
+			_shield_node.modulate = Color(1, 1, 1, 1)
+
+
+## 连击被护盾抵消时的短闪，不关掉光圈。
+func play_combo_guard_pulse() -> void:
+	if _shield_node == null:
+		return
+	_shield_node.visible = true
+	_shield_node.modulate = Color(1, 1, 1, 1)
+	var tween := create_tween()
+	if tween == null:
+		return
+	tween.set_parallel(true)
+	tween.tween_property(_shield_node, "modulate", Color(1.7, 1.7, 1.2, 1), 0.08)
+	tween.tween_property(_shield_node, "scale", Vector2(1.07, 1.07), 0.08)
+	tween.chain()
+	tween.set_parallel(true)
+	tween.tween_property(_shield_node, "modulate", Color(1, 1, 1, 1), 0.18)
+	tween.tween_property(_shield_node, "scale", Vector2(1, 1), 0.18)
+
+
 func _init_shield() -> void:
 	if _PlayerShieldScene == null:
 		return

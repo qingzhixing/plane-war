@@ -51,8 +51,8 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
-func set_boomerang_owner(owner: Node2D) -> void:
-	_owner = owner
+func set_boomerang_owner(new_owner: Node2D) -> void:
+	_owner = new_owner
 
 
 func _find_target() -> Node2D:
