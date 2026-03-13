@@ -9,7 +9,6 @@ extends CharacterBody2D
 @export var bullet_scene_bomb: PackedScene
 @export var hit_invulnerable_seconds: float = 0.35
 @export var arrow_auto_interval: float = 1.4
-@export var boomerang_auto_interval: float = 2.6
 @export var bomb_auto_interval: float = 2.5
 
 var _fire_timer: float = 0.0
@@ -37,9 +36,11 @@ var _weapon_unlocked: Dictionary = {
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
-var _boomerang_auto_timer: float = 0.0
 var _arrow_shot_count: int = 0
-var _boomerang_shot_count: int = 0
+var _boomerang_shot_count: int = 1
+## 当前在飞的回旋镖数量；归零后才发射下一波
+var _boomerang_airborne: int = 0
+var _boomerang_speed_mult: float = 1.0
 var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
@@ -65,14 +66,17 @@ func _ready() -> void:
 	if bullet_scene_bomb == null and _fallback_bullet_scene_bomb != null:
 		bullet_scene_bomb = _fallback_bullet_scene_bomb
 	_arrow_auto_timer = arrow_auto_interval
-	_boomerang_auto_timer = boomerang_auto_interval
 	_bomb_auto_timer = bomb_auto_interval
-	# 旧存档若主武器曾为炸弹，改为副武器已解锁
+	if _weapon_mode == "boomerang":
+		_weapon_mode = "bullet"
+		_weapon_unlocked["boomerang"] = true
 	if _weapon_mode == "bomb":
 		_weapon_mode = "bullet"
 		_weapon_unlocked["bomb"] = true
 		_bomb_shot_count = maxi(_bomb_shot_count, 1)
 	_init_shield()
+	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
+		call_deferred("_spawn_boomerang_volley")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -150,8 +154,6 @@ func _spawn_weapon_shot() -> void:
 	match _weapon_mode:
 		"arrow":
 			_spawn_arrow_shot()
-		"boomerang":
-			_spawn_boomerang_shot()
 		_:
 			_spawn_default_shot()
 
@@ -186,17 +188,28 @@ func _spawn_bomb_shot() -> void:
 		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", side_offset)
 
 
-func _spawn_boomerang_shot() -> void:
-	var n: int = max(1, _boomerang_shot_count)
+func _spawn_boomerang_volley() -> void:
+	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
+		return
+	if _boomerang_airborne > 0:
+		return
+	var n: int = maxi(1, _boomerang_shot_count)
+	_boomerang_airborne = n
 	var spread := 0.18
+	var base_mult := 0.95 * _boomerang_speed_mult
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		# 限制回旋镖只向屏幕上方发射
 		if dir.y > 0.0:
 			dir.y = -dir.y
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
-		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, 0.95, 2, "bullet", "boomerang", side_offset)
+		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, base_mult, 2, "bullet", "boomerang", side_offset)
+
+
+func on_boomerang_returned() -> void:
+	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
+	if _boomerang_airborne == 0 and has_weapon_unlocked("boomerang"):
+		call_deferred("_spawn_boomerang_volley")
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -205,11 +218,6 @@ func _update_side_weapons(delta: float) -> void:
 		if _arrow_auto_timer <= 0.0:
 			_arrow_auto_timer += arrow_auto_interval
 			_spawn_arrow_shot()
-	if has_weapon_unlocked("boomerang"):
-		_boomerang_auto_timer -= delta
-		if _boomerang_auto_timer <= 0.0:
-			_boomerang_auto_timer += boomerang_auto_interval
-			_spawn_boomerang_shot()
 	if has_weapon_unlocked("bomb"):
 		_bomb_auto_timer -= delta
 		if _bomb_auto_timer <= 0.0:
@@ -233,6 +241,8 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 		bullet.set_direction(dir)
 	if bullet.has_method("set_boomerang_owner") and bullet_motion_mode == "boomerang":
 		bullet.set_boomerang_owner(self)
+		if "return_speed_multiplier" in bullet:
+			bullet.return_speed_multiplier = _boomerang_speed_mult
 	if bullet.has_method("set_boss_damage_multiplier"):
 		bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
 	if penetration > 0 and bullet.has_method("set_penetration"):
@@ -326,12 +336,15 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if not has_weapon_unlocked("arrow"):
 				_weapon_unlocked["arrow"] = true
 			_arrow_shot_count = max(1, _arrow_shot_count + 1)
-		"boomerang_cooldown":
-			boomerang_auto_interval = maxf(0.7, boomerang_auto_interval * 0.8)
+		"boomerang_speed", "boomerang_cooldown":
+			_boomerang_speed_mult *= 1.15
 		"boomerang_multi":
 			if not has_weapon_unlocked("boomerang"):
 				_weapon_unlocked["boomerang"] = true
-			_boomerang_shot_count = max(1, _boomerang_shot_count + 1)
+				call_deferred("_spawn_boomerang_volley")
+			else:
+				_boomerang_shot_count = mini(4, _boomerang_shot_count + 1)
+				_boomerang_speed_mult *= 1.05
 		"bomb_multi", "bomb_weapon":
 			if not has_weapon_unlocked("bomb"):
 				_weapon_unlocked["bomb"] = true

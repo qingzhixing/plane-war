@@ -42,13 +42,20 @@ func _process(delta: float) -> void:
 		step = direction * speed * return_speed_multiplier * delta
 		global_position += step
 
-	# 返回时，接触到玩家后销毁
+	# 返回时，接触到玩家后销毁并通知玩家发射下一枚
 	if _returning and is_instance_valid(_owner) and global_position.distance_to(_owner.global_position) <= 24.0:
+		_notify_owner_returned()
 		queue_free()
 		return
 
 	if _is_out_of_bounds():
+		_notify_owner_returned()
 		queue_free()
+
+
+func _notify_owner_returned() -> void:
+	if is_instance_valid(_owner) and _owner.has_method("on_boomerang_returned"):
+		_owner.on_boomerang_returned()
 
 
 func set_boomerang_owner(new_owner: Node2D) -> void:

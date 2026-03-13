@@ -16,8 +16,8 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁"},
 
 	# 副武器：回旋镖（由 boomerang_multi 首次解锁）
-	{"id": "boomerang_cooldown", "name": "回旋加速", "desc": "回旋镖冷却 -20%"},
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁"},
+	{"id": "boomerang_speed", "name": "回旋加速", "desc": "回旋镖飞行与回程速度 +15%"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖（回收后再射）；已解锁则齐射+1 且略提速"},
 
 	# 副武器：炸弹（由 bomb_multi 首次解锁）
 	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机"},
@@ -165,7 +165,7 @@ func show_pick() -> void:
 			continue
 		if u["id"] == "arrow_cooldown" and not arrow_unlocked:
 			continue
-		if u["id"] == "boomerang_cooldown" and not boomerang_unlocked:
+		if u["id"] == "boomerang_speed" and not boomerang_unlocked:
 			continue
 		if u["id"] == "bomb_side_cooldown" and not bomb_unlocked:
 			continue
@@ -241,7 +241,7 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"boss_hunter",
 		"arrow_cooldown",
 		"arrow_multi",
-		"boomerang_cooldown",
+		"boomerang_speed",
 		"boomerang_multi",
 		"combo_boost",
 		"combo_guard",
