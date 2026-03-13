@@ -27,7 +27,10 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-@onready var _stats_label: Control = %StatsLabel
+@onready var _main_gun_stats: RichTextLabel = %MainGunStatsLabel
+@onready var _combo_buff_stats: RichTextLabel = %ComboBuffStatsLabel
+@onready var _side_weapon_stats: RichTextLabel = %SideWeaponStatsLabel
+@onready var _spell_stats: RichTextLabel = %SpellStatsLabel
 var _spell_button: Button = null
 
 
@@ -49,8 +52,18 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if _stats_label != null:
-		_stats_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for n in [
+		get_node_or_null("Root/TopRightVBox/MainGunTitleLabel"),
+		_main_gun_stats,
+		get_node_or_null("Root/TopRightVBox/ComboBuffTitleLabel"),
+		_combo_buff_stats,
+		get_node_or_null("Root/TopRightVBox/SideWeaponTitleLabel"),
+		_side_weapon_stats,
+		get_node_or_null("Root/TopRightVBox/SpellTitleLabel"),
+		_spell_stats,
+	]:
+		if n is Control:
+			(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	call_deferred("_update_stats_label")
 	
 	if _wave_label != null:
@@ -358,16 +371,16 @@ func _play_combo_break_sfx() -> void:
 
 
 func _update_stats_label() -> void:
-	if _stats_label == null or not is_instance_valid(_stats_label):
-		return
-	var rtl := _stats_label as RichTextLabel
-	if rtl == null:
+	if _main_gun_stats == null or _combo_buff_stats == null or _side_weapon_stats == null or _spell_stats == null:
 		return
 	const C_FR := "#ffcc66"
 	const C_MV := "#6fcf97"
 	const C_BS := "#7eb8da"
 	const C_DMG := "#f0a8a0"
-	var lines: PackedStringArray = []
+	var main_lines: PackedStringArray = []
+	var combo_lines: PackedStringArray = []
+	var side_lines: PackedStringArray = []
+	var spell_line := "—"
 	if is_instance_valid(_player):
 		var eff_iv: float = 0.2
 		if _player.has_method("get_effective_fire_interval"):
@@ -401,17 +414,14 @@ func _update_stats_label() -> void:
 		if fr_mult > 1.009:
 			line1 += "[color=%s](+%.0f%%)[/color]" % [C_FR, (fr_mult - 1.0) * 100.0]
 		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
-		lines.append(line1)
-		lines.append("主炮间隔 %.2fs（下次 %.2fs）" % [eff_iv, main_cd])
-		var combo_bits: PackedStringArray = []
+		main_lines.append(line1)
+		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
 		if mv_mult > 1.009:
-			combo_bits.append("[color=%s]移速(+%.0f%%)[/color]" % [C_MV, (mv_mult - 1.0) * 100.0])
+			combo_lines.append("[color=%s]移速(+%.0f%%)[/color]" % [C_MV, (mv_mult - 1.0) * 100.0])
 		if bs_mult > 1.009:
-			combo_bits.append("[color=%s]弹速(+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0])
+			combo_lines.append("[color=%s]弹速(+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0])
 		if dmg_bonus > 0:
-			combo_bits.append("[color=%s]伤害(+%d)[/color]" % [C_DMG, dmg_bonus])
-		if combo_bits.size() > 0:
-			lines.append("连击 " + " ".join(combo_bits))
+			combo_lines.append("[color=%s]伤害(+%d)[/color]" % [C_DMG, dmg_bonus])
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
@@ -420,9 +430,9 @@ func _update_stats_label() -> void:
 			var ar_n := 1
 			if _player.has_method("get_arrow_shot_count"):
 				ar_n = int(_player.get_arrow_shot_count())
-			lines.append("弓箭 %.1f/%.1fs  ×%d" % [ar_rem, ar, ar_n])
+			side_lines.append("弓箭 %.1f/%.1fs ×%d" % [ar_rem, ar, ar_n])
 		else:
-			lines.append("弓箭 —")
+			side_lines.append("弓箭 —")
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb"):
 			var bm := float(_player.bomb_auto_interval) if "bomb_auto_interval" in _player else 2.5
 			var bm_rem := 0.0
@@ -431,9 +441,9 @@ func _update_stats_label() -> void:
 			var bm_n := 1
 			if _player.has_method("get_bomb_shot_count"):
 				bm_n = int(_player.get_bomb_shot_count())
-			lines.append("炸弹 %.1f/%.1fs  ×%d" % [bm_rem, bm, bm_n])
+			side_lines.append("炸弹 %.1f/%.1fs ×%d" % [bm_rem, bm, bm_n])
 		else:
-			lines.append("炸弹 —")
+			side_lines.append("炸弹 —")
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang"):
 			var air := 0
 			var vol := 1
@@ -441,16 +451,17 @@ func _update_stats_label() -> void:
 				air = int(_player.get_boomerang_airborne())
 			if _player.has_method("get_boomerang_shot_count"):
 				vol = int(_player.get_boomerang_shot_count())
-			lines.append("回旋镖 场上%d  齐射%d" % [air, vol])
+			side_lines.append("回旋镖 场上%d 齐射%d" % [air, vol])
 		else:
-			lines.append("回旋镖 —")
+			side_lines.append("回旋镖 —")
 	if is_instance_valid(_main) and _main.has_method("get_spell_cooldown_remaining"):
 		var sp_r := float(_main.get_spell_cooldown_remaining())
 		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
-		lines.append("符卡 %.1f/%.1fs" % [sp_r, sp_t])
-	if lines.is_empty():
-		lines.append("属性加载中…")
-	rtl.text = "\n".join(lines)
+		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
+	_main_gun_stats.text = "\n".join(main_lines) if main_lines.size() > 0 else "—"
+	_combo_buff_stats.text = " ".join(combo_lines) if combo_lines.size() > 0 else "无"
+	_side_weapon_stats.text = "\n".join(side_lines) if side_lines.size() > 0 else "—"
+	_spell_stats.text = spell_line
 
 
 func _ensure_spell_button() -> void:

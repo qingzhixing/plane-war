@@ -122,12 +122,71 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "DPS: 0  Max: 0"
 
-[node name="StatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010001]
+[node name="MainGunTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010001]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
+text = "主炮"
+
+[node name="MainGunStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010002]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-custom_minimum_size = Vector2(300, 160)
-theme_override_font_sizes/normal_font_size = 17
+custom_minimum_size = Vector2(300, 44)
+theme_override_font_sizes/normal_font_size = 16
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+bbcode_enabled = true
+scroll_active = false
+fit_content = true
+autowrap_mode = 3
+text = ""
+
+[node name="ComboBuffTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.55, 0.95, 0.75, 1)
+text = "连击Buff"
+
+[node name="ComboBuffStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010004]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(300, 28)
+theme_override_font_sizes/normal_font_size = 16
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+bbcode_enabled = true
+scroll_active = false
+fit_content = true
+autowrap_mode = 3
+text = ""
+
+[node name="SideWeaponTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010005]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.95, 0.7, 0.55, 1)
+text = "炸弹 / 副武器"
+
+[node name="SideWeaponStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010006]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(300, 72)
+theme_override_font_sizes/normal_font_size = 16
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+bbcode_enabled = true
+scroll_active = false
+fit_content = true
+autowrap_mode = 3
+text = ""
+
+[node name="SpellTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010007]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
+text = "符卡"
+
+[node name="SpellStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010008]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(300, 28)
+theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
 bbcode_enabled = true
 scroll_active = false
