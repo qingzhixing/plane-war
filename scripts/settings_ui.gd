@@ -11,6 +11,9 @@ var _sfx_mute_check: CheckBox
 var _close_button: Button
 var _vibration_check: CheckBox
 var _scale_option: OptionButton
+var _end_run_button: Button
+var _skip_boss_button: Button
+var _debug_upgrades_button: Button
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
@@ -142,31 +145,31 @@ func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 	vbox.add_child(_close_button)
 
-	# 提前结算按钮（局内可从设置中直接结束本局）
-	var end_run_button := Button.new()
-	end_run_button.text = "提前结算"
-	end_run_button.custom_minimum_size = Vector2(200, 64)
-	end_run_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	end_run_button.add_theme_font_size_override("font_size", 24)
-	end_run_button.pressed.connect(_on_end_run_pressed)
-	vbox.add_child(end_run_button)
+	# 提前结算 / 调试项：仅局内（Main）打开设置时显示；主菜单打开时隐藏
+	_end_run_button = Button.new()
+	_end_run_button.text = "提前结算"
+	_end_run_button.custom_minimum_size = Vector2(200, 64)
+	_end_run_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_end_run_button.add_theme_font_size_override("font_size", 24)
+	_end_run_button.pressed.connect(_on_end_run_pressed)
+	vbox.add_child(_end_run_button)
 
-	# 跳到 Boss 关（调试用）
-	var skip_boss_button := Button.new()
-	skip_boss_button.text = "跳到 Boss（调试）"
-	skip_boss_button.custom_minimum_size = Vector2(220, 64)
-	skip_boss_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	skip_boss_button.add_theme_font_size_override("font_size", 24)
-	skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
-	vbox.add_child(skip_boss_button)
+	_skip_boss_button = Button.new()
+	_skip_boss_button.text = "跳到 Boss（调试）"
+	_skip_boss_button.custom_minimum_size = Vector2(220, 64)
+	_skip_boss_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_skip_boss_button.add_theme_font_size_override("font_size", 24)
+	_skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
+	vbox.add_child(_skip_boss_button)
 
-	var debug_upgrades_button := Button.new()
-	debug_upgrades_button.text = "自选升级（调试）"
-	debug_upgrades_button.custom_minimum_size = Vector2(220, 64)
-	debug_upgrades_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	debug_upgrades_button.add_theme_font_size_override("font_size", 24)
-	debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
-	vbox.add_child(debug_upgrades_button)
+	_debug_upgrades_button = Button.new()
+	_debug_upgrades_button.text = "自选升级（调试）"
+	_debug_upgrades_button.custom_minimum_size = Vector2(220, 64)
+	_debug_upgrades_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_debug_upgrades_button.add_theme_font_size_override("font_size", 24)
+	_debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
+	vbox.add_child(_debug_upgrades_button)
+	_apply_run_only_buttons_visibility(false)
 
 	_load_extra_settings()
 
@@ -175,12 +178,24 @@ func show_settings() -> void:
 	_is_from_menu = false
 	_was_paused_before = get_tree().paused
 	get_tree().paused = true
+	_apply_run_only_buttons_visibility(true)
 	visible = true
 
 
 func show_settings_from_menu() -> void:
 	_is_from_menu = true
+	_apply_run_only_buttons_visibility(false)
 	visible = true
+
+
+func _apply_run_only_buttons_visibility(in_run: bool) -> void:
+	var show := in_run
+	if _end_run_button != null:
+		_end_run_button.visible = show
+	if _skip_boss_button != null:
+		_skip_boss_button.visible = show
+	if _debug_upgrades_button != null:
+		_debug_upgrades_button.visible = show
 
 
 func _on_close_pressed() -> void:
