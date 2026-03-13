@@ -55,8 +55,8 @@ const _HIT_BLINK_FREQ := 20.0
 var _has_shield: bool = false
 var _shield_node: Node2D
 const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
-## 基础射速 1/0.2=5/s，3× 封顶 → 超过部分转伤害
-const _MAX_MAIN_ROF: float = 15.0
+## 主炮射速上限（发/秒），超过部分转伤害
+const _MAX_MAIN_ROF: float = 75.0
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -314,7 +314,7 @@ func get_weapon_mode() -> String:
 	return _weapon_mode
 
 
-## HUD：有效主炮射击间隔（秒/发；达 15/s 上限后不再变快）
+## HUD：有效主炮射击间隔（秒/发；达 75/s 上限后不再变快）
 func get_effective_fire_interval() -> float:
 	return _effective_shot_interval()
 

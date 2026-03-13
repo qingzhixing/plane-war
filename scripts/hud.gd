@@ -429,7 +429,7 @@ func _update_stats_label() -> void:
 		var line1 := "射速 %.1f/s" % rof
 		if fr_mult > 1.009:
 			line1 += "[color=%s](连击×%.2f)[/color]" % [C_FR, fr_mult]
-		if rof >= 14.5:
+		if rof >= 72.5:
 			line1 += " [color=%s]上限[/color]" % C_FR
 		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
 		main_lines.append(line1)
