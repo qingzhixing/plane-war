@@ -2,7 +2,7 @@
 
 ## 菜单
 
-- **主菜单场景**：`res://scenes/MainMenu.tscn`（工程 **启动场景**）。进入游戏先见标题与三个入口。
+- **主菜单场景**：`res://scenes/MainMenu.tscn`（工程 **启动场景**）。进入游戏先见标题与三个入口。**布局在场景内预设子节点**（背景、标题、按钮等），脚本只做信号与 `change_scene`，避免运行时拼 UI。
 - **主菜单入口**：
   - **开始游戏**：`change_scene` 进入 `res://scenes/Main.tscn` 开战。
   - **设置**：打开与局内相同的设置面板（`show_settings_from_menu()`，不关暂停，因主菜单未跑战斗）。
