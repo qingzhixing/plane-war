@@ -59,7 +59,7 @@
     - **回旋镖**：场上枚数、齐射数（无固定 CD 时仍展示状态）
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
-  - 布局：**左侧 `LeftStatsVBox`**：`DpsLabel` 下按 **标题 + RichTextLabel** 分组（Score / DPS / 主炮 / 副武器 / 符卡）：
+  - 布局：**左侧 `LeftStatsVBox`**（Score≈28、DPS≈26、分区标题≈22、正文≈19）：`DpsLabel` 下 **标题 + RichTextLabel**（主炮 / 副武器 / 符卡）：
     - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔、**弹速基数与连击弹速 Buff**）
     - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
