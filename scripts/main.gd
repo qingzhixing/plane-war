@@ -9,13 +9,11 @@ var _exp: int = 0
 var _level: int = 1
 var _exp_to_next: int = 10
 var _continue_used: bool = false
-var _exp_multiplier: float = 1.0
 var _wave: int = 1
 var _boss_spawned: bool = false
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
-var _flat_score_bonus: int = 0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
@@ -29,6 +27,7 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 var best_combo: int = 0
 
+const GRAZE_SCORE: int = 4
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
@@ -49,13 +48,8 @@ const _BOMB_BURST_BULLET_COUNT: int = 40
 const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
 
 func _ready() -> void:
-	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
-	var root_window := get_tree().root
-	if root_window is Window:
-		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
-		root_window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
-		root_window.content_scale_size = Vector2i(720, 1280)
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
+	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
 
 	add_to_group("experience_listener")
 	add_to_group("battle_stats_manager")
@@ -136,20 +130,17 @@ func _on_level_up() -> void:
 
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
-		"exp_up":
-			_exp_multiplier += 0.2
-			return
 		"score_up":
 			_score_multiplier += 0.15
-			return
-		"score_flat":
-			_flat_score_bonus += 5
 			return
 		"combo_boost":
 			_combo_gain_per_hit += 1
 			return
 		"combo_guard":
 			_combo_guard_charges += 1
+			var p_guard := get_node_or_null(player_path)
+			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+				p_guard.set_combo_guard_shield_visible(true)
 			return
 		"bomb_cooldown":
 			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
@@ -159,8 +150,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 		p.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
-	# 经验值仅用于统计，不再直接驱动升级；保留接口以兼容现有代码
-	_exp += int(amount * _exp_multiplier)
+	_exp += amount
 
 func get_exp() -> int:
 	return _exp
@@ -276,11 +266,16 @@ func record_player_damage(amount: float, _target: Node) -> void:
 	_on_successful_hit()
 
 
+func record_graze() -> void:
+	var gained := maxi(1, int(round(float(GRAZE_SCORE) * _score_multiplier)))
+	score += gained
+
+
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 	if base_score <= 0:
 		return
 	var multiplier := _get_combo_multiplier()
-	var gained := int(round(float(base_score) * multiplier * _score_multiplier)) + _flat_score_bonus
+	var gained := int(round(float(base_score) * multiplier * _score_multiplier))
 	if gained < 0:
 		gained = 0
 	score += gained
@@ -292,6 +287,12 @@ func on_player_hit() -> void:
 		audio.play_player_hurt()
 	if _combo_guard_charges > 0:
 		_combo_guard_charges -= 1
+		var p_hit := get_node_or_null(player_path)
+		if p_hit != null:
+			if p_hit.has_method("play_combo_guard_pulse"):
+				p_hit.play_combo_guard_pulse()
+			if p_hit.has_method("set_combo_guard_shield_visible"):
+				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
 	if combo > 0:
 		combo = 0

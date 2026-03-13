@@ -3,13 +3,16 @@
 ## 技术栈
 
 - 引擎版本：**Godot 4.x**
+- **窗口拉伸（全工程统一）**：`project.godot` → Display → Stretch **Mode = viewport**、**Aspect = keep**，基准 **720×1280**。主菜单与 `Main` 同一逻辑：拉伸/放大窗口时整画布等比缩放，避免仅战斗场景缩放而标题界面不缩放。
 - 渲染管线：默认（Forward+ 或兼容的移动友好设置，视具体需求调整）
 - 平台目标：Windows + Android
 - 脚本语言：优先使用 **GDScript**（如需改为 C#，在本节补充说明）
 
 ## 项目结构（建议）
 
-- 主场景：`res://scenes/Main.tscn`
+- 启动 / 主菜单：`res://scenes/MainMenu.tscn` → 开始游戏后进入 `res://scenes/Main.tscn`；关于页 `AboutUI` + `scripts/about_ui.gd`（`OS.shell_open` 打开 GitHub）。
+- **README 截图目录** `docs/picture/` 根下放 **`.gdignore`**（空文件即可），Godot 不再扫描该夹，PNG 仅给仓库/README 用、不生成 `.import`。
+- 本地成绩：`user://records.cfg`（`best_score` / `best_combo` / `best_dps`），由 `Main` 结算写入；主菜单「成绩查询」只读同一文件。
 - 玩家：
   - 场景：`res://scenes/Player.tscn`
   - 节点类型：`CharacterBody2D`
@@ -35,10 +38,14 @@
 
 - 玩家闪烁与护盾：
   - 玩家受击后的闪烁使用简单方式实现（Shader 或 `modulate`/`visible` 控制），重点是节奏感与可读性。
-  - 护盾使用独立场景（例如 `res://scenes/vfx/PlayerShield.tscn`），包含：
-    - 护盾 `Sprite2D` + Shader（外圈光晕、轻微扭曲）。
-    - 控制脚本暴露方法：`show_shield() / hide_shield() / play_block_effect()`。
-  - 玩家脚本持有护盾节点引用，在获得护盾时显示，在护盾抵消一次伤害时调用 `play_block_effect()` 并视规则决定是否隐藏。
+  - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
+  - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
+
+## 调试工具（开发/自测）
+
+- **自选升级面板**：战斗中随时打开，从完整列表里点选一项即调用 `Main.apply_upgrade(id)`，**不**经过波次升级流程（不改变 `_waiting_upgrade_choice`）。
+- **入口**：仅通过 **设置 →「自选升级（调试）」** 打开；关闭按钮关面板。打开时暂停游戏（`get_tree().paused = true`），面板 `CanvasLayer` 使用 `process_mode = ALWAYS`。
+- **发布策略**：可在导出版保留；若需禁用，可移除设置按钮或该节点。
 
 ## 第一阶段实现目标（代码）
 
