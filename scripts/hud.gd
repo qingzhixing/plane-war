@@ -398,7 +398,8 @@ func _update_stats_label() -> void:
 		var eff_iv: float = 0.2
 		if _player.has_method("get_effective_fire_interval"):
 			eff_iv = float(_player.get_effective_fire_interval())
-		var rof_actual: float = 1.0 / maxf(0.02, eff_iv)
+		# 分母勿用 0.02：封顶间隔 1/75 < 0.02 会被算成 50 发/秒
+		var rof_actual: float = 1.0 / maxf(0.00001, eff_iv)
 		var rof_theory: float = rof_actual
 		if _player.has_method("get_theoretical_main_rof"):
 			rof_theory = float(_player.get_theoretical_main_rof())
