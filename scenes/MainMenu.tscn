@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://mainmenu"]
+[gd_scene load_steps=6 format=3 uid="uid://mainmenu"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://btv236w48os2y" path="res://scenes/Main.tscn" id="2_main"]
 [ext_resource type="Script" path="res://scripts/settings_ui.gd" id="3_settings"]
 [ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
+[ext_resource type="Script" path="res://scripts/records_query_ui.gd" id="5_records"]
 
 [node name="MainMenuRoot" type="Control"]
 layout_mode = 3
@@ -85,6 +86,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "开始游戏"
 
+[node name="RecordsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 72)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "成绩查询"
+
 [node name="SettingsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
@@ -113,6 +121,117 @@ unique_name_in_owner = true
 process_mode = 3
 script = ExtResource("3_settings")
 
+[node name="RecordsQueryUI" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+process_mode = 4
+script = ExtResource("5_records")
+
+[node name="Dimmer" type="ColorRect" parent="RecordsQueryUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.72)
+
+[node name="Center" type="CenterContainer" parent="RecordsQueryUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="RecordsQueryUI/Center"]
+custom_minimum_size = Vector2(400, 320)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="RecordsQueryUI/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "历史最佳成绩"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "数据来自本机存档，完成一局结算后会更新"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RowScore" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高得分"
+
+[node name="ScoreValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowCombo" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl2" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高连击"
+
+[node name="ComboValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowDps" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl3" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高 DPS"
+
+[node name="DpsValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="CloseRecordsButton" type="Button" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "返回"
+
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/StartButton" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/RecordsButton" to="." method="_on_records_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/SettingsButton" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/QuitButton" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="RecordsQueryUI/Center/Panel/Margin/VBox/CloseRecordsButton" to="RecordsQueryUI" method="_on_close_pressed"]
