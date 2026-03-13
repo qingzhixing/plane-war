@@ -17,8 +17,8 @@ var _combo_edge_bottom: ColorRect = null
 var _combo_edge_left: ColorRect = null
 var _combo_edge_right: ColorRect = null
 var _combo_full_tint: ColorRect = null
-var _bomb_flash_rect: ColorRect = null
-var _bomb_notice_label: Label = null
+var _spell_flash_rect: ColorRect = null
+var _spell_notice_label: Label = null
 @onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
@@ -27,15 +27,19 @@ var _bomb_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-var _bomb_button: Button = null
+@onready var _shield_stats: Label = %ShieldStatsLabel
+@onready var _main_gun_stats: RichTextLabel = %MainGunStatsLabel
+@onready var _side_weapon_stats: RichTextLabel = %SideWeaponStatsLabel
+@onready var _spell_stats: RichTextLabel = %SpellStatsLabel
+var _spell_button: Button = null
 
 
 func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 	_main = get_parent()
-	if is_instance_valid(_main) and _main.has_signal("bomb_used"):
-		_main.bomb_used.connect(_on_bomb_used)
+	if is_instance_valid(_main) and _main.has_signal("spell_used"):
+		_main.spell_used.connect(_on_spell_used)
 	
 	# HUD 文本仅展示信息，不拦截输入
 	if _score_label != null:
@@ -44,10 +48,24 @@ func _ready() -> void:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
+		call_deferred("_refresh_combo_label_pivot")
 	_ensure_combo_notice_label()
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for n in [
+		get_node_or_null("Root/LeftStatsVBox/ShieldTitleLabel"),
+		_shield_stats,
+		get_node_or_null("Root/LeftStatsVBox/MainGunTitleLabel"),
+		_main_gun_stats,
+		get_node_or_null("Root/LeftStatsVBox/SideWeaponTitleLabel"),
+		_side_weapon_stats,
+		get_node_or_null("Root/LeftStatsVBox/SpellTitleLabel"),
+		_spell_stats,
+	]:
+		if n is Control:
+			(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	call_deferred("_update_stats_label")
 	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -61,15 +79,18 @@ func _ready() -> void:
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
 	
-	_ensure_bomb_button()
-	_ensure_bomb_vfx_nodes()
+	_ensure_spell_button()
+	_ensure_spell_vfx_nodes()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
 		var wave_text := "第 %d 波" % _main.get_wave()
 		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
 			var ex: int = int(_main.get_extension_wave())
-			wave_text = "续战 %d/4" % ex
+			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned() and ex >= 8:
+				wave_text = "续战 8/8 · Boss"
+			else:
+				wave_text = "续战 %d/8" % mini(ex, 8)
 			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		else:
@@ -102,7 +123,8 @@ func _process(delta: float) -> void:
 		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
-		_update_bomb_button()
+		_update_spell_button()
+	_update_stats_label()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -118,8 +140,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				if ui == null or not ui.visible:
 					_on_pause_button_pressed()
 			KEY_SPACE:
-				if _main.has_method("try_use_bomb"):
-					_main.try_use_bomb()
+				if _main.has_method("try_use_spell"):
+					_main.try_use_spell()
 			KEY_ESCAPE:
 				var settings := get_tree().get_first_node_in_group("settings_menu")
 				if settings != null:
@@ -178,12 +200,14 @@ func _update_combo_visual(combo: int) -> void:
 
 	_combo_label.modulate = color
 
-	# Combo 增加时的瞬间放大效果
+	# Combo +1：以右上角为轴心微缩放，避免贴边控件 scale 后溢出屏外
 	if combo > _last_combo_value:
+		_refresh_combo_label_pivot()
 		var tween := create_tween()
 		_combo_label.scale = _combo_base_scale
-		tween.tween_property(_combo_label, "scale", _combo_base_scale * 1.2, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		var bump := 1.06
+		tween.tween_property(_combo_label, "scale", _combo_base_scale * bump, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 	_last_combo_value = combo
 
@@ -222,7 +246,7 @@ func _show_combo_notice(text: String) -> void:
 	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
 	var tween := create_tween()
 	_combo_notice_label.scale = Vector2.ONE
-	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE * 1.15, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE * 1.06, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
@@ -242,6 +266,16 @@ func _ensure_combo_notice_label() -> void:
 	_combo_notice_label.anchor_top = 0.20
 	_combo_notice_label.anchor_bottom = 0.26
 	root.add_child(_combo_notice_label)
+
+
+func _refresh_combo_label_pivot() -> void:
+	if _combo_label == null or not is_instance_valid(_combo_label):
+		return
+	# 轴心在控件右上角附近：放大时主要往左下长，不挤出屏幕右缘
+	var sz := _combo_label.size
+	if sz.x < 1.0 or sz.y < 1.0:
+		sz = Vector2(maxf(120.0, _combo_label.get_rect().size.x), maxf(20.0, _combo_label.get_rect().size.y))
+	_combo_label.pivot_offset = Vector2(sz.x, sz.y * 0.5)
 
 
 func _ensure_combo_screen_vfx_nodes() -> void:
@@ -352,114 +386,239 @@ func _play_combo_break_sfx() -> void:
 		audio.play_player_hurt()
 
 
-func _ensure_bomb_button() -> void:
+func _update_stats_label() -> void:
+	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null or _shield_stats == null:
+		return
+	const C_FR := "#ffcc66"
+	const C_BS := "#7eb8da"
+	var main_lines: PackedStringArray = []
+	var side_lines: PackedStringArray = []
+	var spell_line := "—"
+	if is_instance_valid(_player):
+		var eff_iv: float = 0.2
+		if _player.has_method("get_effective_fire_interval"):
+			eff_iv = float(_player.get_effective_fire_interval())
+		# 分母勿用 0.02：封顶间隔 1/75 < 0.02 会被算成 50 发/秒
+		var rof_actual: float = 1.0 / maxf(0.00001, eff_iv)
+		var rof_theory: float = rof_actual
+		if _player.has_method("get_theoretical_main_rof"):
+			rof_theory = float(_player.get_theoretical_main_rof())
+		var bc: int = 1
+		var bmax: int = 6
+		if _player.has_method("get_bullet_count"):
+			bc = int(_player.get_bullet_count())
+		if _player.has_method("get_max_bullet_count"):
+			bmax = int(_player.get_max_bullet_count())
+		var mode_str := "机炮"
+		if _player.has_method("get_weapon_mode") and str(_player.get_weapon_mode()) == "arrow":
+			mode_str = "弓箭"
+		var main_cd := 0.0
+		if _player.has_method("get_main_fire_cd_remaining"):
+			main_cd = float(_player.get_main_fire_cd_remaining())
+		var fr_mult := 1.0
+		var bs_mult := 1.0
+		if _player.has_method("get_combo_fire_rate_mult"):
+			fr_mult = float(_player.get_combo_fire_rate_mult())
+		if _player.has_method("get_combo_bullet_speed_mult"):
+			bs_mult = float(_player.get_combo_bullet_speed_mult())
+		var eff_dmg := 1.0
+		if _player.has_method("get_effective_main_bullet_damage"):
+			eff_dmg = float(_player.get_effective_main_bullet_damage())
+		var ov_contrib := 0.0
+		if _player.has_method("get_main_damage_overflow_contribution_for_hud"):
+			ov_contrib = float(_player.get_main_damage_overflow_contribution_for_hud())
+		var base_dmg := maxf(0.1, eff_dmg - ov_contrib)
+		var dmg_line := "主炮伤害 "
+		if ov_contrib > 0.005:
+			if absf(base_dmg - roundf(base_dmg)) < 0.05 and absf(ov_contrib - roundf(ov_contrib)) < 0.05:
+				dmg_line += "%d [color=%s][+%d][/color]" % [int(roundf(base_dmg)), C_FR, int(roundf(ov_contrib))]
+			elif absf(base_dmg - roundf(base_dmg)) < 0.05:
+				dmg_line += "%d [color=%s][+%.2f][/color]" % [int(roundf(base_dmg)), C_FR, ov_contrib]
+			else:
+				dmg_line += "%.1f [color=%s][+%.2f][/color]" % [base_dmg, C_FR, ov_contrib]
+		else:
+			if absf(eff_dmg - roundf(eff_dmg)) < 0.05:
+				dmg_line += "%d" % int(roundf(eff_dmg))
+			else:
+				dmg_line += "%.1f" % eff_dmg
+		main_lines.append(dmg_line)
+		var cap_h: float = 75.0
+		if _player.get("max_main_rof") != null:
+			cap_h = float(_player.max_main_rof)
+		if rof_theory > cap_h + 0.5:
+			main_lines.append("理论射速 %.0f发/秒 · 实际射速 %.0f发/秒（封顶 %.0f发/秒）" % [rof_theory, rof_actual, cap_h])
+		else:
+			main_lines.append("射速 %.0f发/秒" % rof_actual)
+		if fr_mult > 1.009:
+			main_lines.append("[color=%s]连击攻速×%.2f[/color]" % [C_FR, fr_mult])
+		main_lines.append("齐射：%d/%d 发 · %s" % [bc, bmax, mode_str])
+		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
+		var base_spd := 1200.0
+		if _player.has_method("get_bullet_speed"):
+			base_spd = float(_player.get_bullet_speed())
+		elif "bullet_speed" in _player:
+			base_spd = float(_player.bullet_speed)
+		var eff_spd := base_spd * bs_mult
+		var spd_line := "弹速 %.0f" % eff_spd
+		if bs_mult > 1.009:
+			spd_line += "  [color=%s]基数%.0f · 连击+%.0f%%[/color]" % [C_BS, base_spd, (bs_mult - 1.0) * 100.0]
+		main_lines.append(spd_line)
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
+			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
+			var ar_rem := 0.0
+			if _player.has_method("get_arrow_cd_remaining"):
+				ar_rem = float(_player.get_arrow_cd_remaining())
+			var ar_n := 1
+			if _player.has_method("get_arrow_shot_count"):
+				ar_n = int(_player.get_arrow_shot_count())
+			side_lines.append("弓箭 %.1f/%.1fs ×%d" % [ar_rem, ar, ar_n])
+		else:
+			side_lines.append("弓箭 —")
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb"):
+			var bm := float(_player.bomb_auto_interval) if "bomb_auto_interval" in _player else 2.5
+			var bm_rem := 0.0
+			if _player.has_method("get_bomb_cd_remaining"):
+				bm_rem = float(_player.get_bomb_cd_remaining())
+			var bm_n := 1
+			if _player.has_method("get_bomb_shot_count"):
+				bm_n = int(_player.get_bomb_shot_count())
+			side_lines.append("炸弹 %.1f/%.1fs ×%d" % [bm_rem, bm, bm_n])
+		else:
+			side_lines.append("炸弹 —")
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang"):
+			var air := 0
+			var vol := 1
+			if _player.has_method("get_boomerang_airborne"):
+				air = int(_player.get_boomerang_airborne())
+			if _player.has_method("get_boomerang_shot_count"):
+				vol = int(_player.get_boomerang_shot_count())
+			side_lines.append("回旋镖 场上%d 齐射%d" % [air, vol])
+		else:
+			side_lines.append("回旋镖 —")
+	if is_instance_valid(_main) and _main.has_method("get_spell_cooldown_remaining"):
+		var sp_r := float(_main.get_spell_cooldown_remaining())
+		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
+		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
+	var guard_n := 0
+	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
+		guard_n = int(_main.get_combo_guard_charges())
+	if guard_n <= 0:
+		_shield_stats.text = "无（受击会断连击）"
+	else:
+		_shield_stats.text = "%d 层 · 每次受击消耗 1 层免断连" % guard_n
+	_main_gun_stats.text = "\n".join(main_lines) if main_lines.size() > 0 else "—"
+	_side_weapon_stats.text = "\n".join(side_lines) if side_lines.size() > 0 else "—"
+	_spell_stats.text = spell_line
+
+
+func _ensure_spell_button() -> void:
 	var root := get_node_or_null("Root") as Control
 	if root == null:
 		return
-	_bomb_button = Button.new()
-	_bomb_button.text = "符卡"
-	_bomb_button.custom_minimum_size = Vector2(120, 56)
-	_bomb_button.add_theme_font_size_override("font_size", 22)
+	_spell_button = Button.new()
+	_spell_button.text = "符卡"
+	_spell_button.custom_minimum_size = Vector2(120, 56)
+	_spell_button.add_theme_font_size_override("font_size", 22)
 	if _pixel_bold_font != null:
-		_bomb_button.add_theme_font_override("font", _pixel_bold_font)
-	_bomb_button.anchor_left = 0.82
-	_bomb_button.anchor_right = 0.98
-	_bomb_button.anchor_top = 0.86
-	_bomb_button.anchor_bottom = 0.94
+		_spell_button.add_theme_font_override("font", _pixel_bold_font)
+	_spell_button.anchor_left = 0.82
+	_spell_button.anchor_right = 0.98
+	_spell_button.anchor_top = 0.86
+	_spell_button.anchor_bottom = 0.94
 	# 不抢触摸：拖动经符卡区不断流；发动改由 Main 未处理输入里短按检测
-	_bomb_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_button.focus_mode = Control.FOCUS_NONE
-	_bomb_button.pressed.connect(_on_bomb_button_pressed)
-	root.add_child(_bomb_button)
+	_spell_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_button.focus_mode = Control.FOCUS_NONE
+	_spell_button.pressed.connect(_on_spell_button_pressed)
+	root.add_child(_spell_button)
 
 
-func get_bomb_screen_rect() -> Rect2:
-	if _bomb_button == null or not is_instance_valid(_bomb_button):
+func get_spell_screen_rect() -> Rect2:
+	if _spell_button == null or not is_instance_valid(_spell_button):
 		return Rect2()
-	return _bomb_button.get_global_rect()
+	return _spell_button.get_global_rect()
 
 
-func _update_bomb_button() -> void:
-	if _bomb_button == null or not is_instance_valid(_main):
+func _update_spell_button() -> void:
+	if _spell_button == null or not is_instance_valid(_main):
 		return
-	if not _main.has_method("get_bomb_cooldown_remaining"):
+	if not _main.has_method("get_spell_cooldown_remaining"):
 		return
-	var cd := float(_main.get_bomb_cooldown_remaining())
+	var cd := float(_main.get_spell_cooldown_remaining())
 	if cd > 0.0:
-		_bomb_button.disabled = true
-		_bomb_button.text = "符卡 %.1fs" % cd
+		_spell_button.disabled = true
+		_spell_button.text = "符卡 %.1fs" % cd
 	else:
-		_bomb_button.disabled = false
-		_bomb_button.text = "符卡"
+		_spell_button.disabled = false
+		_spell_button.text = "符卡"
 
 
-func _on_bomb_button_pressed() -> void:
+func _on_spell_button_pressed() -> void:
 	if not is_instance_valid(_main):
 		return
-	if _main.has_method("try_use_bomb"):
-		_main.try_use_bomb()
+	if _main.has_method("try_use_spell"):
+		_main.try_use_spell()
 
 
-func _ensure_bomb_vfx_nodes() -> void:
+func _ensure_spell_vfx_nodes() -> void:
 	var root := get_node_or_null("Root") as Control
 	if root == null:
 		return
 
-	_bomb_flash_rect = ColorRect.new()
-	_bomb_flash_rect.visible = false
-	_bomb_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
-	_bomb_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_bomb_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
-	root.add_child(_bomb_flash_rect)
+	_spell_flash_rect = ColorRect.new()
+	_spell_flash_rect.visible = false
+	_spell_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
+	_spell_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_spell_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(_spell_flash_rect)
 
-	_bomb_notice_label = Label.new()
-	_bomb_notice_label.visible = false
-	_bomb_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_notice_label.text = "符卡发动!"
+	_spell_notice_label = Label.new()
+	_spell_notice_label.visible = false
+	_spell_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_notice_label.text = "符卡发动!"
 	if _pixel_bold_font != null:
-		_bomb_notice_label.add_theme_font_override("font", _pixel_bold_font)
-	_bomb_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_bomb_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_bomb_notice_label.add_theme_font_size_override("font_size", 44)
-	_bomb_notice_label.anchor_left = 0.2
-	_bomb_notice_label.anchor_right = 0.8
-	_bomb_notice_label.anchor_top = 0.42
-	_bomb_notice_label.anchor_bottom = 0.52
-	root.add_child(_bomb_notice_label)
+		_spell_notice_label.add_theme_font_override("font", _pixel_bold_font)
+	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_spell_notice_label.add_theme_font_size_override("font_size", 44)
+	_spell_notice_label.anchor_left = 0.2
+	_spell_notice_label.anchor_right = 0.8
+	_spell_notice_label.anchor_top = 0.42
+	_spell_notice_label.anchor_bottom = 0.52
+	root.add_child(_spell_notice_label)
 
 
-func _on_bomb_used() -> void:
-	_play_bomb_burst_vfx()
+func _on_spell_used() -> void:
+	_play_spell_burst_vfx()
 
 
-func _play_bomb_burst_vfx() -> void:
-	if _bomb_flash_rect != null:
-		_bomb_flash_rect.visible = true
+func _play_spell_burst_vfx() -> void:
+	if _spell_flash_rect != null:
+		_spell_flash_rect.visible = true
 
-	if _bomb_notice_label != null:
-		_bomb_notice_label.visible = true
-		_bomb_notice_label.text = "符卡爆发!"
-		_bomb_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
+	if _spell_notice_label != null:
+		_spell_notice_label.visible = true
+		_spell_notice_label.text = "符卡爆发!"
+		_spell_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
 
 	for i in 4:
 		var alpha := 0.52 - 0.08 * float(i)
-		if _bomb_flash_rect != null:
-			_bomb_flash_rect.modulate = Color(1, 1, 1, 1)
-			_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
+		if _spell_flash_rect != null:
+			_spell_flash_rect.modulate = Color(1, 1, 1, 1)
+			_spell_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
 			var flash_tween := create_tween()
-			flash_tween.tween_property(_bomb_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		if _bomb_notice_label != null:
-			_bomb_notice_label.scale = Vector2.ONE
-			_bomb_notice_label.modulate.a = 1.0
+			flash_tween.tween_property(_spell_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		if _spell_notice_label != null:
+			_spell_notice_label.scale = Vector2.ONE
+			_spell_notice_label.modulate.a = 1.0
 			var text_tween := create_tween()
-			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE * 1.18, 0.06).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+			text_tween.tween_property(_spell_notice_label, "scale", Vector2.ONE * 1.18, 0.06).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			text_tween.tween_property(_spell_notice_label, "scale", Vector2.ONE, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		if i < 3:
 			await get_tree().create_timer(0.10).timeout
 
-	if _bomb_flash_rect != null:
-		_bomb_flash_rect.visible = false
-	if _bomb_notice_label != null:
-		_bomb_notice_label.visible = false
-		_bomb_notice_label.modulate = Color(1, 1, 1, 1)
+	if _spell_flash_rect != null:
+		_spell_flash_rect.visible = false
+	if _spell_notice_label != null:
+		_spell_notice_label.visible = false
+		_spell_notice_label.modulate = Color(1, 1, 1, 1)

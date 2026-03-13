@@ -12,7 +12,7 @@
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
-[ext_resource type="Script" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
+[ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -28,33 +28,6 @@ enemy_scene_elite = ExtResource("9_enemy_elite")
 
 [node name="Timer" type="Timer" parent="EnemySpawner" unique_id=2032949683]
 autostart = true
-
-[node name="ComboBackLayer" type="CanvasLayer" parent="." unique_id=1888123001]
-layer = -128
-process_mode = 3
-
-[node name="Root" type="Control" parent="ComboBackLayer" unique_id=1888123002]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("11_ui_theme")
-
-[node name="ComboLabel" type="Label" parent="ComboBackLayer/Root" unique_id=1529816770]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1.0
-offset_top = 350.0
-offset_right = 721.0
-offset_bottom = 476.0
-theme_override_font_sizes/font_size = 74
-text = "Combo: XXX"
-horizontal_alignment = 1
-vertical_alignment = 1
-mouse_filter = 2
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1215533867]
 process_mode = 3
@@ -73,13 +46,34 @@ theme = ExtResource("11_ui_theme")
 
 [node name="WaveLabel" type="Label" parent="HUD/Root" unique_id=1566627949]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 31.0
-offset_top = 261.0
-offset_right = 135.0
-offset_bottom = 300.0
-theme_override_font_sizes/font_size = 28
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 56.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 26
 text = "第 1 波"
+horizontal_alignment = 2
+
+[node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -298.0
+offset_top = 58.0
+offset_right = -16.0
+offset_bottom = 102.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "Combo Display Bug"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root" unique_id=1840417451]
 layout_mode = 0
@@ -103,24 +97,85 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "设置"
 
-[node name="TopRightVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
+[node name="LeftStatsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
 layout_mode = 0
-offset_left = 480.0
-offset_top = 16.0
-offset_right = 720.0
-offset_bottom = 220.0
+offset_left = 16.0
+offset_top = 156.0
+offset_right = 372.0
+offset_bottom = 580.0
 
-[node name="ScoreLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=268481878]
+[node name="ScoreLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=268481878]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "Score: 0"
 
-[node name="DpsLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=1153599571]
+[node name="DpsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=1153599571]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "DPS: 0  Max: 0"
+
+[node name="ShieldTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010009]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.95, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+text = "稳态护盾"
+
+[node name="ShieldStatsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010010]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.95, 0.92, 1)
+theme_override_font_sizes/font_size = 19
+text = "无"
+
+[node name="MainGunTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010001]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
+theme_override_font_sizes/font_size = 22
+text = "主炮"
+
+[node name="MainGunStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010002]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 88)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="SideWeaponTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010005]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.7, 0.55, 1)
+theme_override_font_sizes/font_size = 22
+text = "副武器"
+
+[node name="SideWeaponStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010006]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 96)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="SpellTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010007]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "符卡"
+
+[node name="SpellStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010008]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 38)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 
 [node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
 process_mode = 3

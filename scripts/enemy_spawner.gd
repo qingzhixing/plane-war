@@ -8,7 +8,7 @@ extends Node
 
 var _remaining_to_spawn: int = 0
 var _timer: Timer
-## 0 = 普通波次；1～4 = Boss 后续战第 n 波
+## 0 = 普通波次；1～7 = 续战小怪第 n 波
 var _extension_index: int = 0
 var _default_timer_wait: float = 1.0
 
@@ -35,14 +35,14 @@ func start_wave(wave: int) -> void:
 	_timer.start()
 
 
-## Boss 后继续：第 ext 波（1～4），数量/间隔/精英率递增
+## 续战小怪：ext 1～7，数量/间隔/精英率递增
 func start_extension_wave(ext: int, threat_tier: int) -> void:
-	_extension_index = clampi(ext, 1, 4)
+	_extension_index = clampi(ext, 1, 7)
 	if _timer == null:
 		return
-	var counts := [8, 11, 14, 18]
-	var intervals := [0.88, 0.72, 0.58, 0.48]
-	var tier_bonus := threat_tier * 2 if ext < 4 else threat_tier * 3
+	var counts := [8, 11, 13, 15, 17, 19, 22]
+	var intervals := [0.88, 0.72, 0.64, 0.56, 0.50, 0.46, 0.42]
+	var tier_bonus := threat_tier * 2 if ext < 6 else threat_tier * 3
 	_remaining_to_spawn = counts[_extension_index - 1] + tier_bonus
 	_timer.wait_time = intervals[_extension_index - 1]
 	_timer.start()

@@ -1,6 +1,6 @@
 extends Area2D
 
-@export var max_hp: int = 180
+@export var max_hp: int = 300
 @export var fire_interval_phase_a: float = 2.8
 @export var fire_interval_phase_b: float = 5.0
 @export var bullet_scene: PackedScene
@@ -21,7 +21,7 @@ var _hit_material: ShaderMaterial
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
 func apply_threat_scaling(tier: int) -> void:
-	_bullet_speed_mult = minf(1.35, pow(1.04, float(tier)))
+	_bullet_speed_mult = minf(1.38, pow(1.045, float(tier)))
 
 
 func _ready() -> void:

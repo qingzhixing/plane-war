@@ -21,8 +21,9 @@
   - 基类脚本：`res://scripts/bullets/BulletBase.gd`（提供 `damage/speed/direction` 等通用属性与基础移动逻辑）。
   - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBullet.tscn`，脚本 `res://scripts/bullets/PlayerBullet.gd`（直线向上、不穿透）。
   - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrow.tscn`，脚本 `res://scripts/bullets/PlayerArrow.gd`。
-  - 玩家回旋镖子弹：场景 `res://scenes/bullets/PlayerBoomerang.tscn`，脚本 `res://scripts/bullets/PlayerBoomerang.gd`。
-  - 技能/炸弹相关弹幕可以复用 `BulletBase`，使用单独场景（如 `PlayerBombBullet.tscn`）与脚本按需扩展。
+  - 玩家回旋镖：`PlayerBoomerang` **重写 `area_entered`**，命中只伤不 `queue_free`；`boomerang_multi` 解锁与齐射 +1。
+  - 符卡爆发弹幕：`PlayerSpellBullet.tscn`（遇 `enemy_bullet` 只清该弹、不全场清弹）；主武器仍 `PlayerBullet.tscn`。
+  - **弓箭**：`_on_area_entered` 遇 `enemy_bullet` 只清弹；炸弹仅爆炸 AoE 清弹；炸弹弹速倍率高于旧版。
 - 敌人：
   - 基类脚本：`res://scripts/enemies/EnemyBase.gd`（提供 `max_hp/hp` 与 `apply_damage/_on_dead` 等统一接口）。
   - 基础敌人场景可继续使用如 `res://scenes/enemies/EnemyBasic01.tscn`、`EnemyBasic02.tscn` 等，脚本统一继承 `EnemyBase` 来实现各自的移动与攻击逻辑。
@@ -40,6 +41,8 @@
   - 玩家受击后的闪烁使用简单方式实现（Shader 或 `modulate`/`visible` 控制），重点是节奏感与可读性。
   - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
   - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
+  - **调试**：局内暂停 → 设置 → **连击+（调试）** `+10/+50/+100/+500` 与 **清零**；对应 `Main.debug_add_combo` / `debug_set_combo`（仅开发验 Buff/HUD）。
+  - **跳 Boss（调试）**：主线未进续战时，假升级跳到 **第 8 波 Boss**；已进入 **续战小怪** 或 **续关后待升级** 时，直接 **续战 Boss**（击破后走「一轮结束」面板）。每进入新续战块可再跳一次主线式次数会重置，续战内可反复跳 Boss 关。
 
 ## 调试工具（开发/自测）
 

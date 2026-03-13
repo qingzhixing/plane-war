@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://d3vxe0r241fci"]
+
+[ext_resource type="Script" uid="uid://dnounpqp244ow" path="res://scripts/bullets/PlayerSpellBullet.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bcf54jkmqsmnk" path="res://assets/sprites/bullets/spell_bullet.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_unp5v"]
+
+[node name="PlayerSpellBullet" type="Area2D" unique_id=1650058168]
+z_index = 12
+z_as_relative = false
+scale = Vector2(1.5, 1.5)
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1481864673]
+scale = Vector2(0.08138393, 0.08138393)
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1578002511]
+rotation = 0.7697089
+shape = SubResource("RectangleShape2D_unp5v")

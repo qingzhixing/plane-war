@@ -1,7 +1,7 @@
 extends Node2D
 
 signal level_up
-signal bomb_used
+signal spell_used
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -11,22 +11,27 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _wave: int = 1
 var _boss_spawned: bool = false
-## 本局已击破过 Boss 后不再触发第二场 Boss（避免续战流程里 _wave>=8 再次 pending）
+## 主线首 Boss 已击破（续战块内可再打 Boss）
 var _boss_defeated_once: bool = false
 ## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
 var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
-## Boss 后续战块内波次 1～4，0 表示未在续战
+## 续关/接着玩 后进续战前还须完成的三选一次数（每次进块 = 3）
+var _post_continue_upgrades_left: int = 0
+const _POST_CONTINUE_UPGRADE_COUNT: int = 3
+## 续战块：1～7 小怪波，8 = 续战 Boss 进行中
 var _extension_wave: int = 0
-## 第 4 波升级选完后弹出「接着玩 / 结算」
-var _after_extension_block_upgrade_show_choice: bool = false
+const _EXTENSION_MOB_WAVES: int = 7
+const _EXTENSION_BLOCK_SIZE: int = 8
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
-var _bomb_cooldown_scale: float = 1.0
+var _spell_cooldown_scale: float = 1.0
+## 一次性：自动符卡
+var _spell_auto: bool = false
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -48,15 +53,15 @@ var _pending_boss_spawn: bool = false
 var _debug_skip_to_boss_used: bool = false
 var _debug_skip_to_boss_active: bool = false
 var _debug_upgrades_needed: int = 0
-var _bomb_cooldown_remaining: float = 0.0
-## 符卡区短按检测（按钮 IGNORE 后触摸全程未处理，与拖动共用）
-var _bomb_tap_start: Dictionary = {}
+var _spell_cooldown_remaining: float = 0.0
+## 符卡区短按检测
+var _spell_tap_start: Dictionary = {}
 
-const _BOMB_COOLDOWN_SECONDS: float = 12.0
-const _BOMB_BURST_WAVE_COUNT: int = 4
-const _BOMB_BURST_WAVE_INTERVAL: float = 0.10
-const _BOMB_BURST_BULLET_COUNT: int = 40
-const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
+const _SPELL_COOLDOWN_SECONDS: float = 12.0
+const _SPELL_BURST_WAVE_COUNT: int = 4
+const _SPELL_BURST_WAVE_INTERVAL: float = 0.10
+const _SPELL_BURST_BULLET_COUNT: int = 40
+const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerSpellBullet.tscn"
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -78,7 +83,7 @@ func _process(delta: float) -> void:
 	_update_combo(delta)
 	_update_combo_buffs()
 	_update_dps()
-	_update_bomb(delta)
+	_update_spell(delta)
 
 
 func _start_wave() -> void:
@@ -110,11 +115,9 @@ func on_wave_cleared() -> void:
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
-	# 续战：每波清场 → 升级；第 4 波升级后再询问是否接着玩
-	if _extension_wave > 0:
+	# 续战：每波清场 → 升级（第 7 波小怪升级后再开 Boss，不在此弹「接着玩」）
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
 		_waiting_upgrade_choice = true
-		if _extension_wave >= 4:
-			_after_extension_block_upgrade_show_choice = true
 		emit_signal("level_up")
 		return
 	_waiting_upgrade_choice = true
@@ -130,23 +133,24 @@ func on_upgrade_selected() -> void:
 	_waiting_upgrade_choice = false
 
 	if _pending_post_boss_upgrade:
+		_post_continue_upgrades_left -= 1
+		if _post_continue_upgrades_left > 0:
+			_waiting_upgrade_choice = true
+			emit_signal("level_up")
+			return
 		_pending_post_boss_upgrade = false
+		_post_continue_upgrades_left = 0
 		_extension_wave = 1
 		if _spawner != null and _spawner.has_method("start_extension_wave"):
 			_spawner.start_extension_wave(1, threat_tier)
 		return
 
-	if _after_extension_block_upgrade_show_choice:
-		_after_extension_block_upgrade_show_choice = false
-		get_tree().paused = true
-		var pbc := get_node_or_null("PostBossChoice")
-		if pbc != null and pbc.has_method("show_choice_after_block"):
-			pbc.show_choice_after_block()
-		else:
-			get_tree().call_group("game_over_ui", "show_game_over")
+	if _extension_wave == _EXTENSION_MOB_WAVES:
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
 		return
 
-	if _extension_wave > 0 and _extension_wave < 4:
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_MOB_WAVES:
 		_extension_wave += 1
 		if _spawner != null and _spawner.has_method("start_extension_wave"):
 			_spawner.start_extension_wave(_extension_wave, threat_tier)
@@ -195,8 +199,16 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
 				p_guard.set_combo_guard_shield_visible(true)
 			return
-		"bomb_cooldown":
-			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
+		"spell_cooldown", "bomb_cooldown":
+			_spell_cooldown_scale = maxf(0.45, _spell_cooldown_scale * 0.85)
+			return
+		"spell_auto", "bomb_auto":
+			if _spell_auto:
+				return
+			_spell_auto = true
+			_spell_cooldown_scale = maxf(0.2, _spell_cooldown_scale * 0.5)
+			if _spell_cooldown_remaining <= 0.0:
+				try_use_spell()
 			return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
@@ -245,20 +257,20 @@ func get_best_combo() -> int:
 	return best_combo
 
 
-func get_bomb_cooldown_total() -> float:
-	return _BOMB_COOLDOWN_SECONDS * _bomb_cooldown_scale
+func get_spell_cooldown_total() -> float:
+	return _SPELL_COOLDOWN_SECONDS * _spell_cooldown_scale
 
 
-func get_bomb_cooldown_remaining() -> float:
-	return _bomb_cooldown_remaining
+func get_spell_cooldown_remaining() -> float:
+	return _spell_cooldown_remaining
 
 
-func try_use_bomb() -> bool:
-	if _bomb_cooldown_remaining > 0.0:
+func try_use_spell() -> bool:
+	if _spell_cooldown_remaining > 0.0:
 		return false
-	_bomb_cooldown_remaining = get_bomb_cooldown_total()
-	_trigger_bomb_effect()
-	emit_signal("bomb_used")
+	_spell_cooldown_remaining = get_spell_cooldown_total()
+	_trigger_spell_effect()
+	emit_signal("spell_used")
 	return true
 
 
@@ -267,22 +279,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e := event as InputEventScreenTouch
 		var k := e.index + 100000
 		if e.pressed:
-			_bomb_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
+			_spell_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
 		else:
-			_try_bomb_short_tap(e.position, k)
+			_try_spell_short_tap(e.position, k)
 	elif event is InputEventMouseButton:
 		var e := event as InputEventMouseButton
 		if e.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if e.pressed:
-			_bomb_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
+			_spell_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
 		else:
-			_try_bomb_short_tap(e.position, -1)
+			_try_spell_short_tap(e.position, -1)
 
 
-func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
-	var st: Variant = _bomb_tap_start.get(key, null)
-	_bomb_tap_start.erase(key)
+func _try_spell_short_tap(screen_pos: Vector2, key: int) -> void:
+	var st: Variant = _spell_tap_start.get(key, null)
+	_spell_tap_start.erase(key)
 	if st == null or typeof(st) != TYPE_DICTIONARY:
 		return
 	var t0: int = int(st["t"])
@@ -292,9 +304,9 @@ func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
 	if screen_pos.distance_to(p0) > 56.0:
 		return
 	var hud := get_node_or_null("HUD")
-	if hud != null and hud.has_method("get_bomb_screen_rect"):
-		if hud.get_bomb_screen_rect().has_point(screen_pos):
-			try_use_bomb()
+	if hud != null and hud.has_method("get_spell_screen_rect"):
+		if hud.get_spell_screen_rect().has_point(screen_pos):
+			try_use_spell()
 
 
 func get_best_score() -> int:
@@ -369,6 +381,10 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 	score += gained
 
 
+func get_combo_guard_charges() -> int:
+	return _combo_guard_charges
+
+
 func on_player_hit() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
@@ -433,18 +449,19 @@ func _update_dps() -> void:
 		max_dps = current_dps
 
 
-func _update_bomb(delta: float) -> void:
-	if _bomb_cooldown_remaining <= 0.0:
-		return
-	_bomb_cooldown_remaining = maxf(0.0, _bomb_cooldown_remaining - delta)
+func _update_spell(delta: float) -> void:
+	if _spell_cooldown_remaining > 0.0:
+		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - delta)
+	if _spell_auto and _spell_cooldown_remaining <= 0.0:
+		try_use_spell()
 
 
-func _trigger_bomb_effect() -> void:
-	# 符卡效果：清空敌弹，并以玩家为中心发射 360° 大量我方子弹
-	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(bullet):
-			bullet.queue_free()
+func has_spell_auto() -> bool:
+	return _spell_auto
 
+
+func _trigger_spell_effect() -> void:
+	# 符卡效果：周身 360° 弹幕；敌弹靠符卡弹碰撞逐发消除（不全屏清弹）
 	var player := get_node_or_null(player_path)
 	var origin := get_viewport().get_visible_rect().size * 0.5
 	var player_damage := 1.0
@@ -456,9 +473,9 @@ func _trigger_bomb_effect() -> void:
 		if player.has_method("get_boss_damage_multiplier"):
 			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
 
-	var bomb_bullet_scene := load(_BOMB_BULLET_SCENE_PATH) as PackedScene
-	if bomb_bullet_scene != null:
-		_fire_bomb_burst_waves(bomb_bullet_scene, origin, player_damage, boss_damage_multiplier)
+	var burst_scene := load(_SPELL_BURST_SCENE_PATH) as PackedScene
+	if burst_scene != null:
+		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
 
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_enemy_explosion"):
@@ -467,24 +484,24 @@ func _trigger_bomb_effect() -> void:
 		audio.play_power_up()
 
 
-func _fire_bomb_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
-	for wave in _BOMB_BURST_WAVE_COUNT:
-		var phase_offset := (TAU / float(_BOMB_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
+func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
+	for wave in _SPELL_BURST_WAVE_COUNT:
+		var phase_offset := (TAU / float(_SPELL_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
 		var radius := 12.0 + 6.0 * float(wave)
-		for i in _BOMB_BURST_BULLET_COUNT:
-			var angle := TAU * float(i) / float(_BOMB_BURST_BULLET_COUNT) + phase_offset
+		for i in _SPELL_BURST_BULLET_COUNT:
+			var angle := TAU * float(i) / float(_SPELL_BURST_BULLET_COUNT) + phase_offset
 			var dir := Vector2.RIGHT.rotated(angle)
-			var bomb_bullet := bullet_scene.instantiate()
-			bomb_bullet.global_position = origin + dir * radius
-			if "damage" in bomb_bullet:
-				bomb_bullet.damage = player_damage
-			if bomb_bullet.has_method("set_direction"):
-				bomb_bullet.set_direction(dir)
-			if bomb_bullet.has_method("set_boss_damage_multiplier"):
-				bomb_bullet.set_boss_damage_multiplier(boss_damage_multiplier)
-			get_tree().current_scene.add_child(bomb_bullet)
-		if wave < _BOMB_BURST_WAVE_COUNT - 1:
-			await get_tree().create_timer(_BOMB_BURST_WAVE_INTERVAL).timeout
+			var b := bullet_scene.instantiate()
+			b.global_position = origin + dir * radius
+			if "damage" in b:
+				b.damage = player_damage
+			if b.has_method("set_direction"):
+				b.set_direction(dir)
+			if b.has_method("set_boss_damage_multiplier"):
+				b.set_boss_damage_multiplier(boss_damage_multiplier)
+			get_tree().current_scene.add_child(b)
+		if wave < _SPELL_BURST_WAVE_COUNT - 1:
+			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL).timeout
 
 
 func _get_combo_multiplier() -> float:
@@ -539,6 +556,9 @@ func _spawn_boss() -> void:
 	if _boss_spawned:
 		return
 	_boss_spawned = true
+	# 续战第 8 波：便于 HUD 显示
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+		_extension_wave = _EXTENSION_BLOCK_SIZE
 
 	# 确保进入 Boss 关时游戏不处于暂停状态
 	get_tree().paused = false
@@ -562,9 +582,14 @@ func _spawn_boss() -> void:
 	var boss := boss_scene.instantiate()
 	if boss == null:
 		return
-	var hp_m := get_threat_hp_mult()
+	# Boss 血量：主线用 1.2^tier；续战第 8 波再乘 (3.2+tier)，避免高强化下秒没
+	var tier_f := float(threat_tier)
+	var hp_m: float = pow(1.2, tier_f)
+	var is_extension_boss: bool = (_extension_wave >= _EXTENSION_BLOCK_SIZE)
+	if is_extension_boss:
+		hp_m *= 3.2 + tier_f
 	if "max_hp" in boss:
-		boss.max_hp = int(round(float(boss.max_hp) * hp_m))
+		boss.max_hp = maxi(200, int(round(float(boss.max_hp) * hp_m)))
 	if boss.has_method("apply_threat_scaling"):
 		boss.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
@@ -573,44 +598,101 @@ func _spawn_boss() -> void:
 	get_tree().current_scene.add_child(boss)
 
 
-func _debug_skip_to_boss() -> void:
-	# 调试工具：一键跳到 Boss 关，并模拟前几波的升级效果
-	if _debug_skip_to_boss_used:
+## 调试：增加当前连击并刷新 Buff / HUD（仅局内设置里调用）
+func debug_add_combo(amount: int) -> void:
+	if amount == 0:
 		return
-	_debug_skip_to_boss_used = true
-	_debug_skip_to_boss_active = true
+	combo = maxi(0, combo + amount)
+	if combo > max_combo:
+		max_combo = combo
+	_last_combo_buff_tier = -1
+	_update_combo_buffs()
 
-	# 防止在暂停状态下跳关导致无法触控
+
+func debug_set_combo(value: int) -> void:
+	combo = maxi(0, value)
+	if combo > max_combo:
+		max_combo = combo
+	_last_combo_buff_tier = -1
+	_update_combo_buffs()
+
+
+func _debug_skip_to_boss() -> void:
+	# 调试：主线 = 假升级跳到第 8 波 Boss；续战 = 直接进续战第 8 波 Boss（同 on_boss_defeated 续战分支）
 	get_tree().paused = false
-
-	# 清理当前敌人和敌方子弹
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemy):
 			enemy.queue_free()
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	var sp := get_node_or_null("EnemySpawner")
+	if sp != null:
+		var timer := sp.get_node_or_null("Timer")
+		if timer is Timer:
+			(timer as Timer).stop()
 
-	# 计算还需要多少次升级（当前波次到 Boss 波次之间）
+	# 续战小怪 1～7 波：直接刷续战 Boss
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+		_waiting_upgrade_choice = false
+		_debug_skip_to_boss_active = false
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
+		return
+
+	# 续关后三连升级阶段：跳过，直接续战 Boss
+	if _pending_post_boss_upgrade:
+		_waiting_upgrade_choice = false
+		_pending_post_boss_upgrade = false
+		_post_continue_upgrades_left = 0
+		_debug_skip_to_boss_active = false
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
+		return
+
+	# 主线：假升级若干次后进 Boss（须 emit level_up 才会弹出三选一并走到 on_upgrade_selected）
+	if _debug_skip_to_boss_used:
+		return
+	_debug_skip_to_boss_used = true
+	_debug_skip_to_boss_active = true
 	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
+	if _debug_upgrades_needed <= 0:
+		_debug_skip_to_boss_active = false
+		_wave = _BOSS_WAVE_START
+		_spawn_boss()
+		return
+	_waiting_upgrade_choice = true
+	emit_signal("level_up")
 
 
 func on_boss_defeated() -> void:
 	_boss_defeated_once = true
+	_boss_spawned = false
 	_pending_boss_spawn = false
 	get_tree().paused = true
 	var pbc := get_node_or_null("PostBossChoice")
-	if pbc != null and pbc.has_method("show_choice"):
-		pbc.show_choice()
-	else:
+	if pbc == null:
 		get_tree().call_group("game_over_ui", "show_game_over")
+		return
+	# 续战块 Boss 击破 → 与「每轮续战结束」相同二选一
+	if _extension_wave >= _EXTENSION_BLOCK_SIZE:
+		_extension_wave = 0
+		if pbc.has_method("show_choice_after_block"):
+			pbc.show_choice_after_block()
+		else:
+			get_tree().call_group("game_over_ui", "show_game_over")
+	else:
+		if pbc.has_method("show_choice"):
+			pbc.show_choice()
+		else:
+			get_tree().call_group("game_over_ui", "show_game_over")
 
 
 func continue_after_boss() -> void:
 	_begin_next_extension_block()
 
 
-## 每 4 波续战结束后「接着玩」：再威胁+1 + 先升级再开新块第 1 波
+## 续战一轮结束（含续战 Boss）后「接着玩」
 func continue_next_extension_block() -> void:
 	_begin_next_extension_block()
 
@@ -618,14 +700,19 @@ func continue_next_extension_block() -> void:
 func _begin_next_extension_block() -> void:
 	threat_tier += 1
 	_score_multiplier += 0.08
+	_combo_guard_charges += 1
+	_debug_skip_to_boss_used = false
+	var p_guard := get_node_or_null(player_path)
+	if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+		p_guard.set_combo_guard_shield_visible(true)
 	_boss_spawned = false
 	_pending_boss_spawn = false
 	_extension_wave = 0
-	_after_extension_block_upgrade_show_choice = false
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
 	get_tree().paused = false
 	_waiting_upgrade_choice = true
 	_pending_post_boss_upgrade = true
+	_post_continue_upgrades_left = _POST_CONTINUE_UPGRADE_COUNT
 	emit_signal("level_up")
