@@ -59,12 +59,15 @@
     - **回旋镖**：场上枚数、齐射数（无固定 CD 时仍展示状态）
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
-  - 布局：**左侧 `LeftStatsVBox`**（Score≈28、DPS≈26、分区标题≈22、正文≈19）：DPS 下 **`ShieldTitleLabel` + `ShieldStatsLabel`**（稳态护盾层数，0 层写「无」）；再下 **主炮 / 副武器 / 符卡**。
-    - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔、**弹速基数与连击弹速 Buff**）
+  - 布局：**左侧 `LeftStatsVBox`**（Score≈28、DPS≈26、分区标题≈22、正文≈19）：DPS 下 **`ShieldTitleLabel` + `ShieldStatsLabel`**（稳态护盾层数，0 层写「无」）；再下 **主炮 / 副武器 / 符卡**（**不再单独「攻速溢出转化」分区**）。
+    - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**：
+      - **主炮伤害**：单发有效伤害；若有攻速溢出转化，写作 **主炮伤害 _基础_ [+_溢出_]**（基础 = 不含溢出转化的部分，[+…] = 溢出按规则折算进乘区后的加成，与升级说明一致）。
+      - **射速**：未超 `max_main_rof` 时只显示一行 **射速 N 发/秒**；**仅当理论射速超过上限** 时再显示 **理论 / 实际** 并标明 **封顶 N 发/秒**。
+      - 齐射、间隔、**弹速基数与连击弹速 Buff** 等照旧。
     - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
   - 各块 `mouse_filter = IGNORE`；内容区 `bbcode_enabled`、`fit_content`、`custom_minimum_size` 保证可见。
-> 实现约定：`hud.gd` 以 **`%ShieldStatsLabel`**（护盾层数）与 **`%MainGunStatsLabel`** / **`%SideWeaponStatsLabel`** / **`%SpellStatsLabel`** 引用内容区；标题仅场景摆字。
+> 实现约定：`hud.gd` 以 **`%ShieldStatsLabel`**（护盾层数）与 **`%MainGunStatsLabel`** / **`%SideWeaponStatsLabel`** / **`%SpellStatsLabel`** 引用内容区；标题仅场景摆字（无 `%OverflowStatsLabel`）。
 
 ### Boss HUD
 
@@ -76,7 +79,7 @@
 ### 连击与评分反馈 UI（新增）
 
 - 连击提示：
-  - 当 `combo` > 0 时，在 HUD 上仅显示当前连击数，如「Combo: 12」。主炮行可显示 **理论射速 → 实际射速**、连击倍率、**攻速溢出→攻击**、弹速。
+  - 当 `combo` > 0 时，在 HUD 上仅显示当前连击数，如「Combo: 12」。主炮块：**射速**（超上限才拆理论/实际+封顶）、连击倍率、**主炮伤害 [+溢出]**、弹速。
   - 在连击达到预设档位（10 / 25 / 50 / 100 连）时，短暂在玩家附近或屏幕中央浮现“10 Combo!”、“25 Combo!!” 等文字，并配合轻微缩放/闪光效果。
 - 连击中断反馈：
   - 玩家受击或长时间未命中导致连击清零时，短暂显示“Combo Break” 或“连击中断”字样，并播放轻微“失误”提示音（不应过于刺耳，以免挫败感过强）。
