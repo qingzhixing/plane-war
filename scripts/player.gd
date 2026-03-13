@@ -398,8 +398,9 @@ func set_combo_buff_tier(tier: int) -> void:
 		_combo_fire_rate_mult = 1.45
 		_combo_damage_bonus = 1
 	else:
-		const FIRE_CAP: float = 3.0
-		const FIRE_PER_TIER: float = 0.08
+		# 与 _MAX_MAIN_ROF 对齐：默认间隔 0.2 → 5/s 基础，倍率 15 → 75/s
+		const FIRE_CAP: float = 15.0
+		const FIRE_PER_TIER: float = 0.5
 		var extra_tiers: int = tier - 3
 		var tiers_to_cap: int = maxi(1, int(ceil((FIRE_CAP - 1.45) / FIRE_PER_TIER)))
 		var fire_raw: float = 1.45 + FIRE_PER_TIER * float(extra_tiers)
