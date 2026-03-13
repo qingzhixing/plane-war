@@ -27,7 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-@onready var _stats_label: RichTextLabel = %StatsLabel
+@onready var _stats_label: Control = %StatsLabel
 var _spell_button: Button = null
 
 
@@ -51,6 +51,7 @@ func _ready() -> void:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _stats_label != null:
 		_stats_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	call_deferred("_update_stats_label")
 	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -105,8 +106,8 @@ func _process(delta: float) -> void:
 		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
-		_update_stats_label()
 		_update_spell_button()
+	_update_stats_label()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -359,6 +360,9 @@ func _play_combo_break_sfx() -> void:
 func _update_stats_label() -> void:
 	if _stats_label == null or not is_instance_valid(_stats_label):
 		return
+	var rtl := _stats_label as RichTextLabel
+	if rtl == null:
+		return
 	const C_FR := "#ffcc66"
 	const C_MV := "#6fcf97"
 	const C_BS := "#7eb8da"
@@ -444,7 +448,9 @@ func _update_stats_label() -> void:
 		var sp_r := float(_main.get_spell_cooldown_remaining())
 		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
 		lines.append("符卡 %.1f/%.1fs" % [sp_r, sp_t])
-	_stats_label.text = "\n".join(lines)
+	if lines.is_empty():
+		lines.append("属性加载中…")
+	rtl.text = "\n".join(lines)
 
 
 func _ensure_spell_button() -> void:
