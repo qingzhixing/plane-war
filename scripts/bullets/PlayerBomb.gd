@@ -90,6 +90,7 @@ func _apply_aoe_damage() -> void:
 		poly_global.append(poly_node.to_global(p))
 	if poly_global.size() < 3:
 		return
+	_clear_enemy_bullets_in_polygon(poly_global)
 	var seen: Dictionary = {}
 	for gid in [&"enemy", &"boss"]:
 		for node in get_tree().get_nodes_in_group(StringName(gid)):
@@ -109,6 +110,23 @@ func _apply_aoe_damage() -> void:
 				node.apply_damage(dealt)
 				get_tree().call_group("battle_stats_manager", "record_player_damage", dealt, node)
 				_spawn_hit_vfx(node)
+
+
+func _clear_enemy_bullets_in_polygon(poly_global: PackedVector2Array) -> void:
+	for b in get_tree().get_nodes_in_group("enemy_bullet"):
+		if not is_instance_valid(b) or not (b is Node2D):
+			continue
+		var n2 := b as Node2D
+		if Geometry2D.is_point_in_polygon(n2.global_position, poly_global):
+			b.queue_free()
+			continue
+		# 稍大弹体：用子碰撞形中心再判一次
+		for child in b.get_children():
+			if child is CollisionShape2D:
+				var cs := child as CollisionShape2D
+				if Geometry2D.is_point_in_polygon(cs.to_global(Vector2.ZERO), poly_global):
+					b.queue_free()
+					break
 
 
 func _aoe_hits_target(node: Node, poly_global: PackedVector2Array) -> bool:
