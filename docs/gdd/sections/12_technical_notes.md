@@ -23,7 +23,7 @@
   - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrow.tscn`，脚本 `res://scripts/bullets/PlayerArrow.gd`。
   - 玩家回旋镖：`PlayerBoomerang` **重写 `area_entered`**，命中只伤不 `queue_free`；`boomerang_multi` 解锁与齐射 +1。
   - 符卡爆发弹幕：仍使用 `PlayerBullet.tscn` 等多向直线弹。
-  - **炸弹副武器**：`PlayerBomb.gd` 第 7 帧除 AoE 外，对爆炸多边形内的 `enemy_bullet` 执行 `queue_free`。
+  - **炸弹**：飞行中 `area_entered` 对 `enemy_bullet` 只 `queue_free` 敌弹；第 7 帧 AoE 再清区内敌弹。
 - 敌人：
   - 基类脚本：`res://scripts/enemies/EnemyBase.gd`（提供 `max_hp/hp` 与 `apply_damage/_on_dead` 等统一接口）。
   - 基础敌人场景可继续使用如 `res://scenes/enemies/EnemyBasic01.tscn`、`EnemyBasic02.tscn` 等，脚本统一继承 `EnemyBase` 来实现各自的移动与攻击逻辑。
