@@ -68,7 +68,7 @@ func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
 		var wave_text := "第 %d 波" % _main.get_wave()
 		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
-			var ex := _main.get_extension_wave()
+			var ex: int = int(_main.get_extension_wave())
 			wave_text = "续战 %d/4" % ex
 			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
