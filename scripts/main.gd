@@ -14,6 +14,8 @@ var _boss_spawned: bool = false
 ## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
 var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
+## Boss 后续战：1～4，0 表示未在续战
+var _extension_wave: int = 0
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -80,6 +82,10 @@ func _start_wave() -> void:
 		_spawner.start_wave(_wave)
 
 
+func get_extension_wave() -> int:
+	return _extension_wave
+
+
 func get_wave() -> int:
 	return _wave
 
@@ -93,17 +99,24 @@ func get_threat_hp_mult() -> float:
 
 
 func on_wave_cleared() -> void:
-	# 一波结束：先清空敌方子弹，再触发升级，等玩家选完再进入下一波/Boss
 	if _waiting_upgrade_choice:
 		return
-	# 清空场上所有敌方子弹
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	# Boss 后续战 4 波：不弹升级、不再打 Boss，第 4 波结束直接结算
+	if _extension_wave > 0:
+		if _extension_wave >= 4:
+			_extension_wave = 0
+			get_tree().call_group("game_over_ui", "show_game_over")
+			return
+		_extension_wave += 1
+		if _spawner != null and _spawner.has_method("start_extension_wave"):
+			_spawner.start_extension_wave(_extension_wave, threat_tier)
+		return
 	_waiting_upgrade_choice = true
 	emit_signal("level_up")
 	_wave += 1
-	# 波次更多：第 8 波后才开始 Boss
 	if _wave >= _BOSS_WAVE_START and not _boss_spawned:
 		_pending_boss_spawn = true
 	else:
@@ -115,7 +128,9 @@ func on_upgrade_selected() -> void:
 
 	if _pending_post_boss_upgrade:
 		_pending_post_boss_upgrade = false
-		_start_wave()
+		_extension_wave = 1
+		if _spawner != null and _spawner.has_method("start_extension_wave"):
+			_spawner.start_extension_wave(1, threat_tier)
 		return
 
 	if _debug_skip_to_boss_active:
@@ -539,8 +554,8 @@ func continue_after_boss() -> void:
 	threat_tier += 1
 	_score_multiplier += 0.08
 	_boss_spawned = false
-	_wave = 1
 	_pending_boss_spawn = false
+	_extension_wave = 0
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()

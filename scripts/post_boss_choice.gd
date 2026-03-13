@@ -48,7 +48,7 @@ func _build_ui() -> void:
 	body.name = "BodyLabel"
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_theme_font_size_override("font_size", 22)
-	body.text = "选择本局结算，或继续挑战：敌方与 Boss 会变强，并再送一次升级。"
+	body.text = "结算直接看成绩；继续则威胁+1、送一次升级，再打 4 波递进难度（更多怪、更快刷新），不再打 Boss。"
 	vbox.add_child(body)
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 16)
@@ -80,7 +80,7 @@ func show_choice() -> void:
 			tier = _main.get_threat_tier()
 		var body := find_child("BodyLabel", true, false) as Label
 		if body != null:
-			body.text = "当前威胁等级 %d。结算直接看成绩；继续则威胁+1、敌人与 Boss 更强，并再选一次升级，再从第 1 波打到 Boss。" % tier
+			body.text = "当前威胁 %d。继续：威胁+1 + 升级 + 续战 4 波（越来越难），第 4 波后结算。" % tier
 
 
 func _on_settle() -> void:

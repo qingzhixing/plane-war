@@ -67,10 +67,16 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
 		var wave_text := "第 %d 波" % _main.get_wave()
-		if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
-			wave_text = "%s - Boss" % wave_text
-		if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
-			wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
+		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
+			var ex := _main.get_extension_wave()
+			wave_text = "续战 %d/4" % ex
+			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
+		else:
+			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
+				wave_text = "%s - Boss" % wave_text
+			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		_wave_label.text = wave_text
 	# 分数 / 连击 / DPS HUD
 	if is_instance_valid(_main):
