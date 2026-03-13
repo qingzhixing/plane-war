@@ -67,8 +67,16 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
 		var wave_text := "第 %d 波" % _main.get_wave()
-		if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
-			wave_text = "%s - Boss" % wave_text
+		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
+			var ex: int = int(_main.get_extension_wave())
+			wave_text = "续战 %d/4" % ex
+			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
+		else:
+			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
+				wave_text = "%s - Boss" % wave_text
+			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		_wave_label.text = wave_text
 	# 分数 / 连击 / DPS HUD
 	if is_instance_valid(_main):
@@ -358,8 +366,17 @@ func _ensure_bomb_button() -> void:
 	_bomb_button.anchor_right = 0.98
 	_bomb_button.anchor_top = 0.86
 	_bomb_button.anchor_bottom = 0.94
+	# 不抢触摸：拖动经符卡区不断流；发动改由 Main 未处理输入里短按检测
+	_bomb_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bomb_button.focus_mode = Control.FOCUS_NONE
 	_bomb_button.pressed.connect(_on_bomb_button_pressed)
 	root.add_child(_bomb_button)
+
+
+func get_bomb_screen_rect() -> Rect2:
+	if _bomb_button == null or not is_instance_valid(_bomb_button):
+		return Rect2()
+	return _bomb_button.get_global_rect()
 
 
 func _update_bomb_button() -> void:

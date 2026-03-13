@@ -8,6 +8,8 @@ radius = 5.0
 height = 63.333332
 
 [node name="PlayerArrow" type="Area2D"]
+z_index = 12
+z_as_relative = false
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

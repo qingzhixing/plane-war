@@ -33,12 +33,14 @@ func apply_damage(amount: float) -> void:
 		_trigger_hit_flash()
 
 
-func apply_wave_scaling(wave: int) -> void:
-	if wave <= 1:
-		return
-	var factor := 1.0 + 0.25 * float(wave - 1)
-	max_hp = int(round(float(max_hp) * factor))
-	hp = max_hp
+func apply_wave_scaling(wave: int, threat_tier: int = 0) -> void:
+	if wave > 1:
+		var factor := 1.0 + 0.25 * float(wave - 1)
+		max_hp = int(round(float(max_hp) * factor))
+	if threat_tier > 0:
+		max_hp = int(round(float(max_hp) * pow(1.12, float(threat_tier))))
+	if wave > 1 or threat_tier > 0:
+		hp = max_hp
 
 
 func _on_body_entered(body: Node) -> void:

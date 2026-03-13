@@ -11,6 +11,15 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _wave: int = 1
 var _boss_spawned: bool = false
+## 本局已击破过 Boss 后不再触发第二场 Boss（避免续战流程里 _wave>=8 再次 pending）
+var _boss_defeated_once: bool = false
+## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
+var threat_tier: int = 0
+var _pending_post_boss_upgrade: bool = false
+## Boss 后续战块内波次 1～4，0 表示未在续战
+var _extension_wave: int = 0
+## 第 4 波升级选完后弹出「接着玩 / 结算」
+var _after_extension_block_upgrade_show_choice: bool = false
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -27,7 +36,7 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 var best_combo: int = 0
 
-const GRAZE_SCORE: int = 4
+const GRAZE_SCORE: int = 9
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
@@ -40,6 +49,8 @@ var _debug_skip_to_boss_used: bool = false
 var _debug_skip_to_boss_active: bool = false
 var _debug_upgrades_needed: int = 0
 var _bomb_cooldown_remaining: float = 0.0
+## 符卡区短按检测（按钮 IGNORE 后触摸全程未处理，与拖动共用）
+var _bomb_tap_start: Dictionary = {}
 
 const _BOMB_COOLDOWN_SECONDS: float = 12.0
 const _BOMB_BURST_WAVE_COUNT: int = 4
@@ -57,6 +68,9 @@ func _ready() -> void:
 	_load_records()
 
 	_spawner = get_node_or_null("EnemySpawner")
+	var pbc := get_node_or_null("PostBossChoice")
+	if pbc != null and pbc.has_method("bind_main"):
+		pbc.bind_main(self)
 	_start_wave()
 
 
@@ -74,23 +88,39 @@ func _start_wave() -> void:
 		_spawner.start_wave(_wave)
 
 
+func get_extension_wave() -> int:
+	return _extension_wave
+
+
 func get_wave() -> int:
 	return _wave
 
 
+func get_threat_tier() -> int:
+	return threat_tier
+
+
+func get_threat_hp_mult() -> float:
+	return pow(1.12, float(threat_tier))
+
+
 func on_wave_cleared() -> void:
-	# 一波结束：先清空敌方子弹，再触发升级，等玩家选完再进入下一波/Boss
 	if _waiting_upgrade_choice:
 		return
-	# 清空场上所有敌方子弹
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	# 续战：每波清场 → 升级；第 4 波升级后再询问是否接着玩
+	if _extension_wave > 0:
+		_waiting_upgrade_choice = true
+		if _extension_wave >= 4:
+			_after_extension_block_upgrade_show_choice = true
+		emit_signal("level_up")
+		return
 	_waiting_upgrade_choice = true
 	emit_signal("level_up")
 	_wave += 1
-	# 波次更多：第 8 波后才开始 Boss
-	if _wave >= _BOSS_WAVE_START and not _boss_spawned:
+	if _wave >= _BOSS_WAVE_START and not _boss_spawned and not _boss_defeated_once:
 		_pending_boss_spawn = true
 	else:
 		_pending_boss_spawn = false
@@ -98,6 +128,29 @@ func on_wave_cleared() -> void:
 
 func on_upgrade_selected() -> void:
 	_waiting_upgrade_choice = false
+
+	if _pending_post_boss_upgrade:
+		_pending_post_boss_upgrade = false
+		_extension_wave = 1
+		if _spawner != null and _spawner.has_method("start_extension_wave"):
+			_spawner.start_extension_wave(1, threat_tier)
+		return
+
+	if _after_extension_block_upgrade_show_choice:
+		_after_extension_block_upgrade_show_choice = false
+		get_tree().paused = true
+		var pbc := get_node_or_null("PostBossChoice")
+		if pbc != null and pbc.has_method("show_choice_after_block"):
+			pbc.show_choice_after_block()
+		else:
+			get_tree().call_group("game_over_ui", "show_game_over")
+		return
+
+	if _extension_wave > 0 and _extension_wave < 4:
+		_extension_wave += 1
+		if _spawner != null and _spawner.has_method("start_extension_wave"):
+			_spawner.start_extension_wave(_extension_wave, threat_tier)
+		return
 
 	if _debug_skip_to_boss_active:
 		_debug_upgrades_needed -= 1
@@ -207,6 +260,41 @@ func try_use_bomb() -> bool:
 	_trigger_bomb_effect()
 	emit_signal("bomb_used")
 	return true
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var e := event as InputEventScreenTouch
+		var k := e.index + 100000
+		if e.pressed:
+			_bomb_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
+		else:
+			_try_bomb_short_tap(e.position, k)
+	elif event is InputEventMouseButton:
+		var e := event as InputEventMouseButton
+		if e.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if e.pressed:
+			_bomb_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
+		else:
+			_try_bomb_short_tap(e.position, -1)
+
+
+func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
+	var st: Variant = _bomb_tap_start.get(key, null)
+	_bomb_tap_start.erase(key)
+	if st == null or typeof(st) != TYPE_DICTIONARY:
+		return
+	var t0: int = int(st["t"])
+	var p0: Vector2 = st["p"]
+	if Time.get_ticks_msec() - t0 > 320:
+		return
+	if screen_pos.distance_to(p0) > 56.0:
+		return
+	var hud := get_node_or_null("HUD")
+	if hud != null and hud.has_method("get_bomb_screen_rect"):
+		if hud.get_bomb_screen_rect().has_point(screen_pos):
+			try_use_bomb()
 
 
 func get_best_score() -> int:
@@ -474,6 +562,11 @@ func _spawn_boss() -> void:
 	var boss := boss_scene.instantiate()
 	if boss == null:
 		return
+	var hp_m := get_threat_hp_mult()
+	if "max_hp" in boss:
+		boss.max_hp = int(round(float(boss.max_hp) * hp_m))
+	if boss.has_method("apply_threat_scaling"):
+		boss.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
 	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
@@ -500,11 +593,39 @@ func _debug_skip_to_boss() -> void:
 
 	# 计算还需要多少次升级（当前波次到 Boss 波次之间）
 	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
-	if _debug_upgrades_needed <= 0:
-		_debug_skip_to_boss_active = false
-		_spawn_boss()
-		return
 
-	# 连续弹出升级界面，让玩家手动选择多次升级
+
+func on_boss_defeated() -> void:
+	_boss_defeated_once = true
+	_pending_boss_spawn = false
+	get_tree().paused = true
+	var pbc := get_node_or_null("PostBossChoice")
+	if pbc != null and pbc.has_method("show_choice"):
+		pbc.show_choice()
+	else:
+		get_tree().call_group("game_over_ui", "show_game_over")
+
+
+func continue_after_boss() -> void:
+	_begin_next_extension_block()
+
+
+## 每 4 波续战结束后「接着玩」：再威胁+1 + 先升级再开新块第 1 波
+func continue_next_extension_block() -> void:
+	_begin_next_extension_block()
+
+
+func _begin_next_extension_block() -> void:
+	threat_tier += 1
+	_score_multiplier += 0.08
+	_boss_spawned = false
+	_pending_boss_spawn = false
+	_extension_wave = 0
+	_after_extension_block_upgrade_show_choice = false
+	for b in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(b):
+			b.queue_free()
+	get_tree().paused = false
 	_waiting_upgrade_choice = true
+	_pending_post_boss_upgrade = true
 	emit_signal("level_up")

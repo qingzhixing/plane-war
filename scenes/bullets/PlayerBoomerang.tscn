@@ -7,6 +7,8 @@
 radius = 13.333333
 
 [node name="PlayerBoomerang" type="Area2D"]
+z_index = 12
+z_as_relative = false
 scale = Vector2(2, 2)
 script = ExtResource("1_script")
 

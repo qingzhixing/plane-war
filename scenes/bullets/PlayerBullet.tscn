@@ -8,6 +8,8 @@ radius = 11.666666
 height = 63.333332
 
 [node name="PlayerBullet" type="Area2D"]
+z_index = 12
+z_as_relative = false
 scale = Vector2(0.7, 0.7)
 script = ExtResource("1_script")
 
