@@ -60,7 +60,7 @@
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
   - 布局：置于 `TopRightVBox` 内 `DpsLabel` 下方；节点类型为 **`RichTextLabel`**（`bbcode_enabled`），连击加成括号内用**不同颜色**区分射速/移速/弹速/伤害；`autowrap`；`mouse_filter = IGNORE`。
-> 实现约定：`hud.gd` 维护 `StatsLabel`；旧存档若为 `Label`，运行时替换为 `RichTextLabel`。Combo 大字行不跟属性小字。
+> 实现约定：`StatsLabel` 与 `ScoreLabel` / `DpsLabel` 相同：**摆在 `TopRightVBox` 内**，`unique_name_in_owner`、`layout_mode = 2`，由 `hud.gd` 以 **`%StatsLabel`** 引用（`@onready`），仅改 `text` / `mouse_filter`，**不在运行时创建或替换节点**。类型为 `RichTextLabel`（BBCode 着色）。
 
 ### Boss HUD
 
