@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://grazesparkvfx01"]
+[gd_scene format=3 uid="uid://bkcxxjvuycivg"]
 
-[ext_resource type="Script" path="res://scripts/graze_spark.gd" id="1"]
+[ext_resource type="Script" uid="uid://csm4arwk0oix6" path="res://scripts/graze_spark.gd" id="1"]
 
 [sub_resource type="Gradient" id="Gradient_graze"]
 offsets = PackedFloat32Array(0, 0.18, 0.42, 1)
@@ -10,15 +10,16 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.92, 1, 1, 1, 0.12, 1, 1, 1, 0)
 gradient = SubResource("Gradient_graze")
 width = 10
 height = 10
-fill = 1
+fill = 2
 fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
+fill_to = Vector2(1, 0.50617284)
 
-[node name="GrazeSpark" type="CPUParticles2D"]
-z_index = -20
+[node name="GrazeSpark" type="CPUParticles2D" unique_id=664324307]
+z_index = 8
 z_as_relative = false
 emitting = false
-amount = 44
+amount = 20
+texture = SubResource("GradientTexture2D_graze")
 lifetime = 0.2
 one_shot = true
 explosiveness = 0.92
@@ -29,8 +30,6 @@ initial_velocity_min = 120.0
 initial_velocity_max = 340.0
 angular_velocity_min = -520.0
 angular_velocity_max = 520.0
-scale_amount_min = 0.18
-scale_amount_max = 0.48
+scale_amount_max = 4.0
 color = Color(0.5, 0.92, 1, 1)
-texture = SubResource("GradientTexture2D_graze")
 script = ExtResource("1")
