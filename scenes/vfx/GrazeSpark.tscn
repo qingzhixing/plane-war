@@ -15,7 +15,7 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [node name="GrazeSpark" type="CPUParticles2D"]
-z_index = 80
+z_index = -20
 z_as_relative = false
 emitting = false
 amount = 18
@@ -29,8 +29,8 @@ initial_velocity_min = 100.0
 initial_velocity_max = 280.0
 angular_velocity_min = -360.0
 angular_velocity_max = 360.0
-scale_amount_min = 2.5
-scale_amount_max = 6.0
+scale_amount_min = 0.45
+scale_amount_max = 1.15
 color = Color(0.5, 0.92, 1, 1)
 texture = SubResource("GradientTexture2D_graze")
 script = ExtResource("1")

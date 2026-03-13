@@ -15,6 +15,8 @@ radius = 24.0
 radius = 131.93274
 
 [node name="Player" type="CharacterBody2D" unique_id=1665526431]
+z_index = -16
+z_as_relative = false
 scale = Vector2(0.4, 0.4)
 script = ExtResource("1_p0vlq")
 bullet_scene_basic = ExtResource("2_basic")
@@ -33,7 +35,7 @@ script = ExtResource("7_graze")
 shape = SubResource("CircleShape2D_cw2d6")
 
 [node name="HitJudgementVisual" type="Node2D" parent="." unique_id=1055014287]
-z_index = 24
+z_index = 2
 script = ExtResource("6_hit")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1444472511]
