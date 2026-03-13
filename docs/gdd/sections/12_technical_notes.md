@@ -3,6 +3,7 @@
 ## 技术栈
 
 - 引擎版本：**Godot 4.x**
+- **窗口拉伸（全工程统一）**：`project.godot` → Display → Stretch **Mode = viewport**、**Aspect = keep**，基准 **720×1280**。主菜单与 `Main` 同一逻辑：拉伸/放大窗口时整画布等比缩放，避免仅战斗场景缩放而标题界面不缩放。
 - 渲染管线：默认（Forward+ 或兼容的移动友好设置，视具体需求调整）
 - 平台目标：Windows + Android
 - 脚本语言：优先使用 **GDScript**（如需改为 C#，在本节补充说明）
