@@ -59,8 +59,13 @@
     - **回旋镖**：场上枚数、齐射数（无固定 CD 时仍展示状态）
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
-  - 布局：置于 `TopRightVBox` 内 `DpsLabel` 下方；节点类型为 **`RichTextLabel`**（`bbcode_enabled`），连击加成括号内用**不同颜色**区分射速/移速/弹速/伤害；`autowrap`；`mouse_filter = IGNORE`。
-> 实现约定：`StatsLabel` 与 `ScoreLabel` / `DpsLabel` 相同：**摆在 `TopRightVBox` 内**，`unique_name_in_owner`、`layout_mode = 2`，由 `hud.gd` 以 **`%StatsLabel`** 引用（`@onready`），仅改 `text` / `mouse_filter`，**不在运行时创建或替换节点**。类型为 `RichTextLabel`（BBCode 着色）。
+  - 布局：`DpsLabel` 下方按 **标题 `Label` + 内容 `RichTextLabel`** 分组（与 Score/DPS 同属 `TopRightVBox`）：
+    - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔）
+    - **ComboBuffTitleLabel**「连击Buff」→ **ComboBuffStatsLabel**（移速/弹速/伤害/射速加成，BBCode 着色）
+    - **SideWeaponTitleLabel**「炸弹 / 副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
+    - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
+  - 各块 `mouse_filter = IGNORE`；内容区 `bbcode_enabled`、`fit_content`、`custom_minimum_size` 保证可见。
+> 实现约定：`hud.gd` 以 **`%MainGunStatsLabel`** 等四个唯一名引用内容区；标题仅场景摆字，脚本不创建节点。
 
 ### Boss HUD
 
