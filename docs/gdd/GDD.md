@@ -10,6 +10,7 @@
 - `docs/gdd/sections/03_core_loop_and_controls.md`：核心循环、失败与继续、输入与手感
 - `docs/gdd/sections/04_numbers_and_combat_rules.md`：数值框架、受击/判定、战斗规则
 - `docs/gdd/sections/05_level_structure.md`：2–5 分钟波次制关卡结构与可读性原则
+- `docs/gdd/sections/05_level_structure_post_boss.md`：Boss 后继续挑战与威胁等级
 - `docs/gdd/sections/06_enemies_and_boss.md`：敌人/精英/Boss 模板
 - `docs/gdd/sections/07_roguelite_upgrades.md`：升级三选一与强化池分类（MVP）
 - `docs/gdd/sections/08_ui_ux.md`：UI/UX 流程与界面清单
@@ -24,7 +25,7 @@
 - **引擎**：Godot 4（CI 细节依赖具体导出配置）
 - **画面**：像素风；参考东方氛围但弹幕更少更简单
 - **操作**：竖屏、单手拖拽移动、自动射击
-- **局内**：2–5 分钟波次制 → Boss；升级三选一（pick-3），Boss/精英/炮台的攻击节奏强调**可读前摇**（约 0.7–1.0 秒），保证新手可预判与反应空间；核心反馈为“评分表现”（高分、高连击、高 DPS），不再有 HP/生命数概念
+- **局内**：2–5 分钟波次制 → Boss；**Boss 击破后可选择继续挑战**（威胁等级↑、敌方强化、再送一次升级）或结算；升级三选一（pick-3）；核心反馈为“评分表现”（高分、高连击、高 DPS）
 - **局外**：Demo 阶段不做永久养成，仅记录本地最高表现（如最高得分 / 最高 DPS 等）
 - **容错与惩罚方向**：玩家**没有 HP 条**，受击不会导致 Game Over，而是主要通过**连击断掉、评分加成下降**来体现惩罚，鼓励“多打几次刷更高分”而非频繁被踢回标题
 
