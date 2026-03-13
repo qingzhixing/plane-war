@@ -270,7 +270,7 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 	var scene := get_tree().current_scene
 	var bullet := scene_res.instantiate()
 	bullet.global_position = global_position + dir * 20.0 + side_offset
-		if "damage" in bullet:
+	if "damage" in bullet:
 		var combo_bonus_damage := float(_combo_damage_bonus) + _rof_overflow_damage
 		bullet.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
 	if "speed" in bullet:
