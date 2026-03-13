@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://scripts/hit_judgement_visual.gd" id="6_hit"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3li8b"]
-radius = 14.0
+radius = 24.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1665526431]
 scale = Vector2(0.4, 0.4)
@@ -17,15 +17,16 @@ bullet_scene_basic = ExtResource("2_basic")
 bullet_scene_arrow = ExtResource("3_arrow")
 bullet_scene_boomerang = ExtResource("4_boomerang")
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1782819317]
+shape = SubResource("CircleShape2D_3li8b")
+
+[node name="HitJudgementVisual" type="Node2D" parent="." unique_id=1055014287]
+z_index = 24
+script = ExtResource("6_hit")
+radius_pixels = 24.0
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1444472511]
 z_index = 1
 position = Vector2(-0.28250122, 0)
 scale = Vector2(0.4, 0.38)
 texture = ExtResource("5_tex")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1782819317]
-shape = SubResource("CircleShape2D_3li8b")
-
-[node name="HitJudgementVisual" type="Node2D" parent="."]
-script = ExtResource("6_hit")
-radius_pixels = 14.0
