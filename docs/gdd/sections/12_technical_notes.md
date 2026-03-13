@@ -42,6 +42,7 @@
   - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
   - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
   - **调试**：局内暂停 → 设置 → **连击+（调试）** `+10/+50/+100/+500` 与 **清零**；对应 `Main.debug_add_combo` / `debug_set_combo`（仅开发验 Buff/HUD）。
+  - **跳 Boss（调试）**：主线未进续战时，假升级跳到 **第 8 波 Boss**；已进入 **续战小怪** 或 **续关后待升级** 时，直接 **续战 Boss**（击破后走「一轮结束」面板）。每进入新续战块可再跳一次主线式次数会重置，续战内可反复跳 Boss 关。
 
 ## 调试工具（开发/自测）
 
