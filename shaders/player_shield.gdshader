@@ -1,38 +1,41 @@
 shader_type canvas_item;
 
 uniform float pulse : hint_range(0.0, 1.0) = 0.0;
-uniform vec4 inner_color : source_color = vec4(0.75, 1.0, 1.0, 0.95);
-uniform vec4 mid_color : source_color = vec4(0.25, 0.85, 1.0, 0.72);
-uniform vec4 outer_color : source_color = vec4(0.1, 0.45, 1.0, 0.4);
+uniform vec4 ring_bright : source_color = vec4(0.85, 1.0, 1.0, 0.88);
+uniform vec4 ring_mid : source_color = vec4(0.2, 0.75, 1.0, 0.55);
+uniform vec4 ring_outer : source_color = vec4(0.05, 0.35, 0.95, 0.22);
 
 void fragment() {
 	vec2 centered_uv = UV - vec2(0.5);
 	float dist = length(centered_uv);
 
-	// 与 TIME 叠加呼吸，环更明显
-	float breathe = 0.5 + 0.5 * sin(TIME * 2.8 + pulse * 6.28318);
-	float edge_radius = mix(0.36, 0.5, breathe);
-	float edge_softness = 0.1;
+	// 中心挖空：机身区域完全不画，避免挡住玩家
+	float hole_inner = 0.26;
+	float hole_outer = 0.36;
+	float out_of_hole = smoothstep(hole_inner, hole_outer, dist);
 
-	// 内亮环 + 中外渐变
-	float inner_ring = smoothstep(edge_radius + 0.06, edge_radius - 0.02, dist);
-	float outer_fall = smoothstep(edge_radius, edge_radius - edge_softness, dist);
-	vec4 col = mix(outer_color, mid_color, outer_fall);
-	col = mix(col, inner_color, inner_ring * 0.85);
+	// 外缘收掉，只保留一圈
+	float breathe = 0.5 + 0.5 * sin(TIME * 2.6);
+	float outer_r = mix(0.54, 0.62, breathe);
+	float fade_outer = 1.0 - smoothstep(outer_r - 0.06, outer_r + 0.08, dist);
 
-	// 内圈再提亮一条细边
-	float rim = smoothstep(edge_radius - 0.04, edge_radius - 0.12, dist)
-		* (1.0 - smoothstep(edge_radius - 0.02, edge_radius + 0.02, dist));
-	col.rgb += vec3(0.35, 0.5, 0.55) * rim * 1.2;
-	col.a = max(col.a, rim * 0.9);
-
-	// 外缘裁切略放宽，大矩形上环更粗
-	if (dist > 0.62) {
-		col.a *= smoothstep(0.68, 0.62, dist);
+	float mask = out_of_hole * fade_outer;
+	if (mask < 0.02) {
+		COLOR = vec4(0.0);
+		return;
 	}
-	if (dist > 0.72) {
-		col.a = 0.0;
-	}
+
+	// 环带：靠外更亮一点，像能量边
+	float t = clamp((dist - hole_outer) / max(outer_r - hole_outer, 0.01), 0.0, 1.0);
+	vec4 col = mix(ring_mid, ring_outer, t * 0.5);
+	col = mix(col, ring_bright, smoothstep(0.42, 0.52, dist) * 0.75);
+	col.a *= mask;
+
+	// 外缘细高亮
+	float rim = smoothstep(outer_r - 0.05, outer_r - 0.12, dist)
+		* (1.0 - smoothstep(outer_r - 0.02, outer_r + 0.04, dist));
+	col.rgb += vec3(0.25, 0.45, 0.55) * rim;
+	col.a = max(col.a, rim * 0.65 * mask);
 
 	COLOR = col;
 }
