@@ -17,6 +17,7 @@ const _ALL: Array[Dictionary] = [
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
+	{"id": "bomb_auto", "name": "自动符卡", "desc": "一次性 冷却-50% 自动放"},
 	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器 / 齐射 +1"},
 	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},

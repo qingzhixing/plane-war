@@ -27,6 +27,8 @@ var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
 var _bomb_cooldown_scale: float = 1.0
+## 一次性：自动符卡（冷却 -50% + CD 好自动放）
+var _bomb_auto: bool = false
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -197,6 +199,14 @@ func apply_upgrade(upgrade_id: String) -> void:
 			return
 		"bomb_cooldown":
 			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
+			return
+		"bomb_auto":
+			if _bomb_auto:
+				return
+			_bomb_auto = true
+			_bomb_cooldown_scale = maxf(0.2, _bomb_cooldown_scale * 0.5)
+			if _bomb_cooldown_remaining <= 0.0:
+				try_use_bomb()
 			return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
@@ -434,9 +444,14 @@ func _update_dps() -> void:
 
 
 func _update_bomb(delta: float) -> void:
-	if _bomb_cooldown_remaining <= 0.0:
-		return
-	_bomb_cooldown_remaining = maxf(0.0, _bomb_cooldown_remaining - delta)
+	if _bomb_cooldown_remaining > 0.0:
+		_bomb_cooldown_remaining = maxf(0.0, _bomb_cooldown_remaining - delta)
+	if _bomb_auto and _bomb_cooldown_remaining <= 0.0:
+		try_use_bomb()
+
+
+func has_bomb_auto() -> bool:
+	return _bomb_auto
 
 
 func _trigger_bomb_effect() -> void:
