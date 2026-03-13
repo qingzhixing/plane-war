@@ -588,6 +588,25 @@ func _spawn_boss() -> void:
 	get_tree().current_scene.add_child(boss)
 
 
+## 调试：增加当前连击并刷新 Buff / HUD（仅局内设置里调用）
+func debug_add_combo(amount: int) -> void:
+	if amount == 0:
+		return
+	combo = maxi(0, combo + amount)
+	if combo > max_combo:
+		max_combo = combo
+	_last_combo_buff_tier = -1
+	_update_combo_buffs()
+
+
+func debug_set_combo(value: int) -> void:
+	combo = maxi(0, value)
+	if combo > max_combo:
+		max_combo = combo
+	_last_combo_buff_tier = -1
+	_update_combo_buffs()
+
+
 func _debug_skip_to_boss() -> void:
 	# 调试工具：一键跳到 Boss 关，并模拟前几波的升级效果
 	if _debug_skip_to_boss_used:

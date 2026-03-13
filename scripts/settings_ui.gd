@@ -14,6 +14,7 @@ var _scale_option: OptionButton
 var _end_run_button: Button
 var _skip_boss_button: Button
 var _debug_upgrades_button: Button
+var _debug_combo_row: HBoxContainer
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
@@ -45,7 +46,7 @@ func _ready() -> void:
 	center.set_offsets_preset(Control.PRESET_FULL_RECT)
 
 	_panel = Panel.new()
-	_panel.custom_minimum_size = Vector2(480, 420)
+	_panel.custom_minimum_size = Vector2(480, 500)
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	center.add_child(_panel)
 
@@ -170,6 +171,30 @@ func _ready() -> void:
 	_debug_upgrades_button.add_theme_font_size_override("font_size", 24)
 	_debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
 	vbox.add_child(_debug_upgrades_button)
+
+	_debug_combo_row = HBoxContainer.new()
+	_debug_combo_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_debug_combo_row.add_theme_constant_override("separation", 8)
+	var combo_lbl := Label.new()
+	combo_lbl.text = "连击+（调试）"
+	combo_lbl.add_theme_font_size_override("font_size", 18)
+	_debug_combo_row.add_child(combo_lbl)
+	for add_n in [10, 50, 100, 500]:
+		var b := Button.new()
+		b.text = "+%d" % add_n
+		b.custom_minimum_size = Vector2(72, 40)
+		b.add_theme_font_size_override("font_size", 18)
+		var n := add_n
+		b.pressed.connect(func() -> void: _on_debug_combo_add(n))
+		_debug_combo_row.add_child(b)
+	var b0 := Button.new()
+	b0.text = "清零"
+	b0.custom_minimum_size = Vector2(72, 40)
+	b0.add_theme_font_size_override("font_size", 18)
+	b0.pressed.connect(_on_debug_combo_clear)
+	_debug_combo_row.add_child(b0)
+	vbox.add_child(_debug_combo_row)
+
 	_apply_run_only_buttons_visibility(false)
 
 	_load_extra_settings()
@@ -234,6 +259,8 @@ func _apply_run_only_buttons_visibility(in_run: bool) -> void:
 		_skip_boss_button.visible = run_ui
 	if _debug_upgrades_button != null:
 		_debug_upgrades_button.visible = run_ui
+	if _debug_combo_row != null:
+		_debug_combo_row.visible = run_ui
 
 
 func _on_close_pressed() -> void:
@@ -259,6 +286,18 @@ func _on_skip_to_boss_pressed() -> void:
 		visible = false
 		get_tree().paused = false
 		main._debug_skip_to_boss()
+
+
+func _on_debug_combo_add(n: int) -> void:
+	var main := get_tree().current_scene
+	if main != null and main.has_method("debug_add_combo"):
+		main.debug_add_combo(n)
+
+
+func _on_debug_combo_clear() -> void:
+	var main := get_tree().current_scene
+	if main != null and main.has_method("debug_set_combo"):
+		main.debug_set_combo(0)
 
 
 func _on_debug_upgrades_pressed() -> void:
