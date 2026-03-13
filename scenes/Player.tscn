@@ -5,14 +5,14 @@
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerArrow.tscn" id="3_arrow"]
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBoomerang.tscn" id="4_boomerang"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://assets/sprites/player/player_ship_base.png" id="5_tex"]
-[ext_resource type="Script" path="res://scripts/hit_judgement_visual.gd" id="6_hit"]
-[ext_resource type="Script" path="res://scripts/player_graze_area.gd" id="7_graze"]
+[ext_resource type="Script" uid="uid://1u2vm5sqjwma" path="res://scripts/hit_judgement_visual.gd" id="6_hit"]
+[ext_resource type="Script" uid="uid://dc24c6fqlvntc" path="res://scripts/player_graze_area.gd" id="7_graze"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3li8b"]
 radius = 24.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_graze"]
-radius = 100.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_cw2d6"]
+radius = 131.93274
 
 [node name="Player" type="CharacterBody2D" unique_id=1665526431]
 scale = Vector2(0.4, 0.4)
@@ -24,18 +24,17 @@ bullet_scene_boomerang = ExtResource("4_boomerang")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1782819317]
 shape = SubResource("CircleShape2D_3li8b")
 
-[node name="GrazeArea" type="Area2D" parent="."]
+[node name="GrazeArea" type="Area2D" parent="." unique_id=620592682]
 collision_layer = 0
 monitorable = false
 script = ExtResource("7_graze")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GrazeArea"]
-shape = SubResource("CircleShape2D_graze")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GrazeArea" unique_id=748923070]
+shape = SubResource("CircleShape2D_cw2d6")
 
 [node name="HitJudgementVisual" type="Node2D" parent="." unique_id=1055014287]
 z_index = 24
 script = ExtResource("6_hit")
-radius_pixels = 24.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1444472511]
 z_index = 1
