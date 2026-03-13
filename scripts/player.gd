@@ -10,6 +10,7 @@ extends CharacterBody2D
 @export var hit_invulnerable_seconds: float = 0.35
 @export var arrow_auto_interval: float = 1.4
 @export var boomerang_auto_interval: float = 2.6
+@export var bomb_auto_interval: float = 2.5
 
 var _fire_timer: float = 0.0
 var _shoot_sfx_timer: float = 0.0
@@ -31,6 +32,7 @@ var _weapon_mode: String = "bullet"
 var _weapon_unlocked: Dictionary = {
 	"arrow": false,
 	"boomerang": false,
+	"bomb": false,
 }
 var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
@@ -38,6 +40,8 @@ var _arrow_auto_timer: float = 0.0
 var _boomerang_auto_timer: float = 0.0
 var _arrow_shot_count: int = 0
 var _boomerang_shot_count: int = 0
+var _bomb_auto_timer: float = 0.0
+var _bomb_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
@@ -62,6 +66,12 @@ func _ready() -> void:
 		bullet_scene_bomb = _fallback_bullet_scene_bomb
 	_arrow_auto_timer = arrow_auto_interval
 	_boomerang_auto_timer = boomerang_auto_interval
+	_bomb_auto_timer = bomb_auto_interval
+	# 旧存档若主武器曾为炸弹，改为副武器已解锁
+	if _weapon_mode == "bomb":
+		_weapon_mode = "bullet"
+		_weapon_unlocked["bomb"] = true
+		_bomb_shot_count = maxi(_bomb_shot_count, 1)
 	_init_shield()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -142,8 +152,6 @@ func _spawn_weapon_shot() -> void:
 			_spawn_arrow_shot()
 		"boomerang":
 			_spawn_boomerang_shot()
-		"bomb":
-			_spawn_bomb_shot()
 		_:
 			_spawn_default_shot()
 
@@ -167,11 +175,15 @@ func _spawn_arrow_shot() -> void:
 
 
 func _spawn_bomb_shot() -> void:
-	var n: int = clampi(_bullet_count, 1, _max_bullet_count)
+	var n: int = max(1, _bomb_shot_count)
+	var spread := 0.14
 	for i in n:
-		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
+		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
-		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", Vector2.ZERO)
+		if dir.y > 0.0:
+			dir.y = -dir.y
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 14.0 * (i - (n - 1) * 0.5)
+		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", side_offset)
 
 
 func _spawn_boomerang_shot() -> void:
@@ -198,6 +210,11 @@ func _update_side_weapons(delta: float) -> void:
 		if _boomerang_auto_timer <= 0.0:
 			_boomerang_auto_timer += boomerang_auto_interval
 			_spawn_boomerang_shot()
+	if has_weapon_unlocked("bomb"):
+		_bomb_auto_timer -= delta
+		if _bomb_auto_timer <= 0.0:
+			_bomb_auto_timer += bomb_auto_interval
+			_spawn_bomb_shot()
 
 
 @warning_ignore("UNUSED_PARAMETER")
@@ -315,8 +332,12 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if not has_weapon_unlocked("boomerang"):
 				_weapon_unlocked["boomerang"] = true
 			_boomerang_shot_count = max(1, _boomerang_shot_count + 1)
-		"bomb_weapon":
-			_weapon_mode = "bomb"
+		"bomb_multi", "bomb_weapon":
+			if not has_weapon_unlocked("bomb"):
+				_weapon_unlocked["bomb"] = true
+			_bomb_shot_count = max(1, _bomb_shot_count + 1)
+		"bomb_side_cooldown":
+			bomb_auto_interval = maxf(0.85, bomb_auto_interval * 0.8)
 
 
 func set_shield_active(active: bool) -> void:

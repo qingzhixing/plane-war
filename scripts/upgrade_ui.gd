@@ -19,8 +19,9 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "boomerang_cooldown", "name": "回旋加速", "desc": "回旋镖冷却 -20%"},
 	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁"},
 
-	# 主武器：炸弹（命中敌机 AoE；与符卡弹幕无关）
-	{"id": "bomb_weapon", "name": "挂载炸弹", "desc": "主武器改为炸弹；命中后范围爆炸（第7帧伤害）"},
+	# 副武器：炸弹（由 bomb_multi 首次解锁）
+	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机"},
+	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
 
 	# 通用 / 生存 / 表现
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
@@ -148,15 +149,15 @@ func show_pick() -> void:
 	var bullet_count: int = 1
 	var arrow_unlocked: bool = false
 	var boomerang_unlocked: bool = false
-	var bomb_main: bool = false
+	var bomb_unlocked: bool = false
 	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
 		bullet_count = player.get_bullet_count()
 		at_max_bullets = bullet_count >= player.get_max_bullet_count()
 	if player != null and player.has_method("has_weapon_unlocked"):
 		arrow_unlocked = player.has_weapon_unlocked("arrow")
 		boomerang_unlocked = player.has_weapon_unlocked("boomerang")
-	if player != null and player.has_method("get_weapon_mode"):
-		bomb_main = player.get_weapon_mode() == "bomb"
+	if player != null and player.has_method("has_weapon_unlocked"):
+		bomb_unlocked = player.has_weapon_unlocked("bomb")
 	for u in UPGRADES:
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
@@ -166,7 +167,7 @@ func show_pick() -> void:
 			continue
 		if u["id"] == "boomerang_cooldown" and not boomerang_unlocked:
 			continue
-		if u["id"] == "bomb_weapon" and bomb_main:
+		if u["id"] == "bomb_side_cooldown" and not bomb_unlocked:
 			continue
 		pool.append(u)
 	pool.shuffle()
@@ -245,5 +246,6 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"combo_boost",
 		"combo_guard",
 		"bomb_cooldown",
-		"bomb_weapon",
+		"bomb_multi",
+		"bomb_side_cooldown",
 	]

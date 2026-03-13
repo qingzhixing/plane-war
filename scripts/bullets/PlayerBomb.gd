@@ -42,9 +42,19 @@ func _on_area_entered(area: Node) -> void:
 		return
 	if Time.get_ticks_msec() - _spawn_ms < _ARM_MS:
 		return
+	if _is_under_player(area):
+		return
 	if not (area.is_in_group("enemy") or area.is_in_group("boss")):
 		return
 	_begin_explosion()
+
+
+func _is_under_player(n: Node) -> bool:
+	while n != null:
+		if n.is_in_group("player"):
+			return true
+		n = n.get_parent()
+	return false
 
 
 func _begin_explosion() -> void:
@@ -86,6 +96,8 @@ func _apply_aoe_damage() -> void:
 			if not is_instance_valid(node) or seen.has(node):
 				continue
 			if not (node.is_in_group("enemy") or node.is_in_group("boss")):
+				continue
+			if _is_under_player(node):
 				continue
 			if not _aoe_hits_target(node, poly_global):
 				continue
