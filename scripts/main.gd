@@ -16,6 +16,9 @@ var _boss_defeated_once: bool = false
 ## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
 var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
+## 续关/接着玩 后进续战前还须完成的三选一次数（每次进块 = 3）
+var _post_continue_upgrades_left: int = 0
+const _POST_CONTINUE_UPGRADE_COUNT: int = 3
 ## 续战块：1～7 小怪波，8 = 续战 Boss 进行中
 var _extension_wave: int = 0
 const _EXTENSION_MOB_WAVES: int = 7
@@ -130,7 +133,13 @@ func on_upgrade_selected() -> void:
 	_waiting_upgrade_choice = false
 
 	if _pending_post_boss_upgrade:
+		_post_continue_upgrades_left -= 1
+		if _post_continue_upgrades_left > 0:
+			_waiting_upgrade_choice = true
+			emit_signal("level_up")
+			return
 		_pending_post_boss_upgrade = false
+		_post_continue_upgrades_left = 0
 		_extension_wave = 1
 		if _spawner != null and _spawner.has_method("start_extension_wave"):
 			_spawner.start_extension_wave(1, threat_tier)
@@ -626,10 +635,11 @@ func _debug_skip_to_boss() -> void:
 		_spawn_boss()
 		return
 
-	# 续关后「先升级再续战」界面：跳过小怪，直接续战 Boss
+	# 续关后三连升级阶段：跳过，直接续战 Boss
 	if _pending_post_boss_upgrade:
 		_waiting_upgrade_choice = false
 		_pending_post_boss_upgrade = false
+		_post_continue_upgrades_left = 0
 		_debug_skip_to_boss_active = false
 		_extension_wave = _EXTENSION_BLOCK_SIZE
 		_spawn_boss()
@@ -699,4 +709,5 @@ func _begin_next_extension_block() -> void:
 	get_tree().paused = false
 	_waiting_upgrade_choice = true
 	_pending_post_boss_upgrade = true
+	_post_continue_upgrades_left = _POST_CONTINUE_UPGRADE_COUNT
 	emit_signal("level_up")

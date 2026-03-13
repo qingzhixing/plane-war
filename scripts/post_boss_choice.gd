@@ -87,7 +87,7 @@ func show_choice() -> void:
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = "当前威胁 %d。继续：威胁+1、护盾+1，先升级再打续战 8 波（7 波小怪 + 第 8 波 Boss）；Boss 后再问是否接着玩。" % tier
+		body.text = "当前威胁 %d。继续：威胁+1、护盾+1，连续 3 次三选一后进续战 8 波（7 波小怪 + 第 8 波 Boss）。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
 		cont.text = "继续挑战"
@@ -103,7 +103,7 @@ func show_choice_after_block() -> void:
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = "已完成一轮续战（威胁 %d）。本局结算，或接着玩（再威胁+1、护盾+1，先升级再 8 波含 Boss）。" % tier
+		body.text = "已完成一轮续战（威胁 %d）。结算或接着玩（再威胁+1、护盾+1、3 次三选一后 8 波含 Boss）。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
 		cont.text = "接着玩"
