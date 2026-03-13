@@ -140,29 +140,11 @@ fit_content = true
 autowrap_mode = 3
 text = ""
 
-[node name="ComboBuffTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010003]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.55, 0.95, 0.75, 1)
-text = "连击Buff"
-
-[node name="ComboBuffStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010004]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(300, 52)
-theme_override_font_sizes/normal_font_size = 16
-theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
-bbcode_enabled = true
-scroll_active = false
-fit_content = true
-autowrap_mode = 3
-text = ""
-
 [node name="SideWeaponTitleLabel" type="Label" parent="HUD/Root/TopRightVBox" unique_id=2100010005]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.95, 0.7, 0.55, 1)
-text = "炸弹 / 副武器"
+text = "副武器"
 
 [node name="SideWeaponStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010006]
 unique_name_in_owner = true
