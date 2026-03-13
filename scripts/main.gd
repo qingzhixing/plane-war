@@ -635,12 +635,19 @@ func _debug_skip_to_boss() -> void:
 		_spawn_boss()
 		return
 
-	# 主线：每块续战可再跳一次 Boss
+	# 主线：假升级若干次后进 Boss（须 emit level_up 才会弹出三选一并走到 on_upgrade_selected）
 	if _debug_skip_to_boss_used:
 		return
 	_debug_skip_to_boss_used = true
 	_debug_skip_to_boss_active = true
 	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
+	if _debug_upgrades_needed <= 0:
+		_debug_skip_to_boss_active = false
+		_wave = _BOSS_WAVE_START
+		_spawn_boss()
+		return
+	_waiting_upgrade_choice = true
+	emit_signal("level_up")
 
 
 func on_boss_defeated() -> void:
