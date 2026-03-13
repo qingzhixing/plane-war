@@ -15,6 +15,10 @@
     - 敌人基类 `EnemyBase` 在 `apply_damage()` 中短暂将 `hit_strength` 设为 1，然后在若干帧内插值回 0。
   - 约束：Hit Flash 时不改变碰撞判定，仅为纯视觉反馈。
 
+- **玩家判定点（Hit Judgement）**
+  - 表现：机体中心 **小圆点**（红芯 + 白边），与 `Player` 的 `CollisionShape2D` 同半径、同中心；全程可见（无敌闪烁时可略降透明度或保持可见，按可读性二选一）。
+  - 技术：`Player` 子节点 `HitJudgementVisual`（`Node2D` + `_draw`），`z_index` 高于机体贴图。
+
 - **玩家受击闪烁（Invincible Blink）**
   - 表现：玩家被敌人或敌弹命中后，短暂无敌期间会整体闪烁（半透明/消失交替），与敌人受击变红区分开。
   - 技术实现：
