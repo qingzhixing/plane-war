@@ -371,6 +371,7 @@ func _update_stats_label() -> void:
 	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null:
 		return
 	const C_FR := "#ffcc66"
+	const C_BS := "#7eb8da"
 	const C_DMG := "#f0a8a0"
 	var main_lines: PackedStringArray = []
 	var side_lines: PackedStringArray = []
@@ -393,10 +394,13 @@ func _update_stats_label() -> void:
 		if _player.has_method("get_main_fire_cd_remaining"):
 			main_cd = float(_player.get_main_fire_cd_remaining())
 		var fr_mult := 1.0
+		var bs_mult := 1.0
 		var dmg_bonus := 0
 		var base_dmg := 1
 		if _player.has_method("get_combo_fire_rate_mult"):
 			fr_mult = float(_player.get_combo_fire_rate_mult())
+		if _player.has_method("get_combo_bullet_speed_mult"):
+			bs_mult = float(_player.get_combo_bullet_speed_mult())
 		if _player.has_method("get_combo_damage_bonus"):
 			dmg_bonus = int(_player.get_combo_damage_bonus())
 		if _player.has_method("get_bullet_damage"):
@@ -411,6 +415,12 @@ func _update_stats_label() -> void:
 		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
 		main_lines.append(line1)
 		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
+		var spd_line := "弹速"
+		if _player.has_method("bullet_speed"):
+			spd_line += " %.0f" % float(_player.bullet_speed)
+		if bs_mult > 1.009:
+			spd_line += "  [color=%s](连击+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0]
+		main_lines.append(spd_line)
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
