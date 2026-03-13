@@ -10,6 +10,7 @@
 ## 项目结构（建议）
 
 - 启动 / 主菜单：`res://scenes/MainMenu.tscn` → 开始游戏后进入 `res://scenes/Main.tscn`
+- 本地成绩：`user://records.cfg`（`best_score` / `best_combo` / `best_dps`），由 `Main` 结算写入；主菜单「成绩查询」只读同一文件。
 - 玩家：
   - 场景：`res://scenes/Player.tscn`
   - 节点类型：`CharacterBody2D`
