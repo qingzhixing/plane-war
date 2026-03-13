@@ -567,11 +567,3 @@ func continue_after_boss() -> void:
 	_waiting_upgrade_choice = true
 	_pending_post_boss_upgrade = true
 	emit_signal("level_up")
-	if _debug_upgrades_needed <= 0:
-		_debug_skip_to_boss_active = false
-		_spawn_boss()
-		return
-
-	# 连续弹出升级界面，让玩家手动选择多次升级
-	_waiting_upgrade_choice = true
-	emit_signal("level_up")
