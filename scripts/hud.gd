@@ -52,11 +52,11 @@ func _ready() -> void:
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for n in [
-		get_node_or_null("Root/TopRightVBox/MainGunTitleLabel"),
+		get_node_or_null("Root/LeftStatsVBox/MainGunTitleLabel"),
 		_main_gun_stats,
-		get_node_or_null("Root/TopRightVBox/SideWeaponTitleLabel"),
+		get_node_or_null("Root/LeftStatsVBox/SideWeaponTitleLabel"),
 		_side_weapon_stats,
-		get_node_or_null("Root/TopRightVBox/SpellTitleLabel"),
+		get_node_or_null("Root/LeftStatsVBox/SpellTitleLabel"),
 		_spell_stats,
 	]:
 		if n is Control:
