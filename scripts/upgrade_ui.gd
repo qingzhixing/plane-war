@@ -20,7 +20,6 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射数量 +1；若未解锁则同时解锁"},
 
 	# 通用 / 生存 / 表现
-	{"id": "move_speed", "name": "高机动机体", "desc": "移动速度 +12%"},
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
@@ -235,7 +234,6 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"arrow_multi",
 		"boomerang_cooldown",
 		"boomerang_multi",
-		"move_speed",
 		"combo_boost",
 		"combo_guard",
 		"bomb_cooldown",

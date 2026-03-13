@@ -9,13 +9,11 @@ var _exp: int = 0
 var _level: int = 1
 var _exp_to_next: int = 10
 var _continue_used: bool = false
-var _exp_multiplier: float = 1.0
 var _wave: int = 1
 var _boss_spawned: bool = false
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
-var _flat_score_bonus: int = 0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
@@ -131,14 +129,8 @@ func _on_level_up() -> void:
 
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
-		"exp_up":
-			_exp_multiplier += 0.2
-			return
 		"score_up":
 			_score_multiplier += 0.15
-			return
-		"score_flat":
-			_flat_score_bonus += 5
 			return
 		"combo_boost":
 			_combo_gain_per_hit += 1
@@ -157,8 +149,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 		p.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
-	# 经验值仅用于统计，不再直接驱动升级；保留接口以兼容现有代码
-	_exp += int(amount * _exp_multiplier)
+	_exp += amount
 
 func get_exp() -> int:
 	return _exp
@@ -278,7 +269,7 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 	if base_score <= 0:
 		return
 	var multiplier := _get_combo_multiplier()
-	var gained := int(round(float(base_score) * multiplier * _score_multiplier)) + _flat_score_bonus
+	var gained := int(round(float(base_score) * multiplier * _score_multiplier))
 	if gained < 0:
 		gained = 0
 	score += gained

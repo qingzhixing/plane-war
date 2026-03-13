@@ -15,13 +15,10 @@ const _ALL: Array[Dictionary] = [
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射 +1 / 解锁"},
 	{"id": "boomerang_cooldown", "name": "回旋加速", "desc": "回旋镖冷却 -20%"},
 	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "回旋镖齐射 +1 / 解锁"},
-	{"id": "move_speed", "name": "高机动机体", "desc": "移动速度 +12%"},
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
-	{"id": "exp_up", "name": "[Main] 经验加成", "desc": "经验倍率 +20%"},
-	{"id": "score_flat", "name": "[Main] 评分固定分", "desc": "每击固定分 +5"},
 ]
 
 var _main: Node

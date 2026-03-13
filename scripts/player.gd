@@ -279,8 +279,6 @@ func apply_upgrade(upgrade_id: String) -> void:
 			bullet_damage += 1
 		"multi_shot":
 			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
-		"move_speed":
-			move_speed *= 1.1
 		"bullet_speed":
 			bullet_speed *= 1.12
 		"damage_percent":
