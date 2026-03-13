@@ -2,6 +2,7 @@ extends Area2D
 ## 大于判定点、小于机体的圆环：敌弹进入即擦弹加分，每弹每局最多 1 次。
 
 const META_GRAZED := &"_graze_scored"
+const _GRAZE_VFX := preload("res://scenes/vfx/GrazeSpark.tscn")
 
 
 func _ready() -> void:
@@ -24,3 +25,19 @@ func _on_area_entered(area: Area2D) -> void:
 	var main := get_tree().current_scene
 	if main != null and main.has_method("record_graze"):
 		main.record_graze()
+	_spawn_graze_vfx(area)
+
+
+func _spawn_graze_vfx(bullet: Area2D) -> void:
+	if not is_instance_valid(bullet):
+		return
+	var parent := get_tree().current_scene
+	if parent == null:
+		return
+	var vfx := _GRAZE_VFX.instantiate() as Node2D
+	if vfx == null:
+		return
+	parent.add_child(vfx)
+	vfx.global_position = bullet.global_position
+	if vfx is CPUParticles2D:
+		(vfx as CPUParticles2D).emitting = true
