@@ -1,9 +1,11 @@
 extends CanvasLayer
-## Boss 击破后：结算 / 继续挑战
+## Boss 击破 / 每 4 波续战结束：结算 vs 继续
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 var _main: Node = null
+var _title_label: Label
+var _after_block: bool = false
 
 
 func _ready() -> void:
@@ -29,7 +31,7 @@ func _build_ui() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(520, 280)
+	panel.custom_minimum_size = Vector2(540, 300)
 	center.add_child(panel)
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 24)
@@ -40,15 +42,17 @@ func _build_ui() -> void:
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 16)
 	margin.add_child(vbox)
-	var title := Label.new()
-	title.text = "Boss 击破"
-	title.add_theme_font_size_override("font_size", 32)
-	vbox.add_child(title)
+	_title_label = Label.new()
+	_title_label.name = "TitleLabel"
+	_title_label.text = "Boss 击破"
+	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_label.add_theme_font_size_override("font_size", 32)
+	vbox.add_child(_title_label)
 	var body := Label.new()
 	body.name = "BodyLabel"
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_theme_font_size_override("font_size", 22)
-	body.text = "结算直接看成绩；继续则威胁+1、送一次升级，再打 4 波递进难度（更多怪、更快刷新），不再打 Boss。"
+	body.text = ""
 	vbox.add_child(body)
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 16)
@@ -61,6 +65,7 @@ func _build_ui() -> void:
 	b_settle.pressed.connect(_on_settle)
 	hb.add_child(b_settle)
 	var b_cont := Button.new()
+	b_cont.name = "ContinueButton"
 	b_cont.text = "继续挑战"
 	b_cont.custom_minimum_size = Vector2(200, 56)
 	b_cont.add_theme_font_size_override("font_size", 22)
@@ -73,22 +78,49 @@ func bind_main(m: Node) -> void:
 
 
 func show_choice() -> void:
+	_after_block = false
 	visible = true
-	if _main != null:
-		var tier := 0
-		if _main.has_method("get_threat_tier"):
-			tier = _main.get_threat_tier()
-		var body := find_child("BodyLabel", true, false) as Label
-		if body != null:
-			body.text = "当前威胁 %d。继续：威胁+1 + 升级 + 续战 4 波（越来越难），第 4 波后结算。" % tier
+	if _title_label != null:
+		_title_label.text = "Boss 击破"
+	var tier := 0
+	if _main != null and _main.has_method("get_threat_tier"):
+		tier = _main.get_threat_tier()
+	var body := find_child("BodyLabel", true, false) as Label
+	if body != null:
+		body.text = "当前威胁 %d。继续：威胁+1，先升级再打续战 4 波（每波结束都可升级）；每满 4 波再问是否接着玩。" % tier
+	var cont := find_child("ContinueButton", true, false) as Button
+	if cont != null:
+		cont.text = "继续挑战"
+
+
+func show_choice_after_block() -> void:
+	_after_block = true
+	visible = true
+	if _title_label != null:
+		_title_label.text = "续战一轮结束"
+	var tier := 0
+	if _main != null and _main.has_method("get_threat_tier"):
+		tier = _main.get_threat_tier()
+	var body := find_child("BodyLabel", true, false) as Label
+	if body != null:
+		body.text = "已完成 4 波续战（威胁 %d）。本局结算，或接着玩下一轮（再威胁+1，先升级再 4 波）。" % tier
+	var cont := find_child("ContinueButton", true, false) as Button
+	if cont != null:
+		cont.text = "接着玩"
 
 
 func _on_settle() -> void:
 	visible = false
+	get_tree().paused = true
 	get_tree().call_group("game_over_ui", "show_game_over")
 
 
 func _on_continue() -> void:
 	visible = false
-	if _main != null and _main.has_method("continue_after_boss"):
+	if _main == null:
+		return
+	if _after_block:
+		if _main.has_method("continue_next_extension_block"):
+			_main.continue_next_extension_block()
+	elif _main.has_method("continue_after_boss"):
 		_main.continue_after_boss()
