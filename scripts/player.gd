@@ -280,6 +280,11 @@ func get_bullet_damage() -> int:
 	return bullet_damage
 
 
+## 主炮单发近似伤害（机炮弹，含连击加成点与「高爆弹头」等乘区）
+func get_effective_main_bullet_damage() -> float:
+	return maxf(0.1, (float(bullet_damage) + float(_combo_damage_bonus)) * _damage_multiplier)
+
+
 func get_bullet_speed() -> float:
 	return bullet_speed
 

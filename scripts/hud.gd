@@ -385,7 +385,6 @@ func _update_stats_label() -> void:
 		return
 	const C_FR := "#ffcc66"
 	const C_BS := "#7eb8da"
-	const C_DMG := "#f0a8a0"
 	var main_lines: PackedStringArray = []
 	var side_lines: PackedStringArray = []
 	var spell_line := "—"
@@ -408,19 +407,18 @@ func _update_stats_label() -> void:
 			main_cd = float(_player.get_main_fire_cd_remaining())
 		var fr_mult := 1.0
 		var bs_mult := 1.0
-		var dmg_bonus := 0
-		var base_dmg := 1
 		if _player.has_method("get_combo_fire_rate_mult"):
 			fr_mult = float(_player.get_combo_fire_rate_mult())
 		if _player.has_method("get_combo_bullet_speed_mult"):
 			bs_mult = float(_player.get_combo_bullet_speed_mult())
-		if _player.has_method("get_combo_damage_bonus"):
-			dmg_bonus = int(_player.get_combo_damage_bonus())
-		if _player.has_method("get_bullet_damage"):
-			base_dmg = int(_player.get_bullet_damage())
-		var dmg_line := "主炮伤害 %d" % base_dmg
-		if dmg_bonus > 0:
-			dmg_line += "[color=%s][+%d][/color]" % [C_DMG, dmg_bonus]
+		var eff_dmg := 1.0
+		if _player.has_method("get_effective_main_bullet_damage"):
+			eff_dmg = float(_player.get_effective_main_bullet_damage())
+		var dmg_line := "主炮伤害 "
+		if absf(eff_dmg - roundf(eff_dmg)) < 0.05:
+			dmg_line += "%d" % int(roundf(eff_dmg))
+		else:
+			dmg_line += "%.1f" % eff_dmg
 		main_lines.append(dmg_line)
 		var line1 := "射速 %.1f/s" % rof
 		if fr_mult > 1.009:
