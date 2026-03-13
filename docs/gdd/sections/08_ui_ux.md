@@ -60,7 +60,7 @@
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
   - 布局：`DpsLabel` 下方按 **标题 `Label` + 内容 `RichTextLabel`** 分组（与 Score/DPS 同属 `TopRightVBox`）：
-    - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔）
+    - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔、**弹速基数与连击弹速 Buff**）
     - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
   - 各块 `mouse_filter = IGNORE`；内容区 `bbcode_enabled`、`fit_content`、`custom_minimum_size` 保证可见。
