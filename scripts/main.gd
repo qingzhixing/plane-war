@@ -27,6 +27,7 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 var best_combo: int = 0
 
+const GRAZE_SCORE: int = 4
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
@@ -263,6 +264,11 @@ func record_player_damage(amount: float, _target: Node) -> void:
 		"amount": amount,
 	})
 	_on_successful_hit()
+
+
+func record_graze() -> void:
+	var gained := maxi(1, int(round(float(GRAZE_SCORE) * _score_multiplier)))
+	score += gained
 
 
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
