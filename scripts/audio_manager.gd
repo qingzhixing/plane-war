@@ -196,6 +196,13 @@ func _load_audio_settings() -> void:
 	_sfx_muted = bool(cfg.get_value("audio", "sfx_muted", false))
 
 
+## 打开设置前调用：从磁盘恢复静音/音量并推到播放器，避免 cfg 被其它保存覆盖后 RAM 与 UI 不一致
+func reload_audio_settings_from_disk() -> void:
+	_load_audio_settings()
+	_apply_bgm_volume()
+	_apply_sfx_volume()
+
+
 func _save_audio_settings() -> void:
 	var cfg := ConfigFile.new()
 	cfg.load(_SETTINGS_FILE_PATH)

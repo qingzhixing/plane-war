@@ -173,6 +173,7 @@ func _ready() -> void:
 	_apply_run_only_buttons_visibility(false)
 
 	_load_extra_settings()
+	_sync_audio_controls_from_manager()
 
 
 func show_settings() -> void:
@@ -180,13 +181,49 @@ func show_settings() -> void:
 	_was_paused_before = get_tree().paused
 	get_tree().paused = true
 	_apply_run_only_buttons_visibility(true)
+	_sync_audio_controls_from_manager()
 	visible = true
 
 
 func show_settings_from_menu() -> void:
 	_is_from_menu = true
 	_apply_run_only_buttons_visibility(false)
+	_sync_audio_controls_from_manager()
 	visible = true
+
+
+func _sync_audio_controls_from_manager() -> void:
+	var audio := _get_audio_manager()
+	if audio == null:
+		return
+	if audio.has_method("reload_audio_settings_from_disk"):
+		audio.reload_audio_settings_from_disk()
+	_syncing_audio_ui = true
+	if _bgm_slider != null:
+		_bgm_slider.set_block_signals(true)
+	if _sfx_slider != null:
+		_sfx_slider.set_block_signals(true)
+	if _bgm_mute_check != null:
+		_bgm_mute_check.set_block_signals(true)
+	if _sfx_mute_check != null:
+		_sfx_mute_check.set_block_signals(true)
+	if audio.has_method("get_bgm_volume_percent") and _bgm_slider != null:
+		_bgm_slider.value = float(audio.get_bgm_volume_percent())
+	if audio.has_method("get_sfx_volume_percent") and _sfx_slider != null:
+		_sfx_slider.value = float(audio.get_sfx_volume_percent())
+	if audio.has_method("is_bgm_muted") and _bgm_mute_check != null:
+		_bgm_mute_check.button_pressed = audio.is_bgm_muted()
+	if audio.has_method("is_sfx_muted") and _sfx_mute_check != null:
+		_sfx_mute_check.button_pressed = audio.is_sfx_muted()
+	if _bgm_slider != null:
+		_bgm_slider.set_block_signals(false)
+	if _sfx_slider != null:
+		_sfx_slider.set_block_signals(false)
+	if _bgm_mute_check != null:
+		_bgm_mute_check.set_block_signals(false)
+	if _sfx_mute_check != null:
+		_sfx_mute_check.set_block_signals(false)
+	_syncing_audio_ui = false
 
 
 func _apply_run_only_buttons_visibility(in_run: bool) -> void:
@@ -236,7 +273,10 @@ func _on_debug_upgrades_pressed() -> void:
 
 
 func _get_audio_manager() -> Node:
-	return get_tree().get_first_node_in_group("audio_manager")
+	var n := get_tree().get_first_node_in_group("audio_manager")
+	if n != null:
+		return n
+	return get_tree().root.get_node_or_null("AudioManager")
 
 
 func _on_bgm_slider_changed(value: float) -> void:
@@ -302,6 +342,7 @@ func _load_extra_settings() -> void:
 
 func _save_extra_settings() -> void:
 	var cfg := ConfigFile.new()
+	cfg.load(_SETTINGS_FILE_PATH)
 	cfg.set_value("settings", "vibration_enabled", _vibration_check != null and _vibration_check.button_pressed)
 	var scale_percent := 100
 	if _scale_option != null:
