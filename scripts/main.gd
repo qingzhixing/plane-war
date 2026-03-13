@@ -604,24 +604,42 @@ func debug_set_combo(value: int) -> void:
 
 
 func _debug_skip_to_boss() -> void:
-	# 调试工具：一键跳到 Boss 关，并模拟前几波的升级效果
-	if _debug_skip_to_boss_used:
-		return
-	_debug_skip_to_boss_used = true
-	_debug_skip_to_boss_active = true
-
-	# 防止在暂停状态下跳关导致无法触控
+	# 调试：主线 = 假升级跳到第 8 波 Boss；续战 = 直接进续战第 8 波 Boss（同 on_boss_defeated 续战分支）
 	get_tree().paused = false
-
-	# 清理当前敌人和敌方子弹
 	for enemy in get_tree().get_nodes_in_group("enemy"):
 		if is_instance_valid(enemy):
 			enemy.queue_free()
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	var sp := get_node_or_null("EnemySpawner")
+	if sp != null:
+		var timer := sp.get_node_or_null("Timer")
+		if timer is Timer:
+			(timer as Timer).stop()
 
-	# 计算还需要多少次升级（当前波次到 Boss 波次之间）
+	# 续战小怪 1～7 波：直接刷续战 Boss
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+		_waiting_upgrade_choice = false
+		_debug_skip_to_boss_active = false
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
+		return
+
+	# 续关后「先升级再续战」界面：跳过小怪，直接续战 Boss
+	if _pending_post_boss_upgrade:
+		_waiting_upgrade_choice = false
+		_pending_post_boss_upgrade = false
+		_debug_skip_to_boss_active = false
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
+		return
+
+	# 主线：每块续战可再跳一次 Boss
+	if _debug_skip_to_boss_used:
+		return
+	_debug_skip_to_boss_used = true
+	_debug_skip_to_boss_active = true
 	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
 
 
@@ -661,6 +679,7 @@ func _begin_next_extension_block() -> void:
 	threat_tier += 1
 	_score_multiplier += 0.08
 	_combo_guard_charges += 1
+	_debug_skip_to_boss_used = false
 	var p_guard := get_node_or_null(player_path)
 	if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
 		p_guard.set_combo_guard_shield_visible(true)
