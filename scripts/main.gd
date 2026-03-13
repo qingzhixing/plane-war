@@ -582,9 +582,14 @@ func _spawn_boss() -> void:
 	var boss := boss_scene.instantiate()
 	if boss == null:
 		return
-	var hp_m := get_threat_hp_mult()
+	# Boss 血量：主线用 1.2^tier；续战第 8 波再乘 (3.2+tier)，避免高强化下秒没
+	var tier_f := float(threat_tier)
+	var hp_m: float = pow(1.2, tier_f)
+	var is_extension_boss: bool = (_extension_wave >= _EXTENSION_BLOCK_SIZE)
+	if is_extension_boss:
+		hp_m *= 3.2 + tier_f
 	if "max_hp" in boss:
-		boss.max_hp = int(round(float(boss.max_hp) * hp_m))
+		boss.max_hp = maxi(200, int(round(float(boss.max_hp) * hp_m)))
 	if boss.has_method("apply_threat_scaling"):
 		boss.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
