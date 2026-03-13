@@ -291,4 +291,3 @@ func _apply_scale_percent(scale_percent: int) -> void:
 	var root_window := get_tree().root
 	if root_window is Window:
 		(root_window as Window).content_scale_factor = float(p) / 100.0
-
