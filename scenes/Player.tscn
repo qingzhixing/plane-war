@@ -5,9 +5,10 @@
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerArrow.tscn" id="3_arrow"]
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBoomerang.tscn" id="4_boomerang"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://assets/sprites/player/player_ship_base.png" id="5_tex"]
+[ext_resource type="Script" path="res://scripts/hit_judgement_visual.gd" id="6_hit"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3li8b"]
-radius = 37.831863
+radius = 14.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1665526431]
 scale = Vector2(0.4, 0.4)
@@ -17,9 +18,14 @@ bullet_scene_arrow = ExtResource("3_arrow")
 bullet_scene_boomerang = ExtResource("4_boomerang")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1444472511]
+z_index = 1
 position = Vector2(-0.28250122, 0)
 scale = Vector2(0.4, 0.38)
 texture = ExtResource("5_tex")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1782819317]
 shape = SubResource("CircleShape2D_3li8b")
+
+[node name="HitJudgementVisual" type="Node2D" parent="."]
+script = ExtResource("6_hit")
+radius_pixels = 14.0
