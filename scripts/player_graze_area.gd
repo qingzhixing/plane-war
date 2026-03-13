@@ -58,15 +58,23 @@ func _trim_old_ids() -> void:
 			_last_vfx_ms.erase(k)
 
 
-## 特效固定从玩家中心发出（GrazeArea 与判定点同心）
+## 特效从玩家中心发出；deferred 入树避免个别 Android 帧序问题
 func _spawn_graze_vfx() -> void:
 	var parent := get_tree().current_scene
 	if parent == null:
+		return
+	call_deferred("_deferred_graze_vfx", parent, global_position)
+
+
+func _deferred_graze_vfx(parent: Node, pos: Vector2) -> void:
+	if not is_instance_valid(parent):
 		return
 	var vfx := _GRAZE_VFX.instantiate() as Node2D
 	if vfx == null:
 		return
 	parent.add_child(vfx)
-	vfx.global_position = global_position
+	vfx.global_position = pos
 	if vfx is CPUParticles2D:
-		(vfx as CPUParticles2D).emitting = true
+		var cp := vfx as CPUParticles2D
+		cp.restart()
+		cp.emitting = true
