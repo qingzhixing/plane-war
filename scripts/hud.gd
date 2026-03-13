@@ -374,7 +374,6 @@ func _update_stats_label() -> void:
 	if _main_gun_stats == null or _combo_buff_stats == null or _side_weapon_stats == null or _spell_stats == null:
 		return
 	const C_FR := "#ffcc66"
-	const C_MV := "#6fcf97"
 	const C_BS := "#7eb8da"
 	const C_DMG := "#f0a8a0"
 	var main_lines: PackedStringArray = []
@@ -399,29 +398,31 @@ func _update_stats_label() -> void:
 		if _player.has_method("get_main_fire_cd_remaining"):
 			main_cd = float(_player.get_main_fire_cd_remaining())
 		var fr_mult := 1.0
-		var mv_mult := 1.0
 		var bs_mult := 1.0
 		var dmg_bonus := 0
+		var base_dmg := 1
 		if _player.has_method("get_combo_fire_rate_mult"):
 			fr_mult = float(_player.get_combo_fire_rate_mult())
-		if _player.has_method("get_combo_move_speed_mult"):
-			mv_mult = float(_player.get_combo_move_speed_mult())
 		if _player.has_method("get_combo_bullet_speed_mult"):
 			bs_mult = float(_player.get_combo_bullet_speed_mult())
 		if _player.has_method("get_combo_damage_bonus"):
 			dmg_bonus = int(_player.get_combo_damage_bonus())
+		if _player.has_method("get_bullet_damage"):
+			base_dmg = int(_player.get_bullet_damage())
+		var dmg_line := "主炮伤害 %d" % base_dmg
+		if dmg_bonus > 0:
+			dmg_line += "[color=%s][+%d][/color]" % [C_DMG, dmg_bonus]
+		main_lines.append(dmg_line)
 		var line1 := "射速 %.1f/s" % rof
 		if fr_mult > 1.009:
 			line1 += "[color=%s](+%.0f%%)[/color]" % [C_FR, (fr_mult - 1.0) * 100.0]
 		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
 		main_lines.append(line1)
 		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
-		if mv_mult > 1.009:
-			combo_lines.append("[color=%s]移速(+%.0f%%)[/color]" % [C_MV, (mv_mult - 1.0) * 100.0])
+		if fr_mult > 1.009:
+			combo_lines.append("射速 [color=%s]+%.0f%%[/color]（连击）" % [C_FR, (fr_mult - 1.0) * 100.0])
 		if bs_mult > 1.009:
-			combo_lines.append("[color=%s]弹速(+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0])
-		if dmg_bonus > 0:
-			combo_lines.append("[color=%s]伤害(+%d)[/color]" % [C_DMG, dmg_bonus])
+			combo_lines.append("弹速 [color=%s]+%.0f%%[/color]（连击）" % [C_BS, (bs_mult - 1.0) * 100.0])
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
@@ -459,7 +460,7 @@ func _update_stats_label() -> void:
 		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
 		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
 	_main_gun_stats.text = "\n".join(main_lines) if main_lines.size() > 0 else "—"
-	_combo_buff_stats.text = " ".join(combo_lines) if combo_lines.size() > 0 else "无"
+	_combo_buff_stats.text = "\n".join(combo_lines) if combo_lines.size() > 0 else "无（连击加成）"
 	_side_weapon_stats.text = "\n".join(side_lines) if side_lines.size() > 0 else "—"
 	_spell_stats.text = spell_line
 

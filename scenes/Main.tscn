@@ -131,7 +131,7 @@ text = "主炮"
 [node name="MainGunStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010002]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(300, 44)
+custom_minimum_size = Vector2(300, 64)
 theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
 bbcode_enabled = true
@@ -149,7 +149,7 @@ text = "连击Buff"
 [node name="ComboBuffStatsLabel" type="RichTextLabel" parent="HUD/Root/TopRightVBox" unique_id=2100010004]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(300, 28)
+custom_minimum_size = Vector2(300, 52)
 theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
 bbcode_enabled = true

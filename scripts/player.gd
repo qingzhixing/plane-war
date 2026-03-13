@@ -132,7 +132,7 @@ func _update_movement(delta: float) -> void:
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
 		dir.x += 1.0
 	if dir != Vector2.ZERO:
-		global_position += dir.normalized() * move_speed * _combo_move_speed_mult * keyboard_speed_multiplier * delta
+		global_position += dir.normalized() * move_speed * keyboard_speed_multiplier * delta
 
 	var viewport_rect := get_viewport_rect()
 	var margin := 16.0
@@ -350,23 +350,18 @@ func set_combo_buff_tier(tier: int) -> void:
 
 	if tier <= 0:
 		return
-	# 前几档：明显提升射速，略带移速/伤害加成
+	# 连击不加移速；射速 / 高连弹速 / 主炮伤害 +1
 	if tier == 1:
 		_combo_fire_rate_mult = 1.15
 	elif tier == 2:
 		_combo_fire_rate_mult = 1.30
-		_combo_move_speed_mult = 1.10
 	elif tier == 3:
 		_combo_fire_rate_mult = 1.45
-		_combo_move_speed_mult = 1.10
 		_combo_damage_bonus = 1
 	else:
-		# 100 连以上：在第三档基础上，每多一档继续强化射速
 		var extra_tiers := tier - 3
 		var fire_bonus := 1.45 + 0.06 * float(extra_tiers)
-		# 限制一个上限，避免完全失控
 		_combo_fire_rate_mult = min(2.10, fire_bonus)
-		_combo_move_speed_mult = 1.10
 		_combo_bullet_speed_mult = 1.15
 		_combo_damage_bonus = 1
 
