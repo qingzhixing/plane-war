@@ -12,7 +12,7 @@
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
-[ext_resource type="Script" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
+[ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -47,36 +47,33 @@ theme = ExtResource("11_ui_theme")
 [node name="WaveLabel" type="Label" parent="HUD/Root" unique_id=1566627949]
 unique_name_in_owner = true
 layout_mode = 1
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
 offset_left = -320.0
 offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 56.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 26
-horizontal_alignment = 2
 text = "第 1 波"
+horizontal_alignment = 2
 
 [node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
 unique_name_in_owner = true
 layout_mode = 1
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = -320.0
+offset_left = -298.0
 offset_top = 58.0
 offset_right = -16.0
 offset_bottom = 102.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 22
-text = ""
+theme_override_font_sizes/font_size = 32
+text = "Combo Display Bug"
 horizontal_alignment = 2
-vertical_alignment = 0
-mouse_filter = 2
+vertical_alignment = 1
 
 [node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root" unique_id=1840417451]
 layout_mode = 0
@@ -104,74 +101,68 @@ text = "设置"
 layout_mode = 0
 offset_left = 16.0
 offset_top = 156.0
-offset_right = 340.0
-offset_bottom = 560.0
+offset_right = 372.0
+offset_bottom = 580.0
 
 [node name="ScoreLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=268481878]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "Score: 0"
 
 [node name="DpsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=1153599571]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "DPS: 0  Max: 0"
 
 [node name="MainGunTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010001]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
+theme_override_font_sizes/font_size = 22
 text = "主炮"
 
 [node name="MainGunStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010002]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 88)
 layout_mode = 2
-custom_minimum_size = Vector2(300, 64)
-theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-scroll_active = false
 fit_content = true
-autowrap_mode = 3
-text = ""
+scroll_active = false
 
 [node name="SideWeaponTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010005]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.95, 0.7, 0.55, 1)
+theme_override_font_sizes/font_size = 22
 text = "副武器"
 
 [node name="SideWeaponStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010006]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 96)
 layout_mode = 2
-custom_minimum_size = Vector2(300, 72)
-theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-scroll_active = false
 fit_content = true
-autowrap_mode = 3
-text = ""
+scroll_active = false
 
 [node name="SpellTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "符卡"
 
 [node name="SpellStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010008]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 38)
 layout_mode = 2
-custom_minimum_size = Vector2(300, 28)
-theme_override_font_sizes/normal_font_size = 16
 theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
+theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-scroll_active = false
 fit_content = true
-autowrap_mode = 3
-text = ""
+scroll_active = false
 
 [node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
 process_mode = 3
