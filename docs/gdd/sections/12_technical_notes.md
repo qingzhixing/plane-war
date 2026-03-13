@@ -9,7 +9,7 @@
 
 ## 项目结构（建议）
 
-- 主场景：`res://scenes/Main.tscn`
+- 启动 / 主菜单：`res://scenes/MainMenu.tscn` → 开始游戏后进入 `res://scenes/Main.tscn`
 - 玩家：
   - 场景：`res://scenes/Player.tscn`
   - 节点类型：`CharacterBody2D`
