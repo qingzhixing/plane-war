@@ -404,8 +404,8 @@ func set_combo_buff_tier(tier: int) -> void:
 		_combo_damage_bonus = 1
 	else:
 		# 连击倍率不封顶；理论射速 = 倍率/间隔，实际出手仍 75/s，溢出按 %→伤害
-		# 默认间隔 0.2 → 75/s 需倍率≥15；每档 +1.2 约 12 档到顶（约 1200 连）
-		const FIRE_PER_TIER: float = 1.2
+		# 100 连后每档略加攻速（已削弱，避免连击加成过猛）
+		const FIRE_PER_TIER: float = 0.35
 		var extra_tiers: int = tier - 3
 		_combo_fire_rate_mult = 1.45 + FIRE_PER_TIER * float(extra_tiers)
 		_combo_bullet_speed_mult = 1.15

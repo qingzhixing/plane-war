@@ -432,16 +432,15 @@ func _update_stats_label() -> void:
 		else:
 			dmg_line += "%.1f" % eff_dmg
 		main_lines.append(dmg_line)
-		var line1 := "理论 %.0f/s → 实际 %.0f/s" % [rof_theory, rof_actual]
-		if fr_mult > 1.009:
-			line1 += " [color=%s]×%.2f[/color]" % [C_FR, fr_mult]
+		main_lines.append("理论射速 %.0f/s · 实际射速 %.0f/s" % [rof_theory, rof_actual])
 		var cap_h: float = 75.0
 		if _player.get("max_main_rof") != null:
 			cap_h = float(_player.max_main_rof)
 		if rof_theory > cap_h + 1.0:
-			line1 += " [color=%s]封顶%.0f[/color]" % [C_FR, cap_h]
-		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
-		main_lines.append(line1)
+			main_lines.append("[color=%s]超 %.0f/s 部分已转攻击（封顶 %.0f/s）[/color]" % [C_FR, cap_h, cap_h])
+		if fr_mult > 1.009:
+			main_lines.append("[color=%s]连击攻速×%.2f[/color]" % [C_FR, fr_mult])
+		main_lines.append("齐射：%d/%d 发 · %s" % [bc, bmax, mode_str])
 		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
 		var base_spd := 1200.0
 		if _player.has_method("get_bullet_speed"):
