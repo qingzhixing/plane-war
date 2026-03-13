@@ -27,7 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-var _stats_label: Label = null
+var _stats_label: RichTextLabel = null
 var _spell_button: Button = null
 
 
@@ -168,24 +168,7 @@ func _update_combo_visual(combo: int) -> void:
 		_last_combo_value = 0
 		return
 
-	var combo_extra := ""
-	if is_instance_valid(_player) and _player.has_method("get_combo_fire_rate_mult"):
-		var fr := float(_player.get_combo_fire_rate_mult())
-		var mv := float(_player.get_combo_move_speed_mult()) if _player.has_method("get_combo_move_speed_mult") else 1.0
-		var bs := float(_player.get_combo_bullet_speed_mult()) if _player.has_method("get_combo_bullet_speed_mult") else 1.0
-		var db := int(_player.get_combo_damage_bonus()) if _player.has_method("get_combo_damage_bonus") else 0
-		var bits: PackedStringArray = []
-		if fr > 1.009:
-			bits.append("射速(+%.0f%%)" % ((fr - 1.0) * 100.0))
-		if mv > 1.009:
-			bits.append("移速(+%.0f%%)" % ((mv - 1.0) * 100.0))
-		if bs > 1.009:
-			bits.append("弹速(+%.0f%%)" % ((bs - 1.0) * 100.0))
-		if db > 0:
-			bits.append("伤害(+%d)" % db)
-		if bits.size() > 0:
-			combo_extra = "  " + " ".join(bits)
-	_combo_label.text = "Combo: %d%s" % [combo, combo_extra]
+	_combo_label.text = "Combo: %d" % combo
 
 	var color := _combo_base_color
 	if combo >= 100:
@@ -377,25 +360,34 @@ func _play_combo_break_sfx() -> void:
 func _ensure_stats_label() -> void:
 	if _stats_label != null and is_instance_valid(_stats_label):
 		return
-	var existing := get_node_or_null("Root/TopRightVBox/StatsLabel") as Label
-	if existing != null:
-		_stats_label = existing
-		return
 	var vbox := get_node_or_null("Root/TopRightVBox") as VBoxContainer
 	if vbox == null:
 		return
-	var lab := Label.new()
-	lab.name = "StatsLabel"
-	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lab.theme_override_font_sizes["font_size"] = 17
-	lab.add_theme_color_override("font_color", Color(0.82, 0.88, 0.96, 0.98))
-	vbox.add_child(lab)
-	_stats_label = lab
+	var existing_any := vbox.get_node_or_null("StatsLabel")
+	if existing_any is RichTextLabel:
+		_stats_label = existing_any as RichTextLabel
+		return
+	if existing_any != null:
+		existing_any.queue_free()
+	var rtl := RichTextLabel.new()
+	rtl.name = "StatsLabel"
+	rtl.bbcode_enabled = true
+	rtl.scroll_active = false
+	rtl.fit_content = true
+	rtl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rtl.theme_override_font_sizes["normal_font_size"] = 17
+	rtl.add_theme_color_override("default_color", Color(0.82, 0.88, 0.96, 0.98))
+	vbox.add_child(rtl)
+	_stats_label = rtl
 
 
 func _update_stats_label() -> void:
 	if _stats_label == null or not is_instance_valid(_stats_label):
 		return
+	const C_FR := "#ffcc66"
+	const C_MV := "#6fcf97"
+	const C_BS := "#7eb8da"
+	const C_DMG := "#f0a8a0"
 	var lines: PackedStringArray = []
 	if is_instance_valid(_player):
 		var eff_iv: float = 0.2
@@ -426,20 +418,21 @@ func _update_stats_label() -> void:
 			bs_mult = float(_player.get_combo_bullet_speed_mult())
 		if _player.has_method("get_combo_damage_bonus"):
 			dmg_bonus = int(_player.get_combo_damage_bonus())
-		var fr_suffix := ""
+		var line1 := "射速 %.1f/s" % rof
 		if fr_mult > 1.009:
-			fr_suffix = " (+%.0f%%)" % ((fr_mult - 1.0) * 100.0)
-		lines.append("射速 %.1f/s%s  齐射 %d/%d  %s" % [rof, fr_suffix, bc, bmax, mode_str])
+			line1 += "[color=%s](+%.0f%%)[/color]" % [C_FR, (fr_mult - 1.0) * 100.0]
+		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
+		lines.append(line1)
 		lines.append("主炮间隔 %.2fs（下次 %.2fs）" % [eff_iv, main_cd])
-		var combo_parts: PackedStringArray = []
+		var combo_bits: PackedStringArray = []
 		if mv_mult > 1.009:
-			combo_parts.append("移速(+%.0f%%)" % ((mv_mult - 1.0) * 100.0))
+			combo_bits.append("[color=%s]移速(+%.0f%%)[/color]" % [C_MV, (mv_mult - 1.0) * 100.0])
 		if bs_mult > 1.009:
-			combo_parts.append("弹速(+%.0f%%)" % ((bs_mult - 1.0) * 100.0))
+			combo_bits.append("[color=%s]弹速(+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0])
 		if dmg_bonus > 0:
-			combo_parts.append("伤害(+%d)" % dmg_bonus)
-		if combo_parts.size() > 0:
-			lines.append("连击 %s" % " ".join(combo_parts))
+			combo_bits.append("[color=%s]伤害(+%d)[/color]" % [C_DMG, dmg_bonus])
+		if combo_bits.size() > 0:
+			lines.append("连击 " + " ".join(combo_bits))
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
