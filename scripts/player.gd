@@ -368,16 +368,17 @@ func set_combo_buff_tier(tier: int) -> void:
 		_combo_fire_rate_mult = 1.45
 		_combo_damage_bonus = 1
 	else:
-		# 100 连 = tier4 起：先较快加射速，高连后递减步长，不设 2.1 硬顶（否则千连后不再成长）
-		var extra_tiers := tier - 3
-		var fire_bonus: float
-		if extra_tiers <= 12:
-			fire_bonus = 1.45 + 0.06 * float(extra_tiers)
-		else:
-			fire_bonus = 1.45 + 0.06 * 12.0 + 0.025 * float(extra_tiers - 12)
-		_combo_fire_rate_mult = clampf(fire_bonus, 1.0, 5.0)
+		# 100 连 = tier4 起：射速涨到上限后，再升档只加主炮伤害（避免无限叠攻速）
+		const FIRE_CAP: float = 3.0
+		const FIRE_PER_TIER: float = 0.08
+		var extra_tiers: int = tier - 3
+		var tiers_to_cap: int = maxi(1, int(ceil((FIRE_CAP - 1.45) / FIRE_PER_TIER)))
+		var fire_raw: float = 1.45 + FIRE_PER_TIER * float(extra_tiers)
+		_combo_fire_rate_mult = minf(FIRE_CAP, fire_raw)
 		_combo_bullet_speed_mult = 1.15
 		_combo_damage_bonus = 1
+		if extra_tiers > tiers_to_cap:
+			_combo_damage_bonus += extra_tiers - tiers_to_cap
 
 
 func release_pointer() -> void:
