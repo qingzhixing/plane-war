@@ -87,7 +87,10 @@ func _process(delta: float) -> void:
 		var wave_text := "第 %d 波" % _main.get_wave()
 		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
 			var ex: int = int(_main.get_extension_wave())
-			wave_text = "续战 %d/4" % ex
+			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned() and ex >= 8:
+				wave_text = "续战 8/8 · Boss"
+			else:
+				wave_text = "续战 %d/8" % mini(ex, 8)
 			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		else:

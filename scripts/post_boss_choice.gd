@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Boss 击破 / 每 4 波续战结束：结算 vs 继续
+## 主线 Boss 击破 / 续战块结束（第 8 波 Boss 后）：结算 vs 继续
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
@@ -87,7 +87,7 @@ func show_choice() -> void:
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = "当前威胁 %d。继续：威胁+1，先升级再打续战 4 波（每波结束都可升级）；每满 4 波再问是否接着玩。" % tier
+		body.text = "当前威胁 %d。继续：威胁+1，先升级再打续战 8 波（7 波小怪 + 第 8 波 Boss）；Boss 后再问是否接着玩。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
 		cont.text = "继续挑战"
@@ -103,7 +103,7 @@ func show_choice_after_block() -> void:
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = "已完成 4 波续战（威胁 %d）。本局结算，或接着玩下一轮（再威胁+1，先升级再 4 波）。" % tier
+		body.text = "已完成一轮续战（威胁 %d）。本局结算，或接着玩下一轮（再威胁+1，先升级再 8 波含 Boss）。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
 		cont.text = "接着玩"

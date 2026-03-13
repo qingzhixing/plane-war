@@ -11,15 +11,15 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _wave: int = 1
 var _boss_spawned: bool = false
-## 本局已击破过 Boss 后不再触发第二场 Boss（避免续战流程里 _wave>=8 再次 pending）
+## 主线首 Boss 已击破（续战块内可再打 Boss）
 var _boss_defeated_once: bool = false
 ## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
 var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
-## Boss 后续战块内波次 1～4，0 表示未在续战
+## 续战块：1～7 小怪波，8 = 续战 Boss 进行中
 var _extension_wave: int = 0
-## 第 4 波升级选完后弹出「接着玩 / 结算」
-var _after_extension_block_upgrade_show_choice: bool = false
+const _EXTENSION_MOB_WAVES: int = 7
+const _EXTENSION_BLOCK_SIZE: int = 8
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -112,11 +112,9 @@ func on_wave_cleared() -> void:
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
-	# 续战：每波清场 → 升级；第 4 波升级后再询问是否接着玩
-	if _extension_wave > 0:
+	# 续战：每波清场 → 升级（第 7 波小怪升级后再开 Boss，不在此弹「接着玩」）
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
 		_waiting_upgrade_choice = true
-		if _extension_wave >= 4:
-			_after_extension_block_upgrade_show_choice = true
 		emit_signal("level_up")
 		return
 	_waiting_upgrade_choice = true
@@ -138,17 +136,12 @@ func on_upgrade_selected() -> void:
 			_spawner.start_extension_wave(1, threat_tier)
 		return
 
-	if _after_extension_block_upgrade_show_choice:
-		_after_extension_block_upgrade_show_choice = false
-		get_tree().paused = true
-		var pbc := get_node_or_null("PostBossChoice")
-		if pbc != null and pbc.has_method("show_choice_after_block"):
-			pbc.show_choice_after_block()
-		else:
-			get_tree().call_group("game_over_ui", "show_game_over")
+	if _extension_wave == _EXTENSION_MOB_WAVES:
+		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_spawn_boss()
 		return
 
-	if _extension_wave > 0 and _extension_wave < 4:
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_MOB_WAVES:
 		_extension_wave += 1
 		if _spawner != null and _spawner.has_method("start_extension_wave"):
 			_spawner.start_extension_wave(_extension_wave, threat_tier)
@@ -554,6 +547,9 @@ func _spawn_boss() -> void:
 	if _boss_spawned:
 		return
 	_boss_spawned = true
+	# 续战第 8 波：便于 HUD 显示
+	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+		_extension_wave = _EXTENSION_BLOCK_SIZE
 
 	# 确保进入 Boss 关时游戏不处于暂停状态
 	get_tree().paused = false
@@ -631,20 +627,32 @@ func _debug_skip_to_boss() -> void:
 
 func on_boss_defeated() -> void:
 	_boss_defeated_once = true
+	_boss_spawned = false
 	_pending_boss_spawn = false
 	get_tree().paused = true
 	var pbc := get_node_or_null("PostBossChoice")
-	if pbc != null and pbc.has_method("show_choice"):
-		pbc.show_choice()
-	else:
+	if pbc == null:
 		get_tree().call_group("game_over_ui", "show_game_over")
+		return
+	# 续战块 Boss 击破 → 与「每轮续战结束」相同二选一
+	if _extension_wave >= _EXTENSION_BLOCK_SIZE:
+		_extension_wave = 0
+		if pbc.has_method("show_choice_after_block"):
+			pbc.show_choice_after_block()
+		else:
+			get_tree().call_group("game_over_ui", "show_game_over")
+	else:
+		if pbc.has_method("show_choice"):
+			pbc.show_choice()
+		else:
+			get_tree().call_group("game_over_ui", "show_game_over")
 
 
 func continue_after_boss() -> void:
 	_begin_next_extension_block()
 
 
-## 每 4 波续战结束后「接着玩」：再威胁+1 + 先升级再开新块第 1 波
+## 续战一轮结束（含续战 Boss）后「接着玩」
 func continue_next_extension_block() -> void:
 	_begin_next_extension_block()
 
@@ -655,7 +663,6 @@ func _begin_next_extension_block() -> void:
 	_boss_spawned = false
 	_pending_boss_spawn = false
 	_extension_wave = 0
-	_after_extension_block_upgrade_show_choice = false
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
