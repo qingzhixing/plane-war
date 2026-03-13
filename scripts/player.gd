@@ -326,6 +326,22 @@ func get_bomb_shot_count() -> int:
 	return maxi(1, _bomb_shot_count)
 
 
+func get_combo_fire_rate_mult() -> float:
+	return _combo_fire_rate_mult
+
+
+func get_combo_move_speed_mult() -> float:
+	return _combo_move_speed_mult
+
+
+func get_combo_bullet_speed_mult() -> float:
+	return _combo_bullet_speed_mult
+
+
+func get_combo_damage_bonus() -> int:
+	return _combo_damage_bonus
+
+
 func set_combo_buff_tier(tier: int) -> void:
 	_combo_fire_rate_mult = 1.0
 	_combo_move_speed_mult = 1.0

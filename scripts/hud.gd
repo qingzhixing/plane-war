@@ -168,7 +168,24 @@ func _update_combo_visual(combo: int) -> void:
 		_last_combo_value = 0
 		return
 
-	_combo_label.text = "Combo: %d" % combo
+	var combo_extra := ""
+	if is_instance_valid(_player) and _player.has_method("get_combo_fire_rate_mult"):
+		var fr := float(_player.get_combo_fire_rate_mult())
+		var mv := float(_player.get_combo_move_speed_mult()) if _player.has_method("get_combo_move_speed_mult") else 1.0
+		var bs := float(_player.get_combo_bullet_speed_mult()) if _player.has_method("get_combo_bullet_speed_mult") else 1.0
+		var db := int(_player.get_combo_damage_bonus()) if _player.has_method("get_combo_damage_bonus") else 0
+		var bits: PackedStringArray = []
+		if fr > 1.009:
+			bits.append("射速(+%.0f%%)" % ((fr - 1.0) * 100.0))
+		if mv > 1.009:
+			bits.append("移速(+%.0f%%)" % ((mv - 1.0) * 100.0))
+		if bs > 1.009:
+			bits.append("弹速(+%.0f%%)" % ((bs - 1.0) * 100.0))
+		if db > 0:
+			bits.append("伤害(+%d)" % db)
+		if bits.size() > 0:
+			combo_extra = "  " + " ".join(bits)
+	_combo_label.text = "Combo: %d%s" % [combo, combo_extra]
 
 	var color := _combo_base_color
 	if combo >= 100:
@@ -397,8 +414,32 @@ func _update_stats_label() -> void:
 		var main_cd := 0.0
 		if _player.has_method("get_main_fire_cd_remaining"):
 			main_cd = float(_player.get_main_fire_cd_remaining())
-		lines.append("射速 %.1f/s  齐射 %d/%d  %s" % [rof, bc, bmax, mode_str])
+		var fr_mult := 1.0
+		var mv_mult := 1.0
+		var bs_mult := 1.0
+		var dmg_bonus := 0
+		if _player.has_method("get_combo_fire_rate_mult"):
+			fr_mult = float(_player.get_combo_fire_rate_mult())
+		if _player.has_method("get_combo_move_speed_mult"):
+			mv_mult = float(_player.get_combo_move_speed_mult())
+		if _player.has_method("get_combo_bullet_speed_mult"):
+			bs_mult = float(_player.get_combo_bullet_speed_mult())
+		if _player.has_method("get_combo_damage_bonus"):
+			dmg_bonus = int(_player.get_combo_damage_bonus())
+		var fr_suffix := ""
+		if fr_mult > 1.009:
+			fr_suffix = " (+%.0f%%)" % ((fr_mult - 1.0) * 100.0)
+		lines.append("射速 %.1f/s%s  齐射 %d/%d  %s" % [rof, fr_suffix, bc, bmax, mode_str])
 		lines.append("主炮间隔 %.2fs（下次 %.2fs）" % [eff_iv, main_cd])
+		var combo_parts: PackedStringArray = []
+		if mv_mult > 1.009:
+			combo_parts.append("移速(+%.0f%%)" % ((mv_mult - 1.0) * 100.0))
+		if bs_mult > 1.009:
+			combo_parts.append("弹速(+%.0f%%)" % ((bs_mult - 1.0) * 100.0))
+		if dmg_bonus > 0:
+			combo_parts.append("伤害(+%d)" % dmg_bonus)
+		if combo_parts.size() > 0:
+			lines.append("连击 %s" % " ".join(combo_parts))
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
