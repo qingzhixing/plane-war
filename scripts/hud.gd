@@ -415,11 +415,15 @@ func _update_stats_label() -> void:
 		line1 += "  齐射 %d/%d  %s" % [bc, bmax, mode_str]
 		main_lines.append(line1)
 		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
-		var spd_line := "弹速"
-		if _player.has_method("bullet_speed"):
-			spd_line += " %.0f" % float(_player.bullet_speed)
+		var base_spd := 1200.0
+		if _player.has_method("get_bullet_speed"):
+			base_spd = float(_player.get_bullet_speed())
+		elif "bullet_speed" in _player:
+			base_spd = float(_player.bullet_speed)
+		var eff_spd := base_spd * bs_mult
+		var spd_line := "弹速 %.0f" % eff_spd
 		if bs_mult > 1.009:
-			spd_line += "  [color=%s](连击+%.0f%%)[/color]" % [C_BS, (bs_mult - 1.0) * 100.0]
+			spd_line += "  [color=%s]基数%.0f · 连击+%.0f%%[/color]" % [C_BS, base_spd, (bs_mult - 1.0) * 100.0]
 		main_lines.append(spd_line)
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4

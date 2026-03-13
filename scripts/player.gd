@@ -280,6 +280,10 @@ func get_bullet_damage() -> int:
 	return bullet_damage
 
 
+func get_bullet_speed() -> float:
+	return bullet_speed
+
+
 func get_boss_damage_multiplier() -> float:
 	return _boss_damage_multiplier
 
