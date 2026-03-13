@@ -1,6 +1,5 @@
 extends Control
-## 子节点唯一名称（场景内 unique_name_in_owner）：%Background %Vignette %MainMargin %MainColumn
-## %TitleLabel %SubtitleLabel %ButtonColumn %StartButton %SettingsButton %QuitButton %FooterLabel %SettingsUI
+## 唯一名称仅绑定需代码访问的节点：%StartButton %SettingsButton %QuitButton %SettingsUI
 
 @export var game_scene: PackedScene
 
