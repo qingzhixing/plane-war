@@ -18,7 +18,7 @@
 - **擦弹（Graze）**
   - 敌弹 / 敌机在 `GrazeArea` 内重叠时，按 **约 50ms / 目标** 重复加分；不替代中弹判定。
   - **特效**：`GrazeSpark`（`CPUParticles2D`）带 **GradientTexture2D 圆形贴图**，避免 Android GLES 无贴图粒子不显示；`restart()` + deferred 入树；约 90ms / 目标 节流。
-  - **绘制顺序**：擦弹粒子 **z 在玩家之下**，`scale_amount` 收敛，避免一大团盖住机体；**所有子弹 z 在玩家之上**，保证弹幕可读性。
+  - **绘制顺序**：**玩家 < 擦弹特效 < 子弹**（机体可读 + 擦弹可见；弹幕仍压在最上层）。
   - **颗粒感**：多枚 **偏小、偏硬边** 的粒子（数量↑、单粒 scale↓、渐变边缘收紧），偏「碎屑/星点」而非一大团柔光。
   - **音效**：`assets/SFX/player/Graze.wav`，经 `AudioManager.play_graze()` 播放；SFX 使用 **多路 AudioStreamPlayer 池（约 22 路）**，避免大后期密集触发时同一路被 `play()` 顶断。
 
