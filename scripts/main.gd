@@ -27,7 +27,7 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 var best_combo: int = 0
 
-const GRAZE_SCORE: int = 4
+const GRAZE_SCORE: int = 9
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
