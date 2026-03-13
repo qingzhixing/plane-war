@@ -1,5 +1,5 @@
 extends CanvasLayer
-## 调试：F9 打开，从完整列表任选升级，直接 apply_upgrade，不推进波次/升级流程。
+## 调试：设置里打开，从完整列表任选升级，直接 apply_upgrade，不推进波次/升级流程。
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
@@ -35,21 +35,6 @@ func _ready() -> void:
 	visible = false
 	_main = get_parent()
 	_build_ui()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		var e := event as InputEventKey
-		if e.keycode == KEY_F9:
-			_toggle()
-			get_viewport().set_input_as_handled()
-
-
-func _toggle() -> void:
-	if _open:
-		_close()
-	else:
-		_open_panel()
 
 
 func _open_panel() -> void:
@@ -97,7 +82,7 @@ func _build_ui() -> void:
 	margin.add_child(vbox)
 
 	var title := Label.new()
-	title.text = "调试：自选升级（F9 关闭）"
+	title.text = "调试：自选升级（点关闭返回）"
 	title.add_theme_font_size_override("font_size", 28)
 	vbox.add_child(title)
 
