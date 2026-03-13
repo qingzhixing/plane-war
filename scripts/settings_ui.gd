@@ -184,8 +184,7 @@ func _ready() -> void:
 		b.text = "+%d" % add_n
 		b.custom_minimum_size = Vector2(72, 40)
 		b.add_theme_font_size_override("font_size", 18)
-		var n := add_n
-		b.pressed.connect(func() -> void: _on_debug_combo_add(n))
+		b.pressed.connect(_on_debug_combo_add.bind(int(add_n)))
 		_debug_combo_row.add_child(b)
 	var b0 := Button.new()
 	b0.text = "清零"
