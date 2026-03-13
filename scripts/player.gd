@@ -142,7 +142,7 @@ func _update_movement(delta: float) -> void:
 	global_position = clamped
 
 func _update_shooting(delta: float) -> void:
-	var effective_interval := fire_interval / maxf(0.1, _combo_fire_rate_mult)
+	var effective_interval := fire_interval
 	if _fire_timer > effective_interval:
 		_fire_timer = effective_interval
 	_fire_timer -= delta
@@ -301,9 +301,9 @@ func get_weapon_mode() -> String:
 	return _weapon_mode
 
 
-## HUD：有效主炮射击间隔（秒/发，含连击射速倍率）
+## HUD：有效主炮射击间隔（秒/发；攻速不叠，原攻速均转伤害）
 func get_effective_fire_interval() -> float:
-	return fire_interval / maxf(0.1, _combo_fire_rate_mult)
+	return fire_interval
 
 
 ## HUD：距离下一发主武器的时间（秒）
@@ -336,7 +336,7 @@ func get_bomb_shot_count() -> int:
 
 
 func get_combo_fire_rate_mult() -> float:
-	return _combo_fire_rate_mult
+	return 1.0
 
 
 func get_combo_move_speed_mult() -> float:
@@ -359,26 +359,17 @@ func set_combo_buff_tier(tier: int) -> void:
 
 	if tier <= 0:
 		return
-	# 连击不加移速；射速 / 高连弹速 / 主炮伤害 +1
+	# 连击不加移速、不加射速；原射速档全部改为主炮伤害 + 高连弹速
 	if tier == 1:
-		_combo_fire_rate_mult = 1.15
+		_combo_damage_bonus = 1
 	elif tier == 2:
-		_combo_fire_rate_mult = 1.30
+		_combo_damage_bonus = 3
 	elif tier == 3:
-		_combo_fire_rate_mult = 1.45
-		_combo_damage_bonus = 1
+		_combo_damage_bonus = 6
 	else:
-		# 100 连 = tier4 起：射速涨到上限后，再升档只加主炮伤害（避免无限叠攻速）
-		const FIRE_CAP: float = 3.0
-		const FIRE_PER_TIER: float = 0.08
-		var extra_tiers: int = tier - 3
-		var tiers_to_cap: int = maxi(1, int(ceil((FIRE_CAP - 1.45) / FIRE_PER_TIER)))
-		var fire_raw: float = 1.45 + FIRE_PER_TIER * float(extra_tiers)
-		_combo_fire_rate_mult = minf(FIRE_CAP, fire_raw)
+		var extra: int = tier - 3
 		_combo_bullet_speed_mult = 1.15
-		_combo_damage_bonus = 1
-		if extra_tiers > tiers_to_cap:
-			_combo_damage_bonus += extra_tiers - tiers_to_cap
+		_combo_damage_bonus = 6 + extra * 2
 
 
 func release_pointer() -> void:
@@ -387,7 +378,7 @@ func release_pointer() -> void:
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
 		"fire_rate":
-			fire_interval *= 0.85
+			bullet_damage += 2
 		"damage":
 			bullet_damage += 1
 		"multi_shot":

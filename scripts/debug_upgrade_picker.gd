@@ -5,7 +5,7 @@ const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 # 与 UpgradeUI + Main.apply_upgrade 对齐；含仅 Main 处理的词条
 const _ALL: Array[Dictionary] = [
-	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器射速 +15%"},
+	{"id": "fire_rate", "name": "火力强化", "desc": "主炮伤害 +2"},
 	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
 	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
 	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
