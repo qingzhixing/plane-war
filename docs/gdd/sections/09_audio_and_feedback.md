@@ -17,7 +17,7 @@
 
 - **擦弹（Graze）**
   - 敌弹进入玩家 `GrazeArea`（大于判定点）且尚未对本弹计过分 → 加分；不替代中弹判定。
-  - **特效**：在敌弹位置实例化 `scenes/vfx/GrazeSpark.tscn`（青白向四周爆开短火花，`CPUParticles2D` one_shot，播完自毁）。
+  - **特效**：在 **敌弹或敌机中心** 实例化 `GrazeSpark`（同一套粒子）。
 
 - **玩家判定点（Hit Judgement）**
   - 表现：机体中心 **小圆点**（红芯 + 白边），与 `Player` 的 `CollisionShape2D` 同半径、同中心；全程可见（无敌闪烁时可略降透明度或保持可见，按可读性二选一）。
