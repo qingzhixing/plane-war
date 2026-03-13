@@ -40,7 +40,7 @@ Godot 4 开发，面向 **Windows / Android**。
 |------|------|
 | **源码** | [github.com/qingzhixing/plane-war](https://github.com/qingzhixing/plane-war) |
 | **设计文档** | [`docs/gdd/GDD.md`](docs/gdd/GDD.md) 及 [`docs/gdd/sections/`](docs/gdd/sections/) |
-| **截图目录** | [`docs/picture/`](docs/picture/)（README 上图亦在此） |
+| **截图目录** | [`docs/picture/`](docs/picture/)（内含 `.gdignore`，Godot 不导入该目录，避免多余 `.import`） |
 
 ---
 
