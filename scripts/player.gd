@@ -55,6 +55,8 @@ const _HIT_BLINK_FREQ := 20.0
 var _has_shield: bool = false
 var _shield_node: Node2D
 const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
+## 基础射速 1/0.2=5/s，3× 封顶 → 超过部分转伤害
+const _MAX_MAIN_ROF: float = 15.0
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -141,8 +143,19 @@ func _update_movement(delta: float) -> void:
 	clamped.y = clamp(clamped.y, margin, viewport_rect.size.y - margin)
 	global_position = clamped
 
+func _main_rof() -> float:
+	return _combo_fire_rate_mult / maxf(0.02, fire_interval)
+
+
+func _effective_shot_interval() -> float:
+	var iv := fire_interval / maxf(0.1, _combo_fire_rate_mult)
+	if _main_rof() > _MAX_MAIN_ROF:
+		return 1.0 / _MAX_MAIN_ROF
+	return iv
+
+
 func _update_shooting(delta: float) -> void:
-	var effective_interval := fire_interval
+	var effective_interval := _effective_shot_interval()
 	if _fire_timer > effective_interval:
 		_fire_timer = effective_interval
 	_fire_timer -= delta
@@ -301,9 +314,9 @@ func get_weapon_mode() -> String:
 	return _weapon_mode
 
 
-## HUD：有效主炮射击间隔（秒/发；攻速不叠，原攻速均转伤害）
+## HUD：有效主炮射击间隔（秒/发；达 15/s 上限后不再变快）
 func get_effective_fire_interval() -> float:
-	return fire_interval
+	return _effective_shot_interval()
 
 
 ## HUD：距离下一发主武器的时间（秒）
@@ -336,7 +349,7 @@ func get_bomb_shot_count() -> int:
 
 
 func get_combo_fire_rate_mult() -> float:
-	return 1.0
+	return _combo_fire_rate_mult
 
 
 func get_combo_move_speed_mult() -> float:
@@ -359,17 +372,24 @@ func set_combo_buff_tier(tier: int) -> void:
 
 	if tier <= 0:
 		return
-	# 连击不加移速、不加射速；原射速档全部改为主炮伤害 + 高连弹速
 	if tier == 1:
-		_combo_damage_bonus = 1
+		_combo_fire_rate_mult = 1.15
 	elif tier == 2:
-		_combo_damage_bonus = 3
+		_combo_fire_rate_mult = 1.30
 	elif tier == 3:
-		_combo_damage_bonus = 6
+		_combo_fire_rate_mult = 1.45
+		_combo_damage_bonus = 1
 	else:
-		var extra: int = tier - 3
+		const FIRE_CAP: float = 3.0
+		const FIRE_PER_TIER: float = 0.08
+		var extra_tiers: int = tier - 3
+		var tiers_to_cap: int = maxi(1, int(ceil((FIRE_CAP - 1.45) / FIRE_PER_TIER)))
+		var fire_raw: float = 1.45 + FIRE_PER_TIER * float(extra_tiers)
+		_combo_fire_rate_mult = minf(FIRE_CAP, fire_raw)
 		_combo_bullet_speed_mult = 1.15
-		_combo_damage_bonus = 6 + extra * 2
+		_combo_damage_bonus = 1
+		if extra_tiers > tiers_to_cap:
+			_combo_damage_bonus += extra_tiers - tiers_to_cap
 
 
 func release_pointer() -> void:
@@ -378,7 +398,11 @@ func release_pointer() -> void:
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
 		"fire_rate":
-			bullet_damage += 2
+			var next_iv: float = fire_interval * 0.85
+			if _combo_fire_rate_mult / maxf(0.02, next_iv) <= _MAX_MAIN_ROF + 0.02:
+				fire_interval = next_iv
+			else:
+				bullet_damage += 2
 		"damage":
 			bullet_damage += 1
 		"multi_shot":
