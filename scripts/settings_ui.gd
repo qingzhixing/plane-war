@@ -160,6 +160,14 @@ func _ready() -> void:
 	skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
 	vbox.add_child(skip_boss_button)
 
+	var debug_upgrades_button := Button.new()
+	debug_upgrades_button.text = "自选升级（调试）"
+	debug_upgrades_button.custom_minimum_size = Vector2(220, 64)
+	debug_upgrades_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	debug_upgrades_button.add_theme_font_size_override("font_size", 24)
+	debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
+	vbox.add_child(debug_upgrades_button)
+
 	_load_extra_settings()
 
 
@@ -198,6 +206,17 @@ func _on_skip_to_boss_pressed() -> void:
 		visible = false
 		get_tree().paused = false
 		main._debug_skip_to_boss()
+
+
+func _on_debug_upgrades_pressed() -> void:
+	var main := get_tree().current_scene
+	if main == null:
+		return
+	var picker := main.get_node_or_null("DebugUpgradePicker")
+	if picker != null and picker.has_method("_open_panel"):
+		visible = false
+		get_tree().paused = false
+		picker._open_panel()
 
 
 func _get_audio_manager() -> Node:

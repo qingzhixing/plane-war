@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
+[ext_resource type="Script" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -168,5 +169,9 @@ script = ExtResource("8_settings_ui")
 [node name="BossHUD" type="CanvasLayer" parent="." unique_id=426736218]
 process_mode = 3
 script = ExtResource("10_boss_hud")
+
+[node name="DebugUpgradePicker" type="CanvasLayer" parent="."]
+process_mode = 4
+script = ExtResource("12_debug_upgrades")
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]
