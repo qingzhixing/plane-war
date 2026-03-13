@@ -11,6 +11,7 @@
 ## 项目结构（建议）
 
 - 启动 / 主菜单：`res://scenes/MainMenu.tscn` → 开始游戏后进入 `res://scenes/Main.tscn`；关于页 `AboutUI` + `scripts/about_ui.gd`（`OS.shell_open` 打开 GitHub）。
+- **README 截图目录** `docs/picture/` 根下放 **`.gdignore`**（空文件即可），Godot 不再扫描该夹，PNG 仅给仓库/README 用、不生成 `.import`。
 - 本地成绩：`user://records.cfg`（`best_score` / `best_combo` / `best_dps`），由 `Main` 结算写入；主菜单「成绩查询」只读同一文件。
 - 玩家：
   - 场景：`res://scenes/Player.tscn`
