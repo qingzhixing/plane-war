@@ -38,6 +38,12 @@
   - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
   - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
 
+## 调试工具（开发/自测）
+
+- **自选升级面板**：战斗中随时打开，从完整列表里点选一项即调用 `Main.apply_upgrade(id)`，**不**经过波次升级流程（不改变 `_waiting_upgrade_choice`）。
+- **默认快捷键**：**F9** 开/关；面板打开时暂停游戏（`get_tree().paused = true`），面板所在 `CanvasLayer` 使用 `process_mode = ALWAYS`，保证仍能响应关闭。
+- **发布策略**：可在导出版保留（方便试玩反馈）；若需禁用，可改为仅 `OS.is_debug_build()` 时注册快捷键或移除该节点。
+
 ## 第一阶段实现目标（代码）
 
 - 在 `Main.tscn` 中实例化玩家：
