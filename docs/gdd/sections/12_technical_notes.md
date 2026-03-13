@@ -41,6 +41,7 @@
   - 玩家受击后的闪烁使用简单方式实现（Shader 或 `modulate`/`visible` 控制），重点是节奏感与可读性。
   - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
   - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
+  - **调试**：局内暂停 → 设置 → **连击+（调试）** `+10/+50/+100/+500` 与 **清零**；对应 `Main.debug_add_combo` / `debug_set_combo`（仅开发验 Buff/HUD）。
 
 ## 调试工具（开发/自测）
 
