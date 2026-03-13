@@ -27,10 +27,11 @@
   - 命中敌机**不因穿透次数销毁**（与基础子弹不同），仅回程触玩家或出界销毁。
   - 场景：`PlayerBoomerang.tscn`；`Player` 上 `boomerang_speed_mult` / `boomerang_return_speed_mult` 可调。
 - **炸弹（副武器，升级解锁）**
-  - 行为：按冷却自动向上发射；**弹速慢于弓箭**；直线飞行；仅在与敌机/Boss 重叠时引爆。
+  - 行为：按冷却自动向上发射；**弹速低于主武器满速、高于旧版炸弹**（具体倍率以 `Player` 上炸弹 `speed_mult` 为准）；直线飞行；仅在与敌机/Boss 重叠时引爆。
   - **范围伤害（AoE）**；**仅爆炸帧多边形内**清除 `enemy_bullet`（飞行中不再撞消敌弹）。
   - 场景：`res://scenes/bullets/PlayerBomb.tscn` + `PlayerBomb.gd`。
-  - 符卡爆发仍使用 `PlayerBullet.tscn`，与副武器炸弹无关。
+- **符卡弹幕**（与副武器炸弹无关）
+  - 发动时自机位置周身高密度径向弹幕；使用 `PlayerSpellBullet.tscn`：**碰到的敌弹单独销毁**，不全场清弹；对敌机/Boss 仍按 `BulletBase` 命中结算。
 
 ### 伤害精度（玩家无 HP）
 
