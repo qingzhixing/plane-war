@@ -35,10 +35,8 @@
 
 - 玩家闪烁与护盾：
   - 玩家受击后的闪烁使用简单方式实现（Shader 或 `modulate`/`visible` 控制），重点是节奏感与可读性。
-  - 护盾使用独立场景（例如 `res://scenes/vfx/PlayerShield.tscn`），包含：
-    - 护盾 `Sprite2D` + Shader（外圈光晕、轻微扭曲）。
-    - 控制脚本暴露方法：`show_shield() / hide_shield() / play_block_effect()`。
-  - 玩家脚本持有护盾节点引用，在获得护盾时显示，在护盾抵消一次伤害时调用 `play_block_effect()` 并视规则决定是否隐藏。
+  - 护盾使用独立场景 `res://scenes/vfx/PlayerShield.tscn`：`Node2D` + `ColorRect` + Shader（大圈、高亮青白光晕、时间呼吸）。
+  - 玩家脚本：`set_combo_guard_shield_visible` / `play_combo_guard_pulse`；Main 在稳态护盾层数变化时同步显示。
 
 ## 第一阶段实现目标（代码）
 
