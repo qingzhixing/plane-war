@@ -70,28 +70,59 @@ func _on_sprite_frame_changed() -> void:
 func _apply_aoe_damage() -> void:
 	if _explosion_area == null:
 		return
-	_explosion_area.collision_mask = 0xFFFFFFFF
-	_explosion_area.monitoring = true
-	# 本帧刚改碰撞，等一次物理同步再取重叠
-	await get_tree().physics_frame
-	if not is_instance_valid(self):
+	# 不用 get_overlapping_areas()：子 Area2D 曾长期 mask=0 / layer=0，物理里经常扫不到。
+	# 用爆炸多边形（全局）做点入多边形判定，与敌机 root 位置或碰撞形采样点求交，稳定出伤。
+	var poly_node := _explosion_area.get_node_or_null("CollisionPolygon2D") as CollisionPolygon2D
+	if poly_node == null:
+		return
+	var poly_global := PackedVector2Array()
+	for p in poly_node.polygon:
+		poly_global.append(poly_node.to_global(p))
+	if poly_global.size() < 3:
 		return
 	var seen: Dictionary = {}
-	for area in _explosion_area.get_overlapping_areas():
-		if not is_instance_valid(area):
-			continue
-		if not (area.is_in_group("enemy") or area.is_in_group("boss")):
-			continue
-		if seen.has(area):
-			continue
-		seen[area] = true
-		var dealt := damage
-		if area.is_in_group("boss"):
-			dealt = max(1, int(round(float(damage) * _boss_damage_multiplier)))
-		if area.has_method("apply_damage"):
-			area.apply_damage(dealt)
-			get_tree().call_group("battle_stats_manager", "record_player_damage", dealt, area)
-			_spawn_hit_vfx(area)
+	for gid in [&"enemy", &"boss"]:
+		for node in get_tree().get_nodes_in_group(StringName(gid)):
+			if not is_instance_valid(node) or seen.has(node):
+				continue
+			if not (node.is_in_group("enemy") or node.is_in_group("boss")):
+				continue
+			if not _aoe_hits_target(node, poly_global):
+				continue
+			seen[node] = true
+			var dealt := damage
+			if node.is_in_group("boss"):
+				dealt = max(1, int(round(float(damage) * _boss_damage_multiplier)))
+			if node.has_method("apply_damage"):
+				node.apply_damage(dealt)
+				get_tree().call_group("battle_stats_manager", "record_player_damage", dealt, node)
+				_spawn_hit_vfx(node)
+
+
+func _aoe_hits_target(node: Node, poly_global: PackedVector2Array) -> bool:
+	# 敌机 root 中心在爆炸多边形内
+	if Geometry2D.is_point_in_polygon(node.global_position, poly_global):
+		return true
+	# 再采样若干子碰撞顶点，避免大块 Boss 中心在形外但机体仍压在范围内
+	for child in node.get_children():
+		if child is CollisionPolygon2D:
+			var cp := child as CollisionPolygon2D
+			for p in cp.polygon:
+				if Geometry2D.is_point_in_polygon(cp.to_global(p), poly_global):
+					return true
+		elif child is CollisionShape2D:
+			var cs := child as CollisionShape2D
+			var sh := cs.shape
+			if sh is CircleShape2D:
+				if Geometry2D.is_point_in_polygon(cs.to_global(Vector2.ZERO), poly_global):
+					return true
+			elif sh is RectangleShape2D:
+				var r := (sh as RectangleShape2D).size * 0.5
+				for sx in [-1.0, 1.0]:
+					for sy in [-1.0, 1.0]:
+						if Geometry2D.is_point_in_polygon(cs.to_global(Vector2(sx * r.x, sy * r.y)), poly_global):
+							return true
+	return false
 
 
 func _on_sprite_animation_finished() -> void:
