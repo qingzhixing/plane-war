@@ -21,7 +21,7 @@
   - 基类脚本：`res://scripts/bullets/BulletBase.gd`（提供 `damage/speed/direction` 等通用属性与基础移动逻辑）。
   - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBullet.tscn`，脚本 `res://scripts/bullets/PlayerBullet.gd`（直线向上、不穿透）。
   - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrow.tscn`，脚本 `res://scripts/bullets/PlayerArrow.gd`。
-  - 玩家回旋镖子弹：场景 `res://scenes/bullets/PlayerBoomerang.tscn`，脚本 `res://scripts/bullets/PlayerBoomerang.gd`。
+  - 玩家回旋镖：`PlayerBoomerang.gd`；回收到玩家后 `on_boomerang_returned()` 再发射下一波；`boomerang_speed` 叠乘移速。
   - 符卡爆发弹幕：仍使用 `PlayerBullet.tscn` 等多向直线弹。
   - **炸弹副武器**：`PlayerBomb.gd` 第 7 帧除 AoE 外，对爆炸多边形内的 `enemy_bullet` 执行 `queue_free`。
 - 敌人：
