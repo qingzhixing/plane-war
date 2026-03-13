@@ -17,6 +17,7 @@ var _debug_upgrades_button: Button
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
+var _syncing_audio_ui: bool = false
 
 
 func _ready() -> void:
@@ -239,24 +240,32 @@ func _get_audio_manager() -> Node:
 
 
 func _on_bgm_slider_changed(value: float) -> void:
+	if _syncing_audio_ui:
+		return
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("set_bgm_volume_linear"):
 		audio.set_bgm_volume_linear(value / 100.0)
 
 
 func _on_sfx_slider_changed(value: float) -> void:
+	if _syncing_audio_ui:
+		return
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("set_sfx_volume_linear"):
 		audio.set_sfx_volume_linear(value / 100.0)
 
 
 func _on_bgm_mute_toggled(pressed: bool) -> void:
+	if _syncing_audio_ui:
+		return
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("set_bgm_muted"):
 		audio.set_bgm_muted(pressed)
 
 
 func _on_sfx_mute_toggled(pressed: bool) -> void:
+	if _syncing_audio_ui:
+		return
 	var audio := _get_audio_manager()
 	if audio != null and audio.has_method("set_sfx_muted"):
 		audio.set_sfx_muted(pressed)
