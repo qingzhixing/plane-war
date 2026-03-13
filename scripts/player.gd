@@ -55,8 +55,11 @@ const _HIT_BLINK_FREQ := 20.0
 var _has_shield: bool = false
 var _shield_node: Node2D
 const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
-## 主炮射速上限（发/秒），超过部分转伤害
+## 主炮射速上限（发/秒）；实际射速封顶，超出比例折算为攻击力
 const _MAX_MAIN_ROF: float = 75.0
+## 超出上限部分：(raw_rof - cap) / cap → 每 100% 溢出折合主炮 +X 点（进伤害乘区前）
+const _ROF_OVERFLOW_PCT_TO_DAMAGE: float = 0.12
+var _rof_overflow_damage: float = 0.0
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -81,6 +84,7 @@ func _ready() -> void:
 	_init_shield()
 	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
 		call_deferred("_spawn_boomerang_volley")
+	_recompute_rof_overflow_damage()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -145,6 +149,15 @@ func _update_movement(delta: float) -> void:
 
 func _main_rof() -> float:
 	return _combo_fire_rate_mult / maxf(0.02, fire_interval)
+
+
+func _recompute_rof_overflow_damage() -> void:
+	var raw: float = _main_rof()
+	if raw <= _MAX_MAIN_ROF + 0.001:
+		_rof_overflow_damage = 0.0
+		return
+	var excess_ratio: float = (raw - _MAX_MAIN_ROF) / _MAX_MAIN_ROF
+	_rof_overflow_damage = excess_ratio * 100.0 * _ROF_OVERFLOW_PCT_TO_DAMAGE
 
 
 func _effective_shot_interval() -> float:
@@ -257,8 +270,8 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 	var scene := get_tree().current_scene
 	var bullet := scene_res.instantiate()
 	bullet.global_position = global_position + dir * 20.0 + side_offset
-	if "damage" in bullet:
-		var combo_bonus_damage := float(_combo_damage_bonus)
+		if "damage" in bullet:
+		var combo_bonus_damage := float(_combo_damage_bonus) + _rof_overflow_damage
 		bullet.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
 	if "speed" in bullet:
 		bullet.speed = bullet_speed * _combo_bullet_speed_mult * speed_mult
@@ -295,7 +308,7 @@ func get_bullet_damage() -> int:
 
 ## 主炮单发近似伤害（机炮弹，含连击加成点与「高爆弹头」等乘区）
 func get_effective_main_bullet_damage() -> float:
-	return maxf(0.1, (float(bullet_damage) + float(_combo_damage_bonus)) * _damage_multiplier)
+	return maxf(0.1, (float(bullet_damage) + float(_combo_damage_bonus) + _rof_overflow_damage) * _damage_multiplier)
 
 
 func get_bullet_speed() -> float:
@@ -364,6 +377,10 @@ func get_combo_damage_bonus() -> int:
 	return _combo_damage_bonus
 
 
+func get_rof_overflow_damage_for_hud() -> float:
+	return _rof_overflow_damage
+
+
 func set_combo_buff_tier(tier: int) -> void:
 	_combo_fire_rate_mult = 1.0
 	_combo_move_speed_mult = 1.0
@@ -371,6 +388,7 @@ func set_combo_buff_tier(tier: int) -> void:
 	_combo_damage_bonus = 0
 
 	if tier <= 0:
+		_recompute_rof_overflow_damage()
 		return
 	if tier == 1:
 		_combo_fire_rate_mult = 1.15
@@ -390,6 +408,7 @@ func set_combo_buff_tier(tier: int) -> void:
 		_combo_damage_bonus = 1
 		if extra_tiers > tiers_to_cap:
 			_combo_damage_bonus += extra_tiers - tiers_to_cap
+	_recompute_rof_overflow_damage()
 
 
 func release_pointer() -> void:
@@ -398,11 +417,8 @@ func release_pointer() -> void:
 func apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
 		"fire_rate":
-			var next_iv: float = fire_interval * 0.85
-			if _combo_fire_rate_mult / maxf(0.02, next_iv) <= _MAX_MAIN_ROF + 0.02:
-				fire_interval = next_iv
-			else:
-				bullet_damage += 2
+			fire_interval *= 0.85
+			_recompute_rof_overflow_damage()
 		"damage":
 			bullet_damage += 1
 		"multi_shot":

@@ -426,6 +426,10 @@ func _update_stats_label() -> void:
 		else:
 			dmg_line += "%.1f" % eff_dmg
 		main_lines.append(dmg_line)
+		if _player.has_method("get_rof_overflow_damage_for_hud"):
+			var ov: float = float(_player.get_rof_overflow_damage_for_hud())
+			if ov > 0.05:
+				main_lines.append("[color=#ffcc66]攻速溢出 → +%.1f 攻[/color]" % ov)
 		var line1 := "射速 %.1f/s" % rof
 		if fr_mult > 1.009:
 			line1 += "[color=%s](连击×%.2f)[/color]" % [C_FR, fr_mult]
