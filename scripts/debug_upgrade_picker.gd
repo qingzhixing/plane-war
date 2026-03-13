@@ -13,8 +13,6 @@ const _ALL: Array[Dictionary] = [
 	{"id": "boss_hunter", "name": "要害瞄准", "desc": "主武器对 Boss 伤害 +20%"},
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射 +1 / 解锁"},
-	{"id": "boomerang_speed", "name": "回旋加速", "desc": "回旋镖移速 +15%"},
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁 / 齐射+1"},
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
