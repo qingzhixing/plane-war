@@ -11,6 +11,8 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _wave: int = 1
 var _boss_spawned: bool = false
+## 本局已击破过 Boss 后不再触发第二场 Boss（避免续战流程里 _wave>=8 再次 pending）
+var _boss_defeated_once: bool = false
 ## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
 var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
@@ -117,7 +119,7 @@ func on_wave_cleared() -> void:
 	_waiting_upgrade_choice = true
 	emit_signal("level_up")
 	_wave += 1
-	if _wave >= _BOSS_WAVE_START and not _boss_spawned:
+	if _wave >= _BOSS_WAVE_START and not _boss_spawned and not _boss_defeated_once:
 		_pending_boss_spawn = true
 	else:
 		_pending_boss_spawn = false
@@ -542,6 +544,8 @@ func _debug_skip_to_boss() -> void:
 
 
 func on_boss_defeated() -> void:
+	_boss_defeated_once = true
+	_pending_boss_spawn = false
 	get_tree().paused = true
 	var pbc := get_node_or_null("PostBossChoice")
 	if pbc != null and pbc.has_method("show_choice"):
