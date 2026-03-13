@@ -660,6 +660,10 @@ func continue_next_extension_block() -> void:
 func _begin_next_extension_block() -> void:
 	threat_tier += 1
 	_score_multiplier += 0.08
+	_combo_guard_charges += 1
+	var p_guard := get_node_or_null(player_path)
+	if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+		p_guard.set_combo_guard_shield_visible(true)
 	_boss_spawned = false
 	_pending_boss_spawn = false
 	_extension_wave = 0
