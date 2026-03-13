@@ -18,7 +18,7 @@
 - **擦弹（Graze）**
   - 敌弹 / 敌机在 `GrazeArea` 内重叠时，按 **约 50ms / 目标** 重复加分；不替代中弹判定。
   - **特效**：在 **玩家中心** 实例化 `GrazeSpark`（约 90ms / 目标 节流）。
-  - **音效**：`assets/SFX/player/Graze.wav`，经 `AudioManager.play_graze()` 播放，走 SFX 音量/静音；全局约 **70ms** 节流避免过密。
+  - **音效**：`assets/SFX/player/Graze.wav`，经 `AudioManager.play_graze()` 播放；SFX 使用 **多路 AudioStreamPlayer 池（约 22 路）**，避免大后期密集触发时同一路被 `play()` 顶断。
 
 - **玩家判定点（Hit Judgement）**
   - 表现：机体中心 **小圆点**（红芯 + 白边），与 `Player` 的 `CollisionShape2D` 同半径、同中心；全程可见（无敌闪烁时可略降透明度或保持可见，按可读性二选一）。
