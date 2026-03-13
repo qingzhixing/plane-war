@@ -57,8 +57,8 @@ var _shield_node: Node2D
 const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
 ## 主炮射速上限（发/秒）；实际射速封顶，超出比例折算为攻击力
 const _MAX_MAIN_ROF: float = 75.0
-## 超出上限部分：(raw_rof - cap) / cap → 每 100% 溢出折合主炮 +X 点（进伤害乘区前）
-const _ROF_OVERFLOW_PCT_TO_DAMAGE: float = 0.12
+## 相对 75/s 每溢出 1% → 主炮 +0.02 伤害（进乘区前）
+const _ROF_OVERFLOW_DAMAGE_PER_PCT: float = 0.02
 var _rof_overflow_damage: float = 0.0
 
 func _ready() -> void:
@@ -156,8 +156,8 @@ func _recompute_rof_overflow_damage() -> void:
 	if raw <= _MAX_MAIN_ROF + 0.001:
 		_rof_overflow_damage = 0.0
 		return
-	var excess_ratio: float = (raw - _MAX_MAIN_ROF) / _MAX_MAIN_ROF
-	_rof_overflow_damage = excess_ratio * 100.0 * _ROF_OVERFLOW_PCT_TO_DAMAGE
+	var overflow_pct: float = (raw - _MAX_MAIN_ROF) / _MAX_MAIN_ROF * 100.0
+	_rof_overflow_damage = overflow_pct * _ROF_OVERFLOW_DAMAGE_PER_PCT
 
 
 func _effective_shot_interval() -> float:
@@ -381,6 +381,10 @@ func get_rof_overflow_damage_for_hud() -> float:
 	return _rof_overflow_damage
 
 
+func get_theoretical_main_rof() -> float:
+	return _main_rof()
+
+
 func set_combo_buff_tier(tier: int) -> void:
 	_combo_fire_rate_mult = 1.0
 	_combo_move_speed_mult = 1.0
@@ -398,17 +402,12 @@ func set_combo_buff_tier(tier: int) -> void:
 		_combo_fire_rate_mult = 1.45
 		_combo_damage_bonus = 1
 	else:
-		# 与 _MAX_MAIN_ROF 对齐：默认间隔 0.2 → 5/s 基础，倍率 15 → 75/s
-		const FIRE_CAP: float = 15.0
+		# 连击倍率不封顶；理论射速 = 倍率/间隔，实际出手仍 75/s，溢出按 %→伤害
 		const FIRE_PER_TIER: float = 0.5
 		var extra_tiers: int = tier - 3
-		var tiers_to_cap: int = maxi(1, int(ceil((FIRE_CAP - 1.45) / FIRE_PER_TIER)))
-		var fire_raw: float = 1.45 + FIRE_PER_TIER * float(extra_tiers)
-		_combo_fire_rate_mult = minf(FIRE_CAP, fire_raw)
+		_combo_fire_rate_mult = 1.45 + FIRE_PER_TIER * float(extra_tiers)
 		_combo_bullet_speed_mult = 1.15
 		_combo_damage_bonus = 1
-		if extra_tiers > tiers_to_cap:
-			_combo_damage_bonus += extra_tiers - tiers_to_cap
 	_recompute_rof_overflow_damage()
 
 
