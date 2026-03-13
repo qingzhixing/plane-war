@@ -25,8 +25,8 @@ const UPGRADES: Array[Dictionary] = [
 	# 通用 / 生存 / 表现
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
-	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
-	{"id": "bomb_auto", "name": "自动符卡", "desc": "【一次性】符卡冷却再 -50%，冷却结束自动释放"},
+	{"id": "spell_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
+	{"id": "spell_auto", "name": "自动符卡", "desc": "【一次性】符卡冷却再 -50%，冷却结束自动释放"},
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
@@ -157,7 +157,7 @@ func show_pick() -> void:
 	if player != null and player.has_method("has_weapon_unlocked"):
 		bomb_unlocked = player.has_weapon_unlocked("bomb")
 	for u in UPGRADES:
-		if u["id"] == "bomb_auto" and _main.has_method("has_bomb_auto") and _main.has_bomb_auto():
+		if u["id"] == "spell_auto" and _main.has_method("has_spell_auto") and _main.has_spell_auto():
 			continue
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
@@ -242,8 +242,8 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"combo_boost",
 		"combo_guard",
 		"boomerang_multi",
-		"bomb_cooldown",
-		"bomb_auto",
+		"spell_cooldown",
+		"spell_auto",
 		"bomb_multi",
 		"bomb_side_cooldown",
 	]

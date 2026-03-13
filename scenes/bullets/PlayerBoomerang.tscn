@@ -1,21 +1,20 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dyr2asbsbh0sp"]
 
-[ext_resource type="Script" path="res://scripts/bullets/PlayerBoomerang.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/bullets/Sickle.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://de1gtc7dynp2y" path="res://scripts/bullets/PlayerBoomerang.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cyw4slfnau0mf" path="res://assets/sprites/bullets/Sickle.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_t2844"]
 radius = 13.333333
 
-[node name="PlayerBoomerang" type="Area2D"]
+[node name="PlayerBoomerang" type="Area2D" unique_id=920931509]
 z_index = 12
 z_as_relative = false
-scale = Vector2(2, 2)
+scale = Vector2(3, 3)
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1150670549]
 scale = Vector2(2, 2)
 texture = ExtResource("2_tex")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1055061275]
 shape = SubResource("CircleShape2D_t2844")
-

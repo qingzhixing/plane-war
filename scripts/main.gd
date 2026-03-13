@@ -1,7 +1,7 @@
 extends Node2D
 
 signal level_up
-signal bomb_used
+signal spell_used
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -26,9 +26,9 @@ var _score_multiplier: float = 1.0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
-var _bomb_cooldown_scale: float = 1.0
-## 一次性：自动符卡（冷却 -50% + CD 好自动放）
-var _bomb_auto: bool = false
+var _spell_cooldown_scale: float = 1.0
+## 一次性：自动符卡
+var _spell_auto: bool = false
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -50,15 +50,15 @@ var _pending_boss_spawn: bool = false
 var _debug_skip_to_boss_used: bool = false
 var _debug_skip_to_boss_active: bool = false
 var _debug_upgrades_needed: int = 0
-var _bomb_cooldown_remaining: float = 0.0
-## 符卡区短按检测（按钮 IGNORE 后触摸全程未处理，与拖动共用）
-var _bomb_tap_start: Dictionary = {}
+var _spell_cooldown_remaining: float = 0.0
+## 符卡区短按检测
+var _spell_tap_start: Dictionary = {}
 
-const _BOMB_COOLDOWN_SECONDS: float = 12.0
-const _BOMB_BURST_WAVE_COUNT: int = 4
-const _BOMB_BURST_WAVE_INTERVAL: float = 0.10
-const _BOMB_BURST_BULLET_COUNT: int = 40
-const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
+const _SPELL_COOLDOWN_SECONDS: float = 12.0
+const _SPELL_BURST_WAVE_COUNT: int = 4
+const _SPELL_BURST_WAVE_INTERVAL: float = 0.10
+const _SPELL_BURST_BULLET_COUNT: int = 40
+const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -80,7 +80,7 @@ func _process(delta: float) -> void:
 	_update_combo(delta)
 	_update_combo_buffs()
 	_update_dps()
-	_update_bomb(delta)
+	_update_spell(delta)
 
 
 func _start_wave() -> void:
@@ -197,16 +197,16 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
 				p_guard.set_combo_guard_shield_visible(true)
 			return
-		"bomb_cooldown":
-			_bomb_cooldown_scale = maxf(0.45, _bomb_cooldown_scale * 0.85)
+		"spell_cooldown", "bomb_cooldown":
+			_spell_cooldown_scale = maxf(0.45, _spell_cooldown_scale * 0.85)
 			return
-		"bomb_auto":
-			if _bomb_auto:
+		"spell_auto", "bomb_auto":
+			if _spell_auto:
 				return
-			_bomb_auto = true
-			_bomb_cooldown_scale = maxf(0.2, _bomb_cooldown_scale * 0.5)
-			if _bomb_cooldown_remaining <= 0.0:
-				try_use_bomb()
+			_spell_auto = true
+			_spell_cooldown_scale = maxf(0.2, _spell_cooldown_scale * 0.5)
+			if _spell_cooldown_remaining <= 0.0:
+				try_use_spell()
 			return
 	var p := get_node_or_null(player_path)
 	if p != null and p.has_method("apply_upgrade"):
@@ -255,20 +255,20 @@ func get_best_combo() -> int:
 	return best_combo
 
 
-func get_bomb_cooldown_total() -> float:
-	return _BOMB_COOLDOWN_SECONDS * _bomb_cooldown_scale
+func get_spell_cooldown_total() -> float:
+	return _SPELL_COOLDOWN_SECONDS * _spell_cooldown_scale
 
 
-func get_bomb_cooldown_remaining() -> float:
-	return _bomb_cooldown_remaining
+func get_spell_cooldown_remaining() -> float:
+	return _spell_cooldown_remaining
 
 
-func try_use_bomb() -> bool:
-	if _bomb_cooldown_remaining > 0.0:
+func try_use_spell() -> bool:
+	if _spell_cooldown_remaining > 0.0:
 		return false
-	_bomb_cooldown_remaining = get_bomb_cooldown_total()
-	_trigger_bomb_effect()
-	emit_signal("bomb_used")
+	_spell_cooldown_remaining = get_spell_cooldown_total()
+	_trigger_spell_effect()
+	emit_signal("spell_used")
 	return true
 
 
@@ -277,22 +277,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		var e := event as InputEventScreenTouch
 		var k := e.index + 100000
 		if e.pressed:
-			_bomb_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
+			_spell_tap_start[k] = {"t": Time.get_ticks_msec(), "p": e.position}
 		else:
-			_try_bomb_short_tap(e.position, k)
+			_try_spell_short_tap(e.position, k)
 	elif event is InputEventMouseButton:
 		var e := event as InputEventMouseButton
 		if e.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if e.pressed:
-			_bomb_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
+			_spell_tap_start[-1] = {"t": Time.get_ticks_msec(), "p": e.position}
 		else:
-			_try_bomb_short_tap(e.position, -1)
+			_try_spell_short_tap(e.position, -1)
 
 
-func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
-	var st: Variant = _bomb_tap_start.get(key, null)
-	_bomb_tap_start.erase(key)
+func _try_spell_short_tap(screen_pos: Vector2, key: int) -> void:
+	var st: Variant = _spell_tap_start.get(key, null)
+	_spell_tap_start.erase(key)
 	if st == null or typeof(st) != TYPE_DICTIONARY:
 		return
 	var t0: int = int(st["t"])
@@ -302,9 +302,9 @@ func _try_bomb_short_tap(screen_pos: Vector2, key: int) -> void:
 	if screen_pos.distance_to(p0) > 56.0:
 		return
 	var hud := get_node_or_null("HUD")
-	if hud != null and hud.has_method("get_bomb_screen_rect"):
-		if hud.get_bomb_screen_rect().has_point(screen_pos):
-			try_use_bomb()
+	if hud != null and hud.has_method("get_spell_screen_rect"):
+		if hud.get_spell_screen_rect().has_point(screen_pos):
+			try_use_spell()
 
 
 func get_best_score() -> int:
@@ -443,18 +443,18 @@ func _update_dps() -> void:
 		max_dps = current_dps
 
 
-func _update_bomb(delta: float) -> void:
-	if _bomb_cooldown_remaining > 0.0:
-		_bomb_cooldown_remaining = maxf(0.0, _bomb_cooldown_remaining - delta)
-	if _bomb_auto and _bomb_cooldown_remaining <= 0.0:
-		try_use_bomb()
+func _update_spell(delta: float) -> void:
+	if _spell_cooldown_remaining > 0.0:
+		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - delta)
+	if _spell_auto and _spell_cooldown_remaining <= 0.0:
+		try_use_spell()
 
 
-func has_bomb_auto() -> bool:
-	return _bomb_auto
+func has_spell_auto() -> bool:
+	return _spell_auto
 
 
-func _trigger_bomb_effect() -> void:
+func _trigger_spell_effect() -> void:
 	# 符卡效果：清空敌弹，并以玩家为中心发射 360° 大量我方子弹
 	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(bullet):
@@ -471,9 +471,9 @@ func _trigger_bomb_effect() -> void:
 		if player.has_method("get_boss_damage_multiplier"):
 			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
 
-	var bomb_bullet_scene := load(_BOMB_BULLET_SCENE_PATH) as PackedScene
-	if bomb_bullet_scene != null:
-		_fire_bomb_burst_waves(bomb_bullet_scene, origin, player_damage, boss_damage_multiplier)
+	var burst_scene := load(_SPELL_BURST_SCENE_PATH) as PackedScene
+	if burst_scene != null:
+		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
 
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_enemy_explosion"):
@@ -482,24 +482,24 @@ func _trigger_bomb_effect() -> void:
 		audio.play_power_up()
 
 
-func _fire_bomb_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
-	for wave in _BOMB_BURST_WAVE_COUNT:
-		var phase_offset := (TAU / float(_BOMB_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
+func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
+	for wave in _SPELL_BURST_WAVE_COUNT:
+		var phase_offset := (TAU / float(_SPELL_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
 		var radius := 12.0 + 6.0 * float(wave)
-		for i in _BOMB_BURST_BULLET_COUNT:
-			var angle := TAU * float(i) / float(_BOMB_BURST_BULLET_COUNT) + phase_offset
+		for i in _SPELL_BURST_BULLET_COUNT:
+			var angle := TAU * float(i) / float(_SPELL_BURST_BULLET_COUNT) + phase_offset
 			var dir := Vector2.RIGHT.rotated(angle)
-			var bomb_bullet := bullet_scene.instantiate()
-			bomb_bullet.global_position = origin + dir * radius
-			if "damage" in bomb_bullet:
-				bomb_bullet.damage = player_damage
-			if bomb_bullet.has_method("set_direction"):
-				bomb_bullet.set_direction(dir)
-			if bomb_bullet.has_method("set_boss_damage_multiplier"):
-				bomb_bullet.set_boss_damage_multiplier(boss_damage_multiplier)
-			get_tree().current_scene.add_child(bomb_bullet)
-		if wave < _BOMB_BURST_WAVE_COUNT - 1:
-			await get_tree().create_timer(_BOMB_BURST_WAVE_INTERVAL).timeout
+			var b := bullet_scene.instantiate()
+			b.global_position = origin + dir * radius
+			if "damage" in b:
+				b.damage = player_damage
+			if b.has_method("set_direction"):
+				b.set_direction(dir)
+			if b.has_method("set_boss_damage_multiplier"):
+				b.set_boss_damage_multiplier(boss_damage_multiplier)
+			get_tree().current_scene.add_child(b)
+		if wave < _SPELL_BURST_WAVE_COUNT - 1:
+			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL).timeout
 
 
 func _get_combo_multiplier() -> float:

@@ -17,8 +17,8 @@ var _combo_edge_bottom: ColorRect = null
 var _combo_edge_left: ColorRect = null
 var _combo_edge_right: ColorRect = null
 var _combo_full_tint: ColorRect = null
-var _bomb_flash_rect: ColorRect = null
-var _bomb_notice_label: Label = null
+var _spell_flash_rect: ColorRect = null
+var _spell_notice_label: Label = null
 @onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
@@ -27,15 +27,15 @@ var _bomb_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-var _bomb_button: Button = null
+var _spell_button: Button = null
 
 
 func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 	_main = get_parent()
-	if is_instance_valid(_main) and _main.has_signal("bomb_used"):
-		_main.bomb_used.connect(_on_bomb_used)
+	if is_instance_valid(_main) and _main.has_signal("spell_used"):
+		_main.spell_used.connect(_on_spell_used)
 	
 	# HUD 文本仅展示信息，不拦截输入
 	if _score_label != null:
@@ -61,8 +61,8 @@ func _ready() -> void:
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
 	
-	_ensure_bomb_button()
-	_ensure_bomb_vfx_nodes()
+	_ensure_spell_button()
+	_ensure_spell_vfx_nodes()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
@@ -102,7 +102,7 @@ func _process(delta: float) -> void:
 		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
-		_update_bomb_button()
+		_update_spell_button()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -118,8 +118,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				if ui == null or not ui.visible:
 					_on_pause_button_pressed()
 			KEY_SPACE:
-				if _main.has_method("try_use_bomb"):
-					_main.try_use_bomb()
+				if _main.has_method("try_use_spell"):
+					_main.try_use_spell()
 			KEY_ESCAPE:
 				var settings := get_tree().get_first_node_in_group("settings_menu")
 				if settings != null:
@@ -352,114 +352,114 @@ func _play_combo_break_sfx() -> void:
 		audio.play_player_hurt()
 
 
-func _ensure_bomb_button() -> void:
+func _ensure_spell_button() -> void:
 	var root := get_node_or_null("Root") as Control
 	if root == null:
 		return
-	_bomb_button = Button.new()
-	_bomb_button.text = "符卡"
-	_bomb_button.custom_minimum_size = Vector2(120, 56)
-	_bomb_button.add_theme_font_size_override("font_size", 22)
+	_spell_button = Button.new()
+	_spell_button.text = "符卡"
+	_spell_button.custom_minimum_size = Vector2(120, 56)
+	_spell_button.add_theme_font_size_override("font_size", 22)
 	if _pixel_bold_font != null:
-		_bomb_button.add_theme_font_override("font", _pixel_bold_font)
-	_bomb_button.anchor_left = 0.82
-	_bomb_button.anchor_right = 0.98
-	_bomb_button.anchor_top = 0.86
-	_bomb_button.anchor_bottom = 0.94
+		_spell_button.add_theme_font_override("font", _pixel_bold_font)
+	_spell_button.anchor_left = 0.82
+	_spell_button.anchor_right = 0.98
+	_spell_button.anchor_top = 0.86
+	_spell_button.anchor_bottom = 0.94
 	# 不抢触摸：拖动经符卡区不断流；发动改由 Main 未处理输入里短按检测
-	_bomb_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_button.focus_mode = Control.FOCUS_NONE
-	_bomb_button.pressed.connect(_on_bomb_button_pressed)
-	root.add_child(_bomb_button)
+	_spell_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_button.focus_mode = Control.FOCUS_NONE
+	_spell_button.pressed.connect(_on_spell_button_pressed)
+	root.add_child(_spell_button)
 
 
-func get_bomb_screen_rect() -> Rect2:
-	if _bomb_button == null or not is_instance_valid(_bomb_button):
+func get_spell_screen_rect() -> Rect2:
+	if _spell_button == null or not is_instance_valid(_spell_button):
 		return Rect2()
-	return _bomb_button.get_global_rect()
+	return _spell_button.get_global_rect()
 
 
-func _update_bomb_button() -> void:
-	if _bomb_button == null or not is_instance_valid(_main):
+func _update_spell_button() -> void:
+	if _spell_button == null or not is_instance_valid(_main):
 		return
-	if not _main.has_method("get_bomb_cooldown_remaining"):
+	if not _main.has_method("get_spell_cooldown_remaining"):
 		return
-	var cd := float(_main.get_bomb_cooldown_remaining())
+	var cd := float(_main.get_spell_cooldown_remaining())
 	if cd > 0.0:
-		_bomb_button.disabled = true
-		_bomb_button.text = "符卡 %.1fs" % cd
+		_spell_button.disabled = true
+		_spell_button.text = "符卡 %.1fs" % cd
 	else:
-		_bomb_button.disabled = false
-		_bomb_button.text = "符卡"
+		_spell_button.disabled = false
+		_spell_button.text = "符卡"
 
 
-func _on_bomb_button_pressed() -> void:
+func _on_spell_button_pressed() -> void:
 	if not is_instance_valid(_main):
 		return
-	if _main.has_method("try_use_bomb"):
-		_main.try_use_bomb()
+	if _main.has_method("try_use_spell"):
+		_main.try_use_spell()
 
 
-func _ensure_bomb_vfx_nodes() -> void:
+func _ensure_spell_vfx_nodes() -> void:
 	var root := get_node_or_null("Root") as Control
 	if root == null:
 		return
 
-	_bomb_flash_rect = ColorRect.new()
-	_bomb_flash_rect.visible = false
-	_bomb_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
-	_bomb_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_bomb_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
-	root.add_child(_bomb_flash_rect)
+	_spell_flash_rect = ColorRect.new()
+	_spell_flash_rect.visible = false
+	_spell_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
+	_spell_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_spell_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(_spell_flash_rect)
 
-	_bomb_notice_label = Label.new()
-	_bomb_notice_label.visible = false
-	_bomb_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_bomb_notice_label.text = "符卡发动!"
+	_spell_notice_label = Label.new()
+	_spell_notice_label.visible = false
+	_spell_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_spell_notice_label.text = "符卡发动!"
 	if _pixel_bold_font != null:
-		_bomb_notice_label.add_theme_font_override("font", _pixel_bold_font)
-	_bomb_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_bomb_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_bomb_notice_label.add_theme_font_size_override("font_size", 44)
-	_bomb_notice_label.anchor_left = 0.2
-	_bomb_notice_label.anchor_right = 0.8
-	_bomb_notice_label.anchor_top = 0.42
-	_bomb_notice_label.anchor_bottom = 0.52
-	root.add_child(_bomb_notice_label)
+		_spell_notice_label.add_theme_font_override("font", _pixel_bold_font)
+	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_spell_notice_label.add_theme_font_size_override("font_size", 44)
+	_spell_notice_label.anchor_left = 0.2
+	_spell_notice_label.anchor_right = 0.8
+	_spell_notice_label.anchor_top = 0.42
+	_spell_notice_label.anchor_bottom = 0.52
+	root.add_child(_spell_notice_label)
 
 
-func _on_bomb_used() -> void:
-	_play_bomb_burst_vfx()
+func _on_spell_used() -> void:
+	_play_spell_burst_vfx()
 
 
-func _play_bomb_burst_vfx() -> void:
-	if _bomb_flash_rect != null:
-		_bomb_flash_rect.visible = true
+func _play_spell_burst_vfx() -> void:
+	if _spell_flash_rect != null:
+		_spell_flash_rect.visible = true
 
-	if _bomb_notice_label != null:
-		_bomb_notice_label.visible = true
-		_bomb_notice_label.text = "符卡爆发!"
-		_bomb_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
+	if _spell_notice_label != null:
+		_spell_notice_label.visible = true
+		_spell_notice_label.text = "符卡爆发!"
+		_spell_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
 
 	for i in 4:
 		var alpha := 0.52 - 0.08 * float(i)
-		if _bomb_flash_rect != null:
-			_bomb_flash_rect.modulate = Color(1, 1, 1, 1)
-			_bomb_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
+		if _spell_flash_rect != null:
+			_spell_flash_rect.modulate = Color(1, 1, 1, 1)
+			_spell_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
 			var flash_tween := create_tween()
-			flash_tween.tween_property(_bomb_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		if _bomb_notice_label != null:
-			_bomb_notice_label.scale = Vector2.ONE
-			_bomb_notice_label.modulate.a = 1.0
+			flash_tween.tween_property(_spell_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		if _spell_notice_label != null:
+			_spell_notice_label.scale = Vector2.ONE
+			_spell_notice_label.modulate.a = 1.0
 			var text_tween := create_tween()
-			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE * 1.18, 0.06).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-			text_tween.tween_property(_bomb_notice_label, "scale", Vector2.ONE, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+			text_tween.tween_property(_spell_notice_label, "scale", Vector2.ONE * 1.18, 0.06).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			text_tween.tween_property(_spell_notice_label, "scale", Vector2.ONE, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		if i < 3:
 			await get_tree().create_timer(0.10).timeout
 
-	if _bomb_flash_rect != null:
-		_bomb_flash_rect.visible = false
-	if _bomb_notice_label != null:
-		_bomb_notice_label.visible = false
-		_bomb_notice_label.modulate = Color(1, 1, 1, 1)
+	if _spell_flash_rect != null:
+		_spell_flash_rect.visible = false
+	if _spell_notice_label != null:
+		_spell_notice_label.visible = false
+		_spell_notice_label.modulate = Color(1, 1, 1, 1)
