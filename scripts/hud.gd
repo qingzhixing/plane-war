@@ -27,6 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
+var _stats_label: Label = null
 var _spell_button: Button = null
 
 
@@ -48,6 +49,9 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ensure_stats_label()
+	if _stats_label != null:
+		_stats_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -102,6 +106,7 @@ func _process(delta: float) -> void:
 		_update_combo_screen_vfx(c)
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
+		_update_stats_label()
 		_update_spell_button()
 
 
@@ -350,6 +355,87 @@ func _play_combo_break_sfx() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
 		audio.play_player_hurt()
+
+
+func _ensure_stats_label() -> void:
+	if _stats_label != null and is_instance_valid(_stats_label):
+		return
+	var existing := get_node_or_null("Root/TopRightVBox/StatsLabel") as Label
+	if existing != null:
+		_stats_label = existing
+		return
+	var vbox := get_node_or_null("Root/TopRightVBox") as VBoxContainer
+	if vbox == null:
+		return
+	var lab := Label.new()
+	lab.name = "StatsLabel"
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lab.theme_override_font_sizes["font_size"] = 17
+	lab.add_theme_color_override("font_color", Color(0.82, 0.88, 0.96, 0.98))
+	vbox.add_child(lab)
+	_stats_label = lab
+
+
+func _update_stats_label() -> void:
+	if _stats_label == null or not is_instance_valid(_stats_label):
+		return
+	var lines: PackedStringArray = []
+	if is_instance_valid(_player):
+		var eff_iv: float = 0.2
+		if _player.has_method("get_effective_fire_interval"):
+			eff_iv = float(_player.get_effective_fire_interval())
+		var rof: float = 1.0 / maxf(0.02, eff_iv)
+		var bc: int = 1
+		var bmax: int = 6
+		if _player.has_method("get_bullet_count"):
+			bc = int(_player.get_bullet_count())
+		if _player.has_method("get_max_bullet_count"):
+			bmax = int(_player.get_max_bullet_count())
+		var mode_str := "机炮"
+		if _player.has_method("get_weapon_mode") and str(_player.get_weapon_mode()) == "arrow":
+			mode_str = "弓箭"
+		var main_cd := 0.0
+		if _player.has_method("get_main_fire_cd_remaining"):
+			main_cd = float(_player.get_main_fire_cd_remaining())
+		lines.append("射速 %.1f/s  齐射 %d/%d  %s" % [rof, bc, bmax, mode_str])
+		lines.append("主炮间隔 %.2fs（下次 %.2fs）" % [eff_iv, main_cd])
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
+			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
+			var ar_rem := 0.0
+			if _player.has_method("get_arrow_cd_remaining"):
+				ar_rem = float(_player.get_arrow_cd_remaining())
+			var ar_n := 1
+			if _player.has_method("get_arrow_shot_count"):
+				ar_n = int(_player.get_arrow_shot_count())
+			lines.append("弓箭 %.1f/%.1fs  ×%d" % [ar_rem, ar, ar_n])
+		else:
+			lines.append("弓箭 —")
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb"):
+			var bm := float(_player.bomb_auto_interval) if "bomb_auto_interval" in _player else 2.5
+			var bm_rem := 0.0
+			if _player.has_method("get_bomb_cd_remaining"):
+				bm_rem = float(_player.get_bomb_cd_remaining())
+			var bm_n := 1
+			if _player.has_method("get_bomb_shot_count"):
+				bm_n = int(_player.get_bomb_shot_count())
+			lines.append("炸弹 %.1f/%.1fs  ×%d" % [bm_rem, bm, bm_n])
+		else:
+			lines.append("炸弹 —")
+		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang"):
+			var air := 0
+			var vol := 1
+			if _player.has_method("get_boomerang_airborne"):
+				air = int(_player.get_boomerang_airborne())
+			if _player.has_method("get_boomerang_shot_count"):
+				vol = int(_player.get_boomerang_shot_count())
+			lines.append("回旋镖 场上%d  齐射%d" % [air, vol])
+		else:
+			lines.append("回旋镖 —")
+	if is_instance_valid(_main) and _main.has_method("get_spell_cooldown_remaining"):
+		var sp_r := float(_main.get_spell_cooldown_remaining())
+		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
+		lines.append("符卡 %.1f/%.1fs" % [sp_r, sp_t])
+	_stats_label.text = "\n".join(lines)
 
 
 func _ensure_spell_button() -> void:

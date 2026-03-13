@@ -292,6 +292,40 @@ func get_weapon_mode() -> String:
 	return _weapon_mode
 
 
+## HUD：有效主炮射击间隔（秒/发，含连击射速倍率）
+func get_effective_fire_interval() -> float:
+	return fire_interval / maxf(0.1, _combo_fire_rate_mult)
+
+
+## HUD：距离下一发主武器的时间（秒）
+func get_main_fire_cd_remaining() -> float:
+	return maxf(0.0, _fire_timer)
+
+
+func get_arrow_cd_remaining() -> float:
+	return maxf(0.0, _arrow_auto_timer)
+
+
+func get_bomb_cd_remaining() -> float:
+	return maxf(0.0, _bomb_auto_timer)
+
+
+func get_boomerang_airborne() -> int:
+	return _boomerang_airborne
+
+
+func get_boomerang_shot_count() -> int:
+	return maxi(1, _boomerang_shot_count)
+
+
+func get_arrow_shot_count() -> int:
+	return maxi(1, _arrow_shot_count)
+
+
+func get_bomb_shot_count() -> int:
+	return maxi(1, _bomb_shot_count)
+
+
 func set_combo_buff_tier(tier: int) -> void:
 	_combo_fire_rate_mult = 1.0
 	_combo_move_speed_mult = 1.0
