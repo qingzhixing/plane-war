@@ -11,7 +11,8 @@
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
-[ext_resource type="Script" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
+[ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
+[ext_resource type="Script" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -106,6 +107,10 @@ text = "Combo: XXX"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
+process_mode = 3
+script = ExtResource("13_post_boss")
+
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
 script = ExtResource("5_game_over")
@@ -177,7 +182,7 @@ script = ExtResource("8_settings_ui")
 process_mode = 3
 script = ExtResource("10_boss_hud")
 
-[node name="DebugUpgradePicker" type="CanvasLayer" parent="."]
+[node name="DebugUpgradePicker" type="CanvasLayer" parent="." unique_id=1720892747]
 process_mode = 4
 script = ExtResource("12_debug_upgrades")
 

@@ -11,6 +11,9 @@ var _exp_to_next: int = 10
 var _continue_used: bool = false
 var _wave: int = 1
 var _boss_spawned: bool = false
+## Boss 后继续挑战层数；敌机/Boss HP ×1.12^tier，得分乘区每层 +8%
+var threat_tier: int = 0
+var _pending_post_boss_upgrade: bool = false
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -57,6 +60,9 @@ func _ready() -> void:
 	_load_records()
 
 	_spawner = get_node_or_null("EnemySpawner")
+	var pbc := get_node_or_null("PostBossChoice")
+	if pbc != null and pbc.has_method("bind_main"):
+		pbc.bind_main(self)
 	_start_wave()
 
 
@@ -76,6 +82,14 @@ func _start_wave() -> void:
 
 func get_wave() -> int:
 	return _wave
+
+
+func get_threat_tier() -> int:
+	return threat_tier
+
+
+func get_threat_hp_mult() -> float:
+	return pow(1.12, float(threat_tier))
 
 
 func on_wave_cleared() -> void:
@@ -98,6 +112,11 @@ func on_wave_cleared() -> void:
 
 func on_upgrade_selected() -> void:
 	_waiting_upgrade_choice = false
+
+	if _pending_post_boss_upgrade:
+		_pending_post_boss_upgrade = false
+		_start_wave()
+		return
 
 	if _debug_skip_to_boss_active:
 		_debug_upgrades_needed -= 1
@@ -474,6 +493,11 @@ func _spawn_boss() -> void:
 	var boss := boss_scene.instantiate()
 	if boss == null:
 		return
+	var hp_m := get_threat_hp_mult()
+	if "max_hp" in boss:
+		boss.max_hp = int(round(float(boss.max_hp) * hp_m))
+	if boss.has_method("apply_threat_scaling"):
+		boss.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
 	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
@@ -500,6 +524,30 @@ func _debug_skip_to_boss() -> void:
 
 	# 计算还需要多少次升级（当前波次到 Boss 波次之间）
 	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
+
+
+func on_boss_defeated() -> void:
+	get_tree().paused = true
+	var pbc := get_node_or_null("PostBossChoice")
+	if pbc != null and pbc.has_method("show_choice"):
+		pbc.show_choice()
+	else:
+		get_tree().call_group("game_over_ui", "show_game_over")
+
+
+func continue_after_boss() -> void:
+	threat_tier += 1
+	_score_multiplier += 0.08
+	_boss_spawned = false
+	_wave = 1
+	_pending_boss_spawn = false
+	for b in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(b):
+			b.queue_free()
+	get_tree().paused = false
+	_waiting_upgrade_choice = true
+	_pending_post_boss_upgrade = true
+	emit_signal("level_up")
 	if _debug_upgrades_needed <= 0:
 		_debug_skip_to_boss_active = false
 		_spawn_boss()

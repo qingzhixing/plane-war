@@ -68,8 +68,11 @@ func _on_spawn_timeout() -> void:
 		return
 
 	var enemy := scene_to_use.instantiate()
+	var tier := 0
+	if main != null and main.has_method("get_threat_tier"):
+		tier = main.get_threat_tier()
 	if enemy != null and enemy.has_method("apply_wave_scaling"):
-		enemy.apply_wave_scaling(wave)
+		enemy.apply_wave_scaling(wave, tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	var x := randf_range(50.0, viewport_rect.size.x - 50.0)
 	enemy.global_position = Vector2(x, -50.0)

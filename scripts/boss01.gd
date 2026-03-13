@@ -11,6 +11,7 @@ var _phase_b: bool = false
 var _fire_timer: float = 0.0
 var _move_time: float = 0.0
 var _phase_transition_timer: float = 0.0
+var _bullet_speed_mult: float = 1.0
 
 const _HIT_FLASH_DURATION := 0.14
 var _hit_flash_timer: float = 0.0
@@ -18,6 +19,10 @@ var _hit_material: ShaderMaterial
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
+
+func apply_threat_scaling(tier: int) -> void:
+	_bullet_speed_mult = minf(1.35, pow(1.04, float(tier)))
+
 
 func _ready() -> void:
 	_hp = max_hp
@@ -106,7 +111,7 @@ func _fire_phase_b() -> void:
 		var bullet := bullet_scene.instantiate()
 		bullet.global_position = global_position + dir * 34.0
 		if "speed" in bullet:
-			bullet.speed = 380.0
+			bullet.speed = 380.0 * _bullet_speed_mult
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
@@ -120,7 +125,7 @@ func _fire_phase_b() -> void:
 		var bullet := bullet_scene.instantiate()
 		bullet.global_position = global_position + dir * 44.0
 		if "speed" in bullet:
-			bullet.speed = 280.0
+			bullet.speed = 280.0 * _bullet_speed_mult
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
@@ -147,7 +152,11 @@ func _on_dead() -> void:
 	_update_boss_hud()
 	_play_boss_explosion_sfx()
 	get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
-	get_tree().call_group("game_over_ui", "show_game_over")
+	var main := get_tree().current_scene
+	if main != null and main.has_method("on_boss_defeated"):
+		main.on_boss_defeated()
+	else:
+		get_tree().call_group("game_over_ui", "show_game_over")
 	queue_free()
 
 
