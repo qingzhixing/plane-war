@@ -58,7 +58,7 @@ const _SPELL_COOLDOWN_SECONDS: float = 12.0
 const _SPELL_BURST_WAVE_COUNT: int = 4
 const _SPELL_BURST_WAVE_INTERVAL: float = 0.10
 const _SPELL_BURST_BULLET_COUNT: int = 40
-const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
+const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerSpellBullet.tscn"
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -455,11 +455,7 @@ func has_spell_auto() -> bool:
 
 
 func _trigger_spell_effect() -> void:
-	# 符卡效果：清空敌弹，并以玩家为中心发射 360° 大量我方子弹
-	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(bullet):
-			bullet.queue_free()
-
+	# 符卡效果：周身 360° 弹幕；敌弹靠符卡弹碰撞逐发消除（不全屏清弹）
 	var player := get_node_or_null(player_path)
 	var origin := get_viewport().get_visible_rect().size * 0.5
 	var player_damage := 1.0
