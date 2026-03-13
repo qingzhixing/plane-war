@@ -11,6 +11,7 @@ const ENEMY_INJURED_STREAM: AudioStream = preload("res://assets/SFX/enemy/EnemyI
 const PLAYER_SHOOT_STREAM: AudioStream = preload("res://assets/SFX/player/Shoot.wav")
 const PLAYER_HURT_STREAM: AudioStream = preload("res://assets/SFX/player/hurt.wav")
 const PLAYER_POWER_UP_STREAM: AudioStream = preload("res://assets/SFX/player/power_up.wav")
+const GRAZE_STREAM: AudioStream = preload("res://assets/SFX/player/Graze.wav")
 const ENEMY_EXPLOSION_STREAMS: Array[AudioStream] = [
 	preload("res://assets/SFX/explode/Explosion1.ogg"),
 	preload("res://assets/SFX/explode/Explosion2.ogg"),
@@ -24,6 +25,8 @@ var _bgm_player: AudioStreamPlayer
 var _sfx_player: AudioStreamPlayer
 var _shoot_sfx_player: AudioStreamPlayer
 var _ui_sfx_player: AudioStreamPlayer
+var _graze_sfx_player: AudioStreamPlayer
+var _last_graze_sfx_ms: int = 0
 
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
@@ -62,6 +65,11 @@ func _ready() -> void:
 	_ui_sfx_player = AudioStreamPlayer.new()
 	_ui_sfx_player.bus = "Master"
 	add_child(_ui_sfx_player)
+	_apply_sfx_volume()
+
+	_graze_sfx_player = AudioStreamPlayer.new()
+	_graze_sfx_player.bus = "Master"
+	add_child(_graze_sfx_player)
 	_apply_sfx_volume()
 
 	_reset_playlist()
@@ -144,6 +152,20 @@ func play_power_up() -> void:
 		return
 	_ui_sfx_player.stream = PLAYER_POWER_UP_STREAM
 	_ui_sfx_player.play()
+
+
+## 擦弹音效；全局节流避免高频重叠时爆音
+func play_graze() -> void:
+	if _graze_sfx_player == null:
+		return
+	if _sfx_muted:
+		return
+	var now: int = Time.get_ticks_msec()
+	if now - _last_graze_sfx_ms < 70:
+		return
+	_last_graze_sfx_ms = now
+	_graze_sfx_player.stream = GRAZE_STREAM
+	_graze_sfx_player.play()
 
 
 func set_bgm_volume_linear(value: float) -> void:
@@ -231,9 +253,13 @@ func _apply_sfx_volume() -> void:
 			_shoot_sfx_player.volume_db = -80.0
 		if _ui_sfx_player != null:
 			_ui_sfx_player.volume_db = -80.0
+		if _graze_sfx_player != null:
+			_graze_sfx_player.volume_db = -80.0
 	else:
 		_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
 		if _shoot_sfx_player != null:
 			_shoot_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
 		if _ui_sfx_player != null:
 			_ui_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
+		if _graze_sfx_player != null:
+			_graze_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
