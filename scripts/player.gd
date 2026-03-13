@@ -382,6 +382,11 @@ func get_rof_overflow_damage_for_hud() -> float:
 	return _rof_overflow_damage
 
 
+## HUD：溢出部分进乘区后的单发加成（与 get_effective_main_bullet_damage 中溢出项一致）
+func get_main_damage_overflow_contribution_for_hud() -> float:
+	return float(_rof_overflow_damage) * _damage_multiplier
+
+
 func get_theoretical_main_rof() -> float:
 	return _main_rof()
 

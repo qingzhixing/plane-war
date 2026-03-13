@@ -28,7 +28,6 @@ var _spell_notice_label: Label = null
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
 @onready var _shield_stats: Label = %ShieldStatsLabel
-@onready var _overflow_stats: Label = %OverflowStatsLabel
 @onready var _main_gun_stats: RichTextLabel = %MainGunStatsLabel
 @onready var _side_weapon_stats: RichTextLabel = %SideWeaponStatsLabel
 @onready var _spell_stats: RichTextLabel = %SpellStatsLabel
@@ -57,8 +56,6 @@ func _ready() -> void:
 	for n in [
 		get_node_or_null("Root/LeftStatsVBox/ShieldTitleLabel"),
 		_shield_stats,
-		get_node_or_null("Root/LeftStatsVBox/OverflowTitleLabel"),
-		_overflow_stats,
 		get_node_or_null("Root/LeftStatsVBox/MainGunTitleLabel"),
 		_main_gun_stats,
 		get_node_or_null("Root/LeftStatsVBox/SideWeaponTitleLabel"),
@@ -390,7 +387,7 @@ func _play_combo_break_sfx() -> void:
 
 
 func _update_stats_label() -> void:
-	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null or _shield_stats == null or _overflow_stats == null:
+	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null or _shield_stats == null:
 		return
 	const C_FR := "#ffcc66"
 	const C_BS := "#7eb8da"
@@ -426,18 +423,31 @@ func _update_stats_label() -> void:
 		var eff_dmg := 1.0
 		if _player.has_method("get_effective_main_bullet_damage"):
 			eff_dmg = float(_player.get_effective_main_bullet_damage())
+		var ov_contrib := 0.0
+		if _player.has_method("get_main_damage_overflow_contribution_for_hud"):
+			ov_contrib = float(_player.get_main_damage_overflow_contribution_for_hud())
+		var base_dmg := maxf(0.1, eff_dmg - ov_contrib)
 		var dmg_line := "主炮伤害 "
-		if absf(eff_dmg - roundf(eff_dmg)) < 0.05:
-			dmg_line += "%d" % int(roundf(eff_dmg))
+		if ov_contrib > 0.005:
+			if absf(base_dmg - roundf(base_dmg)) < 0.05 and absf(ov_contrib - roundf(ov_contrib)) < 0.05:
+				dmg_line += "%d [color=%s][+%d][/color]" % [int(roundf(base_dmg)), C_FR, int(roundf(ov_contrib))]
+			elif absf(base_dmg - roundf(base_dmg)) < 0.05:
+				dmg_line += "%d [color=%s][+%.2f][/color]" % [int(roundf(base_dmg)), C_FR, ov_contrib]
+			else:
+				dmg_line += "%.1f [color=%s][+%.2f][/color]" % [base_dmg, C_FR, ov_contrib]
 		else:
-			dmg_line += "%.1f" % eff_dmg
+			if absf(eff_dmg - roundf(eff_dmg)) < 0.05:
+				dmg_line += "%d" % int(roundf(eff_dmg))
+			else:
+				dmg_line += "%.1f" % eff_dmg
 		main_lines.append(dmg_line)
-		main_lines.append("理论射速 %.0f/s · 实际射速 %.0f/s" % [rof_theory, rof_actual])
 		var cap_h: float = 75.0
 		if _player.get("max_main_rof") != null:
 			cap_h = float(_player.max_main_rof)
-		if rof_theory > cap_h + 1.0:
-			main_lines.append("[color=%s]超 %.0f/s 部分已转攻击（封顶 %.0f/s）[/color]" % [C_FR, cap_h, cap_h])
+		if rof_theory > cap_h + 0.5:
+			main_lines.append("理论射速 %.0f发/秒 · 实际射速 %.0f发/秒（封顶 %.0f发/秒）" % [rof_theory, rof_actual, cap_h])
+		else:
+			main_lines.append("射速 %.0f发/秒" % rof_actual)
 		if fr_mult > 1.009:
 			main_lines.append("[color=%s]连击攻速×%.2f[/color]" % [C_FR, fr_mult])
 		main_lines.append("齐射：%d/%d 发 · %s" % [bc, bmax, mode_str])
@@ -452,23 +462,6 @@ func _update_stats_label() -> void:
 		if bs_mult > 1.009:
 			spd_line += "  [color=%s]基数%.0f · 连击+%.0f%%[/color]" % [C_BS, base_spd, (bs_mult - 1.0) * 100.0]
 		main_lines.append(spd_line)
-		# 攻速溢出转化：独立统计块（与主炮块分开）
-		if _player.has_method("get_theoretical_main_rof") and _player.has_method("get_rof_overflow_damage_for_hud"):
-			var ov2: float = float(_player.get_rof_overflow_damage_for_hud())
-			var th2: float = float(_player.get_theoretical_main_rof())
-			if ov2 > 0.001:
-				var cap_r: float = 75.0
-				if _player.get("max_main_rof") != null:
-					cap_r = float(_player.max_main_rof)
-				var pct: float = (th2 - cap_r) / cap_r * 100.0
-				_overflow_stats.text = "理论射速 %.0f/s（实际 %.0f/s）\n溢出 %.1f%% · 1%%→0.02 伤\n转化攻击 +%.2f" % [th2, cap_r, pct, ov2]
-			else:
-				var cap2: float = 75.0
-				if _player.get("max_main_rof") != null:
-					cap2 = float(_player.max_main_rof)
-				_overflow_stats.text = "无（理论 %.0f/s ≤ %.0f/s）" % [th2, cap2]
-		else:
-			_overflow_stats.text = "—"
 		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
 			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
 			var ar_rem := 0.0
