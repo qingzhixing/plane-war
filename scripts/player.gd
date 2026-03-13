@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var bullet_scene_basic: PackedScene
 @export var bullet_scene_arrow: PackedScene
 @export var bullet_scene_boomerang: PackedScene
+@export var bullet_scene_bomb: PackedScene
 @export var hit_invulnerable_seconds: float = 0.35
 @export var arrow_auto_interval: float = 1.4
 @export var boomerang_auto_interval: float = 2.6
@@ -40,6 +41,7 @@ var _boomerang_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://scenes/bullets/PlayerArrow.tscn")
 @onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
+@onready var _fallback_bullet_scene_bomb: PackedScene = preload("res://scenes/bullets/PlayerBomb.tscn")
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
 const _HIT_BLINK_FREQ := 20.0
@@ -56,6 +58,8 @@ func _ready() -> void:
 		bullet_scene_arrow = _fallback_bullet_scene_arrow
 	if bullet_scene_boomerang == null and _fallback_bullet_scene_boomerang != null:
 		bullet_scene_boomerang = _fallback_bullet_scene_boomerang
+	if bullet_scene_bomb == null and _fallback_bullet_scene_bomb != null:
+		bullet_scene_bomb = _fallback_bullet_scene_bomb
 	_arrow_auto_timer = arrow_auto_interval
 	_boomerang_auto_timer = boomerang_auto_interval
 	_init_shield()
@@ -138,6 +142,8 @@ func _spawn_weapon_shot() -> void:
 			_spawn_arrow_shot()
 		"boomerang":
 			_spawn_boomerang_shot()
+		"bomb":
+			_spawn_bomb_shot()
 		_:
 			_spawn_default_shot()
 
@@ -158,6 +164,14 @@ func _spawn_arrow_shot() -> void:
 		var dir := Vector2(sin(angle), -cos(angle))
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 12.0 * (i - (n - 1) * 0.5)
 		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight", side_offset)
+
+
+func _spawn_bomb_shot() -> void:
+	var n: int = clampi(_bullet_count, 1, _max_bullet_count)
+	for i in n:
+		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
+		var dir := Vector2(sin(angle), -cos(angle))
+		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", Vector2.ZERO)
 
 
 func _spawn_boomerang_shot() -> void:
@@ -301,6 +315,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if not has_weapon_unlocked("boomerang"):
 				_weapon_unlocked["boomerang"] = true
 			_boomerang_shot_count = max(1, _boomerang_shot_count + 1)
+		"bomb_weapon":
+			_weapon_mode = "bomb"
 
 
 func set_shield_active(active: bool) -> void:

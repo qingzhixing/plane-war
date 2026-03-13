@@ -31,5 +31,5 @@ initial_velocity_max = 340.0
 angular_velocity_min = -520.0
 angular_velocity_max = 520.0
 scale_amount_max = 4.0
-color = Color(0.5, 0.92, 1, 1)
+color = Color(0.9557983, 0.8563839, 0, 1)
 script = ExtResource("1")

@@ -18,6 +18,7 @@ const _ALL: Array[Dictionary] = [
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
 	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
 	{"id": "bomb_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
+	{"id": "bomb_weapon", "name": "挂载炸弹", "desc": "主武器改为炸弹 AoE"},
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 

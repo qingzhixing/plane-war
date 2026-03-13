@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBullet.tscn" id="2_basic"]
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerArrow.tscn" id="3_arrow"]
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBoomerang.tscn" id="4_boomerang"]
+[ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBomb.tscn" id="5_bomb"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://assets/sprites/player/player_ship_base.png" id="5_tex"]
 [ext_resource type="Script" uid="uid://1u2vm5sqjwma" path="res://scripts/hit_judgement_visual.gd" id="6_hit"]
 [ext_resource type="Script" uid="uid://dc24c6fqlvntc" path="res://scripts/player_graze_area.gd" id="7_graze"]
@@ -22,6 +23,7 @@ script = ExtResource("1_p0vlq")
 bullet_scene_basic = ExtResource("2_basic")
 bullet_scene_arrow = ExtResource("3_arrow")
 bullet_scene_boomerang = ExtResource("4_boomerang")
+bullet_scene_bomb = ExtResource("5_bomb")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1782819317]
 shape = SubResource("CircleShape2D_3li8b")
