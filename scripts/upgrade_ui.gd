@@ -23,7 +23,7 @@ const UPGRADES: Array[Dictionary] = [
 
 	# 通用 / 生存 / 表现
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
-	{"id": "combo_guard", "name": "稳态护盾", "desc": "抵消一次受击导致的连击中断"},
+	{"id": "combo_guard", "name": "稳态护盾", "desc": "护盾 +1 层；受击时消耗 1 层代替断连，可叠加"},
 	{"id": "spell_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
 	{"id": "spell_auto", "name": "自动符卡", "desc": "【一次性】符卡冷却再 -50%，冷却结束自动释放"},
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},

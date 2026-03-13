@@ -27,6 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
+@onready var _shield_stats: Label = %ShieldStatsLabel
 @onready var _main_gun_stats: RichTextLabel = %MainGunStatsLabel
 @onready var _side_weapon_stats: RichTextLabel = %SideWeaponStatsLabel
 @onready var _spell_stats: RichTextLabel = %SpellStatsLabel
@@ -53,6 +54,8 @@ func _ready() -> void:
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for n in [
+		get_node_or_null("Root/LeftStatsVBox/ShieldTitleLabel"),
+		_shield_stats,
 		get_node_or_null("Root/LeftStatsVBox/MainGunTitleLabel"),
 		_main_gun_stats,
 		get_node_or_null("Root/LeftStatsVBox/SideWeaponTitleLabel"),
@@ -381,7 +384,7 @@ func _play_combo_break_sfx() -> void:
 
 
 func _update_stats_label() -> void:
-	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null:
+	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null or _shield_stats == null:
 		return
 	const C_FR := "#ffcc66"
 	const C_BS := "#7eb8da"
@@ -472,6 +475,13 @@ func _update_stats_label() -> void:
 		var sp_r := float(_main.get_spell_cooldown_remaining())
 		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
 		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
+	var guard_n := 0
+	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
+		guard_n = int(_main.get_combo_guard_charges())
+	if guard_n <= 0:
+		_shield_stats.text = "无（受击会断连击）"
+	else:
+		_shield_stats.text = "%d 层 · 每次受击消耗 1 层免断连" % guard_n
 	_main_gun_stats.text = "\n".join(main_lines) if main_lines.size() > 0 else "—"
 	_side_weapon_stats.text = "\n".join(side_lines) if side_lines.size() > 0 else "—"
 	_spell_stats.text = spell_line

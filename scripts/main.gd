@@ -379,6 +379,10 @@ func record_enemy_killed(_enemy: Node, base_score: int) -> void:
 	score += gained
 
 
+func get_combo_guard_charges() -> int:
+	return _combo_guard_charges
+
+
 func on_player_hit() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
