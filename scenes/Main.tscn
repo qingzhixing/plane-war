@@ -29,6 +29,33 @@ enemy_scene_elite = ExtResource("9_enemy_elite")
 [node name="Timer" type="Timer" parent="EnemySpawner" unique_id=2032949683]
 autostart = true
 
+[node name="ComboBackLayer" type="CanvasLayer" parent="." unique_id=1888123001]
+layer = -128
+process_mode = 3
+
+[node name="Root" type="Control" parent="ComboBackLayer" unique_id=1888123002]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("11_ui_theme")
+
+[node name="ComboLabel" type="Label" parent="ComboBackLayer/Root" unique_id=1529816770]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1.0
+offset_top = 350.0
+offset_right = 721.0
+offset_bottom = 476.0
+theme_override_font_sizes/font_size = 74
+text = "Combo: XXX"
+horizontal_alignment = 1
+vertical_alignment = 1
+mouse_filter = 2
+
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1215533867]
 process_mode = 3
 script = ExtResource("4_hud")
@@ -43,20 +70,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("11_ui_theme")
-
-[node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
-unique_name_in_owner = true
-z_index = -50
-layout_mode = 0
-offset_left = 1.0
-offset_top = 350.0
-offset_right = 721.0
-offset_bottom = 476.0
-theme_override_font_sizes/font_size = 74
-text = "Combo: XXX"
-horizontal_alignment = 1
-vertical_alignment = 1
-mouse_filter = 2
 
 [node name="WaveLabel" type="Label" parent="HUD/Root" unique_id=1566627949]
 unique_name_in_owner = true

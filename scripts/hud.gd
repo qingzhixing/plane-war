@@ -42,7 +42,6 @@ func _ready() -> void:
 		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _combo_label != null:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_combo_label.z_index = -50
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
 	_ensure_combo_notice_label()
