@@ -40,7 +40,7 @@
 - 符卡/炸弹按钮（若启用，可放在独立容器中）；触发时应有明显的全屏闪光与文字提示，并能感知到“连续爆发”节奏
 - **评分与表现相关 HUD（Score / Combo / DPS）**：通过容器组件（如 `VBoxContainer`/`HBoxContainer`）进行分组和对齐，避免单纯靠坐标硬排。
   - `ScoreLabel`：当前分数（Score），推荐放在右上角信息区域的一行，文本形式如「Score: 12345」。
-  - `ComboLabel`：单独放在 **`CanvasLayer.layer = -128`**（`ComboBackLayer`），画在 **所有机体/子弹 Sprite 之下**；其余 HUD 用 **`layer = 1`** 盖在游戏与 Combo 字之上；连击提示与边缘 VFX 仍在 HUD 层。  
+  - `ComboLabel`：单独放在 **`CanvasLayer.layer = -128`**（`ComboBackLayer`），画在 **所有机体/子弹 Sprite 之下**；其余 HUD / 结算 / 升级等仍为默认层，叠在游戏与 Combo 之上；连击提示与边缘 VFX 仍在 HUD 层。  
     - **位置调整约定**：允许在场景中单独摆放 `ComboLabel`（不一定强制在 `TopRightVBox` 内），`hud.gd` 会优先在右上信息容器中查找，若未找到则回退到 `Root` 下查找同名节点。
     - **颜色反馈约定**：连击数越高，`ComboLabel` 的颜色越接近暖色/高亮色，以体现紧张和成就感，例如：
       - 低连击（如 1–9 连）：使用默认/中性颜色；
