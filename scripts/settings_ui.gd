@@ -189,13 +189,13 @@ func show_settings_from_menu() -> void:
 
 
 func _apply_run_only_buttons_visibility(in_run: bool) -> void:
-	var show := in_run
+	var run_ui := in_run
 	if _end_run_button != null:
-		_end_run_button.visible = show
+		_end_run_button.visible = run_ui
 	if _skip_boss_button != null:
-		_skip_boss_button.visible = show
+		_skip_boss_button.visible = run_ui
 	if _debug_upgrades_button != null:
-		_debug_upgrades_button.visible = show
+		_debug_upgrades_button.visible = run_ui
 
 
 func _on_close_pressed() -> void:
