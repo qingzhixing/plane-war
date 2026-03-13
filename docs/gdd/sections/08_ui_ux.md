@@ -61,11 +61,10 @@
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
   - 布局：`DpsLabel` 下方按 **标题 `Label` + 内容 `RichTextLabel`** 分组（与 Score/DPS 同属 `TopRightVBox`）：
     - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔）
-    - **ComboBuffTitleLabel**「连击Buff」→ **ComboBuffStatsLabel**（**分行**：射速加成一行、弹速加成一行；**不含移速**；主炮伤害只在主炮区显示为 `xxx[+xxx]`）
-    - **SideWeaponTitleLabel**「炸弹 / 副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
+    - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
   - 各块 `mouse_filter = IGNORE`；内容区 `bbcode_enabled`、`fit_content`、`custom_minimum_size` 保证可见。
-> 实现约定：`hud.gd` 以 **`%MainGunStatsLabel`** 等四个唯一名引用内容区；标题仅场景摆字，脚本不创建节点。
+> 实现约定：`hud.gd` 以 **`%MainGunStatsLabel`** / **`%SideWeaponStatsLabel`** / **`%SpellStatsLabel`** 引用内容区；标题仅场景摆字。
 
 ### Boss HUD
 
@@ -77,7 +76,7 @@
 ### 连击与评分反馈 UI（新增）
 
 - 连击提示：
-  - 当 `combo` > 0 时，在 HUD 上仅显示当前连击数，如「Combo: 12」。连击 **不提供移速**；射速/弹速在 **连击Buff** 区分行展示；主炮伤害在 **主炮** 区展示为 `基础[+连击]`。
+  - 当 `combo` > 0 时，在 HUD 上仅显示当前连击数，如「Combo: 12」。连击带来的射速等仍体现在 **主炮** 行（如射速旁 `+xx%`）；主炮伤害为 `基础[+连击]`。**不设连击Buff 独立栏目**。
   - 在连击达到预设档位（10 / 25 / 50 / 100 连）时，短暂在玩家附近或屏幕中央浮现“10 Combo!”、“25 Combo!!” 等文字，并配合轻微缩放/闪光效果。
 - 连击中断反馈：
   - 玩家受击或长时间未命中导致连击清零时，短暂显示“Combo Break” 或“连击中断”字样，并播放轻微“失误”提示音（不应过于刺耳，以免挫败感过强）。
