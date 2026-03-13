@@ -389,8 +389,6 @@ func apply_upgrade(upgrade_id: String) -> void:
 			# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
 			if _bullet_count > 1:
 				_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
-		"boss_hunter":
-			_boss_damage_multiplier += 0.2
 		"arrow_cooldown":
 			arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
 		"arrow_multi":

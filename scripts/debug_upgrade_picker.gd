@@ -10,7 +10,6 @@ const _ALL: Array[Dictionary] = [
 	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
 	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
 	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
-	{"id": "boss_hunter", "name": "要害瞄准", "desc": "主武器对 Boss 伤害 +20%"},
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射 +1 / 解锁"},
 	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖 / 齐射 +1"},

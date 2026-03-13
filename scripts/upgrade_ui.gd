@@ -9,7 +9,6 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
 	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
 	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
-	{"id": "boss_hunter", "name": "要害瞄准", "desc": "主武器对 Boss 伤害 +20%"},
 
 	# 副武器：弓箭（由 arrow_multi 首次解锁）
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
@@ -236,7 +235,6 @@ func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
 		"multi_shot",
 		"bullet_speed",
 		"spread_focus",
-		"boss_hunter",
 		"arrow_cooldown",
 		"arrow_multi",
 		"combo_boost",
