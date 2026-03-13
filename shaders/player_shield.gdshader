@@ -9,33 +9,26 @@ void fragment() {
 	vec2 centered_uv = UV - vec2(0.5);
 	float dist = length(centered_uv);
 
-	// 中心挖空：机身区域完全不画，避免挡住玩家
 	float hole_inner = 0.26;
 	float hole_outer = 0.36;
 	float out_of_hole = smoothstep(hole_inner, hole_outer, dist);
 
-	// 外缘收掉，只保留一圈
 	float breathe = 0.5 + 0.5 * sin(TIME * 2.6);
 	float outer_r = mix(0.54, 0.62, breathe);
 	float fade_outer = 1.0 - smoothstep(outer_r - 0.06, outer_r + 0.08, dist);
 
 	float mask = out_of_hole * fade_outer;
-	if (mask < 0.02) {
-		COLOR = vec4(0.0);
-		return;
-	}
+	float mask_vis = smoothstep(0.0, 0.04, mask);
 
-	// 环带：靠外更亮一点，像能量边
 	float t = clamp((dist - hole_outer) / max(outer_r - hole_outer, 0.01), 0.0, 1.0);
 	vec4 col = mix(ring_mid, ring_outer, t * 0.5);
 	col = mix(col, ring_bright, smoothstep(0.42, 0.52, dist) * 0.75);
-	col.a *= mask;
+	col.a *= mask * mask_vis;
 
-	// 外缘细高亮
 	float rim = smoothstep(outer_r - 0.05, outer_r - 0.12, dist)
 		* (1.0 - smoothstep(outer_r - 0.02, outer_r + 0.04, dist));
-	col.rgb += vec3(0.25, 0.45, 0.55) * rim;
-	col.a = max(col.a, rim * 0.65 * mask);
+	col.rgb += vec3(0.25, 0.45, 0.55) * rim * mask_vis;
+	col.a = max(col.a, rim * 0.65 * mask * mask_vis);
 
 	COLOR = col;
 }
