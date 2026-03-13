@@ -32,7 +32,7 @@
 ## 局内 HUD
 
 - 局内不显示玩家 HP（已取消玩家生命值系统，玩家不会死亡）。
-- 波次（`WaveLabel`，如「第 1 波」；当 Boss 登场且战斗进行中时，可将该区域改为「Boss 战」或在波次后附加标记，如「第 4 波 - Boss」，以强调当前阶段）
+- **波次**（`WaveLabel`）：**屏幕右上角**、右对齐，如「第 1 波」；Boss 战时可附加「- Boss」等（由 `hud.gd` 更新文案）
 - 局内不显示经验条；升级由**波次结束**直接触发，每波清场后默认弹出三选一升级界面。
 - 左上角按钮区域：使用一个垂直容器（例如 `TopLeftButtons: VBoxContainer`）承载以下按钮，统一对齐与间距：
   - 暂停按钮（`PauseButton`，左上，**大号触控按钮**，文字“暂停 / 继续”）
@@ -59,7 +59,7 @@
     - **回旋镖**：场上枚数、齐射数（无固定 CD 时仍展示状态）
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
-  - 布局：`DpsLabel` 下方按 **标题 `Label` + 内容 `RichTextLabel`** 分组（与 Score/DPS 同属 `TopRightVBox`）：
+  - 布局：**左侧 `LeftStatsVBox`**：`DpsLabel` 下按 **标题 + RichTextLabel** 分组（Score / DPS / 主炮 / 副武器 / 符卡）：
     - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**（射速、齐射、间隔、**弹速基数与连击弹速 Buff**）
     - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
