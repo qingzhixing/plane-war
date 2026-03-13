@@ -47,6 +47,7 @@ func _ready() -> void:
 		_combo_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
+		call_deferred("_refresh_combo_label_pivot")
 	_ensure_combo_notice_label()
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
@@ -193,12 +194,14 @@ func _update_combo_visual(combo: int) -> void:
 
 	_combo_label.modulate = color
 
-	# Combo 增加时的瞬间放大效果
+	# Combo +1：以右上角为轴心微缩放，避免贴边控件 scale 后溢出屏外
 	if combo > _last_combo_value:
+		_refresh_combo_label_pivot()
 		var tween := create_tween()
 		_combo_label.scale = _combo_base_scale
-		tween.tween_property(_combo_label, "scale", _combo_base_scale * 1.2, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		var bump := 1.06
+		tween.tween_property(_combo_label, "scale", _combo_base_scale * bump, 0.07).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(_combo_label, "scale", _combo_base_scale, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 	_last_combo_value = combo
 
@@ -237,7 +240,7 @@ func _show_combo_notice(text: String) -> void:
 	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
 	var tween := create_tween()
 	_combo_notice_label.scale = Vector2.ONE
-	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE * 1.15, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE * 1.06, 0.10).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
@@ -257,6 +260,16 @@ func _ensure_combo_notice_label() -> void:
 	_combo_notice_label.anchor_top = 0.20
 	_combo_notice_label.anchor_bottom = 0.26
 	root.add_child(_combo_notice_label)
+
+
+func _refresh_combo_label_pivot() -> void:
+	if _combo_label == null or not is_instance_valid(_combo_label):
+		return
+	# 轴心在控件右上角附近：放大时主要往左下长，不挤出屏幕右缘
+	var sz := _combo_label.size
+	if sz.x < 1.0 or sz.y < 1.0:
+		sz = Vector2(maxf(120.0, _combo_label.get_rect().size.x), maxf(20.0, _combo_label.get_rect().size.y))
+	_combo_label.pivot_offset = Vector2(sz.x, sz.y * 0.5)
 
 
 func _ensure_combo_screen_vfx_nodes() -> void:
