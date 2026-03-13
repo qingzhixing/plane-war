@@ -158,6 +158,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "重新开始"
 
+[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963161]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "主菜单"
+
 [node name="UpgradeUI" type="CanvasLayer" parent="." unique_id=1043995664]
 process_mode = 3
 script = ExtResource("7_upgrade_ui")
