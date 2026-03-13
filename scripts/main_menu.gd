@@ -1,5 +1,5 @@
 extends Control
-## 唯一名称：%StartButton %RecordsButton %SettingsButton %QuitButton %SettingsUI %RecordsQueryUI
+## 唯一名称：%StartButton %RecordsButton %SettingsButton %AboutButton %QuitButton %SettingsUI %RecordsQueryUI %AboutUI
 
 @export var game_scene: PackedScene
 
@@ -21,6 +21,10 @@ func _on_records_pressed() -> void:
 
 func _on_settings_pressed() -> void:
 	(%SettingsUI as CanvasLayer).show_settings_from_menu()
+
+
+func _on_about_pressed() -> void:
+	(%AboutUI as CanvasLayer).show_panel()
 
 
 func _on_quit_pressed() -> void:

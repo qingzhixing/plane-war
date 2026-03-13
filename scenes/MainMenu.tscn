@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://mainmenu"]
+[gd_scene load_steps=7 format=3 uid="uid://mainmenu"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://btv236w48os2y" path="res://scenes/Main.tscn" id="2_main"]
 [ext_resource type="Script" path="res://scripts/settings_ui.gd" id="3_settings"]
 [ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
 [ext_resource type="Script" path="res://scripts/records_query_ui.gd" id="5_records"]
+[ext_resource type="Script" path="res://scripts/about_ui.gd" id="6_about"]
 
 [node name="MainMenuRoot" type="Control"]
 layout_mode = 3
@@ -100,6 +101,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "设置"
 
+[node name="AboutButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 72)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "关于"
+
 [node name="QuitButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
@@ -125,6 +133,88 @@ script = ExtResource("3_settings")
 unique_name_in_owner = true
 process_mode = 4
 script = ExtResource("5_records")
+
+[node name="AboutUI" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+process_mode = 4
+script = ExtResource("6_about")
+
+[node name="AboutDimmer" type="ColorRect" parent="AboutUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.75)
+
+[node name="AboutCenter" type="CenterContainer" parent="AboutUI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AboutPanel" type="PanelContainer" parent="AboutUI/AboutCenter"]
+custom_minimum_size = Vector2(420, 480)
+layout_mode = 2
+
+[node name="AboutMargin" type="MarginContainer" parent="AboutUI/AboutCenter/AboutPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="AboutVBox" type="VBoxContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AboutTitle" type="Label" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "关于 plane-war"
+horizontal_alignment = 1
+
+[node name="AboutScroll" type="ScrollContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AboutBody" type="RichTextLabel" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/AboutScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+theme_override_font_sizes/normal_font_size = 18
+text = "[b]plane-war[/b]
+竖屏弹幕射击小品：波次清场、三选一强化、Boss 战；以评分 / 连击 / DPS 为反馈核心。
+
+[b]开发者[/b]
+qingzhixing
+
+[b]技术[/b]
+Godot Engine 4.x · GDScript
+
+[b]开源[/b]
+源码与议题见 GitHub（下方按钮可在浏览器打开）。"
+
+[node name="GithubButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "在浏览器打开 GitHub 仓库"
+
+[node name="CloseAboutButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "返回"
 
 [node name="Dimmer" type="ColorRect" parent="RecordsQueryUI"]
 anchors_preset = 15
@@ -233,5 +323,8 @@ text = "返回"
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/StartButton" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/RecordsButton" to="." method="_on_records_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/SettingsButton" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/AboutButton" to="." method="_on_about_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/QuitButton" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="RecordsQueryUI/Center/Panel/Margin/VBox/CloseRecordsButton" to="RecordsQueryUI" method="_on_close_pressed"]
+[connection signal="pressed" from="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/GithubButton" to="AboutUI" method="_on_github_pressed"]
+[connection signal="pressed" from="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/CloseAboutButton" to="AboutUI" method="_on_close_pressed"]
