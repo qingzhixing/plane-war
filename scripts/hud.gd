@@ -27,7 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-var _stats_label: RichTextLabel = null
+@onready var _stats_label: RichTextLabel = %StatsLabel
 var _spell_button: Button = null
 
 
@@ -49,7 +49,6 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ensure_stats_label()
 	if _stats_label != null:
 		_stats_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -355,30 +354,6 @@ func _play_combo_break_sfx() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
 		audio.play_player_hurt()
-
-
-func _ensure_stats_label() -> void:
-	if _stats_label != null and is_instance_valid(_stats_label):
-		return
-	var vbox := get_node_or_null("Root/TopRightVBox") as VBoxContainer
-	if vbox == null:
-		return
-	var existing_any := vbox.get_node_or_null("StatsLabel")
-	if existing_any is RichTextLabel:
-		_stats_label = existing_any as RichTextLabel
-		return
-	if existing_any != null:
-		existing_any.queue_free()
-	var rtl := RichTextLabel.new()
-	rtl.name = "StatsLabel"
-	rtl.bbcode_enabled = true
-	rtl.scroll_active = false
-	rtl.fit_content = true
-	rtl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rtl.theme_override_font_sizes["normal_font_size"] = 17
-	rtl.add_theme_color_override("default_color", Color(0.82, 0.88, 0.96, 0.98))
-	vbox.add_child(rtl)
-	_stats_label = rtl
 
 
 func _update_stats_label() -> void:
