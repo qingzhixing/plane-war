@@ -49,13 +49,8 @@ const _BOMB_BURST_BULLET_COUNT: int = 40
 const _BOMB_BULLET_SCENE_PATH: String = "res://scenes/bullets/PlayerBullet.tscn"
 
 func _ready() -> void:
-	# 以 720x1280 为基准的等比内容缩放：窗口变大时整体放大画面，而不是扩大可见范围
-	var root_window := get_tree().root
-	if root_window is Window:
-		root_window.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
-		root_window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
-		root_window.content_scale_size = Vector2i(720, 1280)
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
+	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
 
 	add_to_group("experience_listener")
 	add_to_group("battle_stats_manager")
