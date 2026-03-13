@@ -41,8 +41,8 @@
 ## 调试工具（开发/自测）
 
 - **自选升级面板**：战斗中随时打开，从完整列表里点选一项即调用 `Main.apply_upgrade(id)`，**不**经过波次升级流程（不改变 `_waiting_upgrade_choice`）。
-- **默认快捷键**：**F9** 开/关；面板打开时暂停游戏（`get_tree().paused = true`），面板所在 `CanvasLayer` 使用 `process_mode = ALWAYS`，保证仍能响应关闭。
-- **发布策略**：可在导出版保留（方便试玩反馈）；若需禁用，可改为仅 `OS.is_debug_build()` 时注册快捷键或移除该节点。
+- **入口**：仅通过 **设置 →「自选升级（调试）」** 打开；关闭按钮关面板。打开时暂停游戏（`get_tree().paused = true`），面板 `CanvasLayer` 使用 `process_mode = ALWAYS`。
+- **发布策略**：可在导出版保留；若需禁用，可移除设置按钮或该节点。
 
 ## 第一阶段实现目标（代码）
 
