@@ -21,12 +21,12 @@ const ENEMY_EXPLOSION_STREAMS: Array[AudioStream] = [
 ]
 const LOSE_STREAM: AudioStream = preload("res://assets/SFX/game_state/Lose.ogg")
 
+## 多路 SFX，避免大后期同一条 player 被 play() 顶掉导致半截断音
+const _SFX_POLYPHONY: int = 22
+
 var _bgm_player: AudioStreamPlayer
-var _sfx_player: AudioStreamPlayer
-var _shoot_sfx_player: AudioStreamPlayer
-var _ui_sfx_player: AudioStreamPlayer
-var _graze_sfx_player: AudioStreamPlayer
-var _last_graze_sfx_ms: int = 0
+var _sfx_pool: Array[AudioStreamPlayer] = []
+var _sfx_pool_index: int = 0
 
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
@@ -40,7 +40,6 @@ const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
 
 
 func _ready() -> void:
-	# 全局音频管理：放到 AutoLoad 中，并且始终处理，不受暂停影响
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("audio_manager")
 	randomize()
@@ -52,28 +51,26 @@ func _ready() -> void:
 	add_child(_bgm_player)
 	_apply_bgm_volume()
 
-	_sfx_player = AudioStreamPlayer.new()
-	_sfx_player.bus = "Master"
-	add_child(_sfx_player)
-	_apply_sfx_volume()
-
-	_shoot_sfx_player = AudioStreamPlayer.new()
-	_shoot_sfx_player.bus = "Master"
-	add_child(_shoot_sfx_player)
-	_apply_sfx_volume()
-
-	_ui_sfx_player = AudioStreamPlayer.new()
-	_ui_sfx_player.bus = "Master"
-	add_child(_ui_sfx_player)
-	_apply_sfx_volume()
-
-	_graze_sfx_player = AudioStreamPlayer.new()
-	_graze_sfx_player.bus = "Master"
-	add_child(_graze_sfx_player)
+	for _i in _SFX_POLYPHONY:
+		var p := AudioStreamPlayer.new()
+		p.bus = "Master"
+		add_child(p)
+		_sfx_pool.append(p)
 	_apply_sfx_volume()
 
 	_reset_playlist()
 	_play_next_bgm()
+
+
+func _play_stream_on_pool(stream: AudioStream) -> void:
+	if stream == null or _sfx_pool.is_empty():
+		return
+	if _sfx_muted:
+		return
+	var p: AudioStreamPlayer = _sfx_pool[_sfx_pool_index]
+	_sfx_pool_index = (_sfx_pool_index + 1) % _sfx_pool.size()
+	p.stream = stream
+	p.play()
 
 
 func _reset_playlist() -> void:
@@ -98,74 +95,36 @@ func _on_bgm_finished() -> void:
 
 
 func play_enemy_injured() -> void:
-	if _sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	_sfx_player.stream = ENEMY_INJURED_STREAM
-	_sfx_player.play()
+	_play_stream_on_pool(ENEMY_INJURED_STREAM)
 
 
 func play_enemy_explosion() -> void:
-	if _sfx_player == null or ENEMY_EXPLOSION_STREAMS.is_empty():
-		return
-	if _sfx_muted:
+	if ENEMY_EXPLOSION_STREAMS.is_empty():
 		return
 	var index := randi() % ENEMY_EXPLOSION_STREAMS.size()
-	_sfx_player.stream = ENEMY_EXPLOSION_STREAMS[index]
-	_sfx_player.play()
+	_play_stream_on_pool(ENEMY_EXPLOSION_STREAMS[index])
 
 
 func play_lose() -> void:
 	if _bgm_player != null:
 		_bgm_player.stop()
-	if _sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	_sfx_player.stream = LOSE_STREAM
-	_sfx_player.play()
+	_play_stream_on_pool(LOSE_STREAM)
 
 
 func play_shoot() -> void:
-	if _shoot_sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	_shoot_sfx_player.stream = PLAYER_SHOOT_STREAM
-	_shoot_sfx_player.play()
+	_play_stream_on_pool(PLAYER_SHOOT_STREAM)
 
 
 func play_player_hurt() -> void:
-	if _ui_sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	_ui_sfx_player.stream = PLAYER_HURT_STREAM
-	_ui_sfx_player.play()
+	_play_stream_on_pool(PLAYER_HURT_STREAM)
 
 
 func play_power_up() -> void:
-	if _ui_sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	_ui_sfx_player.stream = PLAYER_POWER_UP_STREAM
-	_ui_sfx_player.play()
+	_play_stream_on_pool(PLAYER_POWER_UP_STREAM)
 
 
-## 擦弹音效；全局节流避免高频重叠时爆音
 func play_graze() -> void:
-	if _graze_sfx_player == null:
-		return
-	if _sfx_muted:
-		return
-	var now: int = Time.get_ticks_msec()
-	if now - _last_graze_sfx_ms < 70:
-		return
-	_last_graze_sfx_ms = now
-	_graze_sfx_player.stream = GRAZE_STREAM
-	_graze_sfx_player.play()
+	_play_stream_on_pool(GRAZE_STREAM)
 
 
 func set_bgm_volume_linear(value: float) -> void:
@@ -218,7 +177,6 @@ func _load_audio_settings() -> void:
 	_sfx_muted = bool(cfg.get_value("audio", "sfx_muted", false))
 
 
-## 打开设置前调用：从磁盘恢复静音/音量并推到播放器，避免 cfg 被其它保存覆盖后 RAM 与 UI 不一致
 func reload_audio_settings_from_disk() -> void:
 	_load_audio_settings()
 	_apply_bgm_volume()
@@ -245,21 +203,9 @@ func _apply_bgm_volume() -> void:
 
 
 func _apply_sfx_volume() -> void:
-	if _sfx_player == null:
-		return
-	if _sfx_muted or _sfx_volume_linear <= 0.001:
-		_sfx_player.volume_db = -80.0
-		if _shoot_sfx_player != null:
-			_shoot_sfx_player.volume_db = -80.0
-		if _ui_sfx_player != null:
-			_ui_sfx_player.volume_db = -80.0
-		if _graze_sfx_player != null:
-			_graze_sfx_player.volume_db = -80.0
-	else:
-		_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
-		if _shoot_sfx_player != null:
-			_shoot_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
-		if _ui_sfx_player != null:
-			_ui_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
-		if _graze_sfx_player != null:
-			_graze_sfx_player.volume_db = linear_to_db(_sfx_volume_linear)
+	var db := -80.0
+	if not _sfx_muted and _sfx_volume_linear > 0.001:
+		db = linear_to_db(_sfx_volume_linear)
+	for p in _sfx_pool:
+		if p != null:
+			p.volume_db = db
