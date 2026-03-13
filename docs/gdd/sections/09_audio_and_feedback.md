@@ -17,7 +17,7 @@
 
 - **擦弹（Graze）**
   - 敌弹 / 敌机在 `GrazeArea` 内重叠时，按 **约 50ms / 目标** 重复加分；不替代中弹判定。
-  - **特效**：在 **玩家中心** 实例化 `GrazeSpark`（约 90ms / 目标 节流）。
+  - **特效**：`GrazeSpark`（`CPUParticles2D`）带 **GradientTexture2D 圆形贴图**，避免 Android GLES 无贴图粒子不显示；`restart()` + deferred 入树；约 90ms / 目标 节流。
   - **音效**：`assets/SFX/player/Graze.wav`，经 `AudioManager.play_graze()` 播放；SFX 使用 **多路 AudioStreamPlayer 池（约 22 路）**，避免大后期密集触发时同一路被 `play()` 顶断。
 
 - **玩家判定点（Hit Judgement）**
