@@ -11,6 +11,13 @@ func _ready() -> void:
 		sprite.texture = preload("res://assets/sprites/bullets/Arrow.png")
 
 
+func _on_area_entered(area: Node) -> void:
+	if area.is_in_group("enemy_bullet") and is_instance_valid(area):
+		area.queue_free()
+		return
+	super._on_area_entered(area)
+
+
 func _process(delta: float) -> void:
 	if not _initialized_direction:
 		_initialized_direction = true

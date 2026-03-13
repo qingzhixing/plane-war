@@ -175,7 +175,7 @@ func _spawn_arrow_shot() -> void:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 12.0 * (i - (n - 1) * 0.5)
-		_spawn_configured_bullet(bullet_scene_arrow, dir, 0.0, 1.35, 0, "arrow", "straight", side_offset)
+		_spawn_configured_bullet(bullet_scene_arrow, dir, 1.0, 1.35, 0, "arrow", "straight", side_offset)
 
 
 func _spawn_bomb_shot() -> void:
@@ -187,7 +187,7 @@ func _spawn_bomb_shot() -> void:
 		if dir.y > 0.0:
 			dir.y = -dir.y
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 14.0 * (i - (n - 1) * 0.5)
-		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.75, 0, "bullet", "straight", side_offset)
+		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.48, 0, "bullet", "straight", side_offset)
 
 
 func _spawn_boomerang_volley() -> void:

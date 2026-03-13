@@ -42,11 +42,6 @@ func _on_area_entered(area: Node) -> void:
 		return
 	if _is_under_player(area):
 		return
-	# 轨迹上撞敌弹：只清弹，不引爆
-	if area.is_in_group("enemy_bullet"):
-		if is_instance_valid(area):
-			area.queue_free()
-		return
 	if Time.get_ticks_msec() - _spawn_ms < _ARM_MS:
 		return
 	if not (area.is_in_group("enemy") or area.is_in_group("boss")):

@@ -13,7 +13,7 @@ const UPGRADES: Array[Dictionary] = [
 
 	# 副武器：弓箭（由 arrow_multi 首次解锁）
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
-	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射数量 +1；若未解锁则同时解锁"},
+	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "解锁弓箭；齐射+1；箭矢高伤且可撞毁敌弹"},
 
 	# 副武器：回旋镖（boomerang_multi 解锁 + 齐射 +1）
 	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖齐射 +1（全数回收后再射下一波）"},
