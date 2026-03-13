@@ -400,19 +400,22 @@ func set_combo_buff_tier(tier: int) -> void:
 	if tier <= 0:
 		_recompute_rof_overflow_damage()
 		return
+	# 整体略降；100 连后每档边际递减（层数越高越难加攻速）
 	if tier == 1:
-		_combo_fire_rate_mult = 1.15
+		_combo_fire_rate_mult = 1.10
 	elif tier == 2:
-		_combo_fire_rate_mult = 1.30
+		_combo_fire_rate_mult = 1.22
 	elif tier == 3:
-		_combo_fire_rate_mult = 1.45
+		_combo_fire_rate_mult = 1.34
 		_combo_damage_bonus = 1
 	else:
-		# 连击倍率不封顶；理论射速 = 倍率/间隔，实际出手仍 75/s，溢出按 %→伤害
-		# 100 连后每档略加攻速（已削弱，避免连击加成过猛）
-		const FIRE_PER_TIER: float = 0.35
+		# 连击倍率不封顶；理论射速 = 倍率/间隔，实际 75/s，溢出转伤
+		const FIRE_FIRST_EXTRA: float = 0.20
 		var extra_tiers: int = tier - 3
-		_combo_fire_rate_mult = 1.45 + FIRE_PER_TIER * float(extra_tiers)
+		var mult := 1.34
+		for j in range(1, extra_tiers + 1):
+			mult += FIRE_FIRST_EXTRA / float(j)
+		_combo_fire_rate_mult = mult
 		_combo_bullet_speed_mult = 1.15
 		_combo_damage_bonus = 1
 	_recompute_rof_overflow_damage()
