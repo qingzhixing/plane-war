@@ -29,7 +29,7 @@
 - **炸弹（主武器 4，升级解锁）**
   - 行为：直线向上飞行；**首次碰到敌机/Boss 时原地触发爆炸动画**，不再继续位移。
   - **范围伤害（AoE）**：爆炸对多边形判定范围内的敌机/Boss 各结算一次伤害；**伤害仅在爆炸动画第 7 帧**（与特效峰值对齐）产生，此前/此后帧不重复结算。
-  - 使用独立场景：`res://scenes/bullets/PlayerBomb.tscn`，脚本 `PlayerBombBullet.gd`（继承 `BulletBase`，覆盖命中与销毁逻辑）。
+  - 使用独立场景：`res://scenes/bullets/PlayerBomb.tscn`，脚本 `PlayerBomb.gd`（继承 `BulletBase`，覆盖命中与销毁逻辑）。
   - 与**符卡爆发**弹幕解耦：符卡仍使用轻量直线弹幕场景；炸弹仅作可选主武器。
 
 ### 伤害精度（玩家无 HP）
