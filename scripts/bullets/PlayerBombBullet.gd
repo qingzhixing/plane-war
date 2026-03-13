@@ -31,7 +31,7 @@ func _process(delta: float) -> void:
 	super._process(delta)
 
 
-func _on_area_entered(area: Area2D) -> void:
+func _on_area_entered(area: Node) -> void:
 	if _exploding:
 		return
 	if not (area.is_in_group("enemy") or area.is_in_group("boss")):

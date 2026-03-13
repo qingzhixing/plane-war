@@ -1,25 +1,24 @@
-[gd_scene load_steps=7 format=3 uid="uid://mainmenu"]
+[gd_scene format=3 uid="uid://mainmenu"]
 
-[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/main_menu.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://btv236w48os2y" path="res://scenes/Main.tscn" id="2_main"]
-[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="3_settings"]
-[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
-[ext_resource type="Script" path="res://scripts/records_query_ui.gd" id="5_records"]
-[ext_resource type="Script" path="res://scripts/about_ui.gd" id="6_about"]
+[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="3_settings"]
+[ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
+[ext_resource type="Script" uid="uid://dqw5ixwqegv66" path="res://scripts/records_query_ui.gd" id="5_records"]
+[ext_resource type="Script" uid="uid://bvv3wiup5utvs" path="res://scripts/about_ui.gd" id="6_about"]
 
-[node name="MainMenuRoot" type="Control"]
+[node name="MainMenuRoot" type="Control" unique_id=1522116683]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 theme = ExtResource("4_theme")
 script = ExtResource("1_script")
 game_scene = ExtResource("2_main")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=559129640]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,7 +28,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.06, 0.07, 0.14, 1)
 
-[node name="Vignette" type="ColorRect" parent="."]
+[node name="Vignette" type="ColorRect" parent="." unique_id=1691807975]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,7 +38,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.02, 0.03, 0.08, 0.55)
 
-[node name="MainMargin" type="MarginContainer" parent="."]
+[node name="MainMargin" type="MarginContainer" parent="." unique_id=372136557]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -51,71 +50,71 @@ theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 48
 
-[node name="MainColumn" type="VBoxContainer" parent="MainMargin"]
+[node name="MainColumn" type="VBoxContainer" parent="MainMargin" unique_id=1100289906]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="TitleLabel" type="Label" parent="MainMargin/MainColumn"]
+[node name="TitleLabel" type="Label" parent="MainMargin/MainColumn" unique_id=1385565401]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 52
 text = "plane-war"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="MainMargin/MainColumn"]
+[node name="SubtitleLabel" type="Label" parent="MainMargin/MainColumn" unique_id=1825869109]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.62, 0.75, 1)
 theme_override_font_sizes/font_size = 22
 text = "竖屏弹幕 · 波次升级"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="MainMargin/MainColumn"]
+[node name="Spacer" type="Control" parent="MainMargin/MainColumn" unique_id=1056687452]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="ButtonColumn" type="VBoxContainer" parent="MainMargin/MainColumn"]
+[node name="ButtonColumn" type="VBoxContainer" parent="MainMargin/MainColumn" unique_id=248850066]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="StartButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+[node name="StartButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=903083005]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "开始游戏"
 
-[node name="RecordsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+[node name="RecordsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=1200506814]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "成绩查询"
 
-[node name="SettingsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+[node name="SettingsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=809608158]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "设置"
 
-[node name="AboutButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+[node name="AboutButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=719437131]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "关于"
 
-[node name="QuitButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+[node name="QuitButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=386294911]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "退出"
 
-[node name="FooterLabel" type="Label" parent="MainMargin/MainColumn"]
+[node name="FooterLabel" type="Label" parent="MainMargin/MainColumn" unique_id=135502580]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.45, 0.55, 1)
@@ -124,71 +123,171 @@ text = "触控或鼠标点击按钮"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="SettingsUI" type="CanvasLayer" parent="."]
+[node name="SettingsUI" type="CanvasLayer" parent="." unique_id=2015724451]
 unique_name_in_owner = true
 process_mode = 3
 script = ExtResource("3_settings")
 
-[node name="RecordsQueryUI" type="CanvasLayer" parent="."]
+[node name="RecordsQueryUI" type="CanvasLayer" parent="." unique_id=1684068955]
 unique_name_in_owner = true
 process_mode = 4
 script = ExtResource("5_records")
 
-[node name="AboutUI" type="CanvasLayer" parent="."]
+[node name="Dimmer" type="ColorRect" parent="RecordsQueryUI" unique_id=269771730]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="Center" type="CenterContainer" parent="RecordsQueryUI" unique_id=1078414836]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="RecordsQueryUI/Center" unique_id=68687780]
+custom_minimum_size = Vector2(400, 320)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="RecordsQueryUI/Center/Panel" unique_id=275792686]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin" unique_id=1866569538]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=132549351]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "历史最佳成绩"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=438723940]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "数据来自本机存档，完成一局结算后会更新"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RowScore" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=1422519216]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore" unique_id=802426128]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高得分"
+
+[node name="ScoreValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore" unique_id=348009243]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowCombo" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=815348152]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl2" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo" unique_id=1216069737]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高连击"
+
+[node name="ComboValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo" unique_id=1482624313]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowDps" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=1396720609]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Lbl3" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps" unique_id=977601266]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "最高 DPS"
+
+[node name="DpsValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps" unique_id=2093095190]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 2
+
+[node name="CloseRecordsButton" type="Button" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=1674496591]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "返回"
+
+[node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
 unique_name_in_owner = true
 process_mode = 4
 script = ExtResource("6_about")
 
-[node name="AboutDimmer" type="ColorRect" parent="AboutUI"]
+[node name="AboutDimmer" type="ColorRect" parent="AboutUI" unique_id=1439742973]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0, 0, 0, 0.75)
 
-[node name="AboutCenter" type="CenterContainer" parent="AboutUI"]
+[node name="AboutCenter" type="CenterContainer" parent="AboutUI" unique_id=1629863087]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AboutPanel" type="PanelContainer" parent="AboutUI/AboutCenter"]
+[node name="AboutPanel" type="PanelContainer" parent="AboutUI/AboutCenter" unique_id=2014823278]
 custom_minimum_size = Vector2(420, 480)
 layout_mode = 2
 
-[node name="AboutMargin" type="MarginContainer" parent="AboutUI/AboutCenter/AboutPanel"]
+[node name="AboutMargin" type="MarginContainer" parent="AboutUI/AboutCenter/AboutPanel" unique_id=156674451]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="AboutVBox" type="VBoxContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin"]
+[node name="AboutVBox" type="VBoxContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin" unique_id=1141712803]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="AboutTitle" type="Label" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+[node name="AboutTitle" type="Label" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=541530285]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "关于 plane-war"
 horizontal_alignment = 1
 
-[node name="AboutScroll" type="ScrollContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+[node name="AboutScroll" type="ScrollContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=1310741673]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="AboutBody" type="RichTextLabel" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/AboutScroll"]
+[node name="AboutBody" type="RichTextLabel" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/AboutScroll" unique_id=1148900081]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
 theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
 text = "[b]plane-war[/b]
 竖屏弹幕射击小品：波次清场、三选一强化、Boss 战；以评分 / 连击 / DPS 为反馈核心。
 
@@ -200,124 +299,22 @@ Godot Engine 4.x · GDScript
 
 [b]开源[/b]
 源码与议题见 GitHub（下方按钮可在浏览器打开）。"
+fit_content = true
+scroll_active = false
 
-[node name="GithubButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+[node name="GithubButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=1868042632]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "在浏览器打开 GitHub 仓库"
 
-[node name="CloseAboutButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox"]
+[node name="CloseAboutButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=233508975]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 22
-text = "返回"
-
-[node name="Dimmer" type="ColorRect" parent="RecordsQueryUI"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 0
-color = Color(0, 0, 0, 0.72)
-
-[node name="Center" type="CenterContainer" parent="RecordsQueryUI"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="RecordsQueryUI/Center"]
-custom_minimum_size = Vector2(400, 320)
-layout_mode = 2
-
-[node name="Margin" type="MarginContainer" parent="RecordsQueryUI/Center/Panel"]
-layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 20
-
-[node name="VBox" type="VBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="Title" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "历史最佳成绩"
-horizontal_alignment = 1
-
-[node name="Hint" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 16
-text = "数据来自本机存档，完成一局结算后会更新"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="RowScore" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Lbl" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "最高得分"
-
-[node name="ScoreValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
-text = "0"
-horizontal_alignment = 2
-
-[node name="RowCombo" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Lbl2" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "最高连击"
-
-[node name="ComboValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
-text = "0"
-horizontal_alignment = 2
-
-[node name="RowDps" type="HBoxContainer" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Lbl3" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "最高 DPS"
-
-[node name="DpsValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
-text = "0"
-horizontal_alignment = 2
-
-[node name="CloseRecordsButton" type="Button" parent="RecordsQueryUI/Center/Panel/Margin/VBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 56)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 24
 text = "返回"
 
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/StartButton" to="." method="_on_start_pressed"]
