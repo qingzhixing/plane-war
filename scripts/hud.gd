@@ -413,7 +413,7 @@ func _ensure_left_slots_panel() -> void:
 	root.add_child(_left_slots_vbox)
 	var SlotScript: GDScript = preload("res://scripts/ui/side_weapon_cd_slot.gd") as GDScript
 	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
-	var tex_shield: Texture2D = preload("res://assets/ui/Heart.png") as Texture2D
+	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
 	_main_gun_slot = SlotScript.new()
 	_main_gun_slot.set_icon_texture(tex_gun)
 	_left_slots_vbox.add_child(_main_gun_slot)
