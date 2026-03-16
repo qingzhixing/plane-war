@@ -19,7 +19,6 @@ var _combo_edge_right: ColorRect = null
 var _combo_full_tint: ColorRect = null
 var _spell_flash_rect: ColorRect = null
 var _spell_notice_label: Label = null
-@onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _pause_button: Button = %PauseButton
@@ -238,8 +237,6 @@ func _show_combo_notice(text: String) -> void:
 	if _combo_notice_label == null:
 		return
 	_combo_notice_label.text = text
-	if _pixel_bold_font != null:
-		_combo_notice_label.add_theme_font_override("font", _pixel_bold_font)
 	_combo_notice_timer = 0.8
 	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
 	var tween := create_tween()
@@ -597,8 +594,6 @@ func _ensure_spell_vfx_nodes() -> void:
 	_spell_notice_label.visible = false
 	_spell_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_spell_notice_label.text = "符卡发动!"
-	if _pixel_bold_font != null:
-		_spell_notice_label.add_theme_font_override("font", _pixel_bold_font)
 	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_spell_notice_label.add_theme_font_size_override("font_size", 44)
