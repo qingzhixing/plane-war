@@ -516,6 +516,14 @@ func _update_side_weapon_cd_slots() -> void:
 func _update_spell_cd_slot() -> void:
 	if _spell_cd_slot == null or not is_instance_valid(_main):
 		return
+	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+	# 未自动符卡时不展示右侧符卡槽
+	if not has_auto:
+		_spell_cd_slot.visible = false
+		_spell_cd_slot.set_ratio(0.0)
+		_spell_cd_slot.set_count(0)
+		return
+	_spell_cd_slot.visible = true
 	if not _main.has_method("get_spell_cooldown_remaining"):
 		_spell_cd_slot.set_ratio(0.0)
 		_spell_cd_slot.set_count(0)
