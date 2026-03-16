@@ -19,7 +19,6 @@ var _combo_edge_right: ColorRect = null
 var _combo_full_tint: ColorRect = null
 var _spell_flash_rect: ColorRect = null
 var _spell_notice_label: Label = null
-@onready var _pixel_bold_font: FontFile = preload("res://assets/font/PixelOperator8-Bold.ttf")
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _pause_button: Button = %PauseButton
@@ -27,11 +26,20 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-@onready var _shield_stats: Label = %ShieldStatsLabel
-@onready var _main_gun_stats: RichTextLabel = %MainGunStatsLabel
-@onready var _side_weapon_stats: RichTextLabel = %SideWeaponStatsLabel
-@onready var _spell_stats: RichTextLabel = %SpellStatsLabel
-var _spell_button: Button = null
+@onready var _spell_button: TextureButton = %SpellStarButton
+
+# 左侧主炮/护盾槽位：与右侧副武器相同展示方式（方形图标 + 外圈进度 + x N）
+var _left_slots_vbox: VBoxContainer = null
+var _main_gun_slot: Control = null
+var _shield_slot: Control = null
+
+# 右侧副武器 CD 条：每解锁一种副武器添加一个槽位（方形图标 + 外圈进度 + x N）
+var _side_weapon_cd_vbox: VBoxContainer = null
+var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
+var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
+var _spell_cd_slot: Control = null
+
+const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
 
 
 func _ready() -> void:
@@ -53,20 +61,6 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for n in [
-		get_node_or_null("Root/LeftStatsVBox/ShieldTitleLabel"),
-		_shield_stats,
-		get_node_or_null("Root/LeftStatsVBox/MainGunTitleLabel"),
-		_main_gun_stats,
-		get_node_or_null("Root/LeftStatsVBox/SideWeaponTitleLabel"),
-		_side_weapon_stats,
-		get_node_or_null("Root/LeftStatsVBox/SpellTitleLabel"),
-		_spell_stats,
-	]:
-		if n is Control:
-			(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
-	call_deferred("_update_stats_label")
-	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -79,8 +73,10 @@ func _ready() -> void:
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
 	
-	_ensure_spell_button()
 	_ensure_spell_vfx_nodes()
+	_ensure_side_weapon_textures()
+	_ensure_side_weapon_cd_panel()
+	_ensure_left_slots_panel()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
@@ -124,7 +120,8 @@ func _process(delta: float) -> void:
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 		_update_spell_button()
-	_update_stats_label()
+	_update_left_slots()
+	_update_side_weapon_cd_slots()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -240,8 +237,6 @@ func _show_combo_notice(text: String) -> void:
 	if _combo_notice_label == null:
 		return
 	_combo_notice_label.text = text
-	if _pixel_bold_font != null:
-		_combo_notice_label.add_theme_font_override("font", _pixel_bold_font)
 	_combo_notice_timer = 0.8
 	_combo_notice_label.modulate = Color(1.0, 0.9, 0.35, 1.0)
 	var tween := create_tween()
@@ -386,150 +381,163 @@ func _play_combo_break_sfx() -> void:
 		audio.play_player_hurt()
 
 
-func _update_stats_label() -> void:
-	if _main_gun_stats == null or _side_weapon_stats == null or _spell_stats == null or _shield_stats == null:
+func _ensure_side_weapon_textures() -> void:
+	if _side_weapon_textures.size() > 0:
 		return
-	const C_FR := "#ffcc66"
-	const C_BS := "#7eb8da"
-	var main_lines: PackedStringArray = []
-	var side_lines: PackedStringArray = []
-	var spell_line := "—"
-	if is_instance_valid(_player):
-		var eff_iv: float = 0.2
-		if _player.has_method("get_effective_fire_interval"):
-			eff_iv = float(_player.get_effective_fire_interval())
-		# 分母勿用 0.02：封顶间隔 1/75 < 0.02 会被算成 50 发/秒
-		var rof_actual: float = 1.0 / maxf(0.00001, eff_iv)
-		var rof_theory: float = rof_actual
-		if _player.has_method("get_theoretical_main_rof"):
-			rof_theory = float(_player.get_theoretical_main_rof())
-		var bc: int = 1
-		var bmax: int = 6
-		if _player.has_method("get_bullet_count"):
-			bc = int(_player.get_bullet_count())
-		if _player.has_method("get_max_bullet_count"):
-			bmax = int(_player.get_max_bullet_count())
-		var mode_str := "机炮"
-		if _player.has_method("get_weapon_mode") and str(_player.get_weapon_mode()) == "arrow":
-			mode_str = "弓箭"
-		var main_cd := 0.0
-		if _player.has_method("get_main_fire_cd_remaining"):
-			main_cd = float(_player.get_main_fire_cd_remaining())
-		var fr_mult := 1.0
-		var bs_mult := 1.0
-		if _player.has_method("get_combo_fire_rate_mult"):
-			fr_mult = float(_player.get_combo_fire_rate_mult())
-		if _player.has_method("get_combo_bullet_speed_mult"):
-			bs_mult = float(_player.get_combo_bullet_speed_mult())
-		var eff_dmg := 1.0
-		if _player.has_method("get_effective_main_bullet_damage"):
-			eff_dmg = float(_player.get_effective_main_bullet_damage())
-		var ov_contrib := 0.0
-		if _player.has_method("get_main_damage_overflow_contribution_for_hud"):
-			ov_contrib = float(_player.get_main_damage_overflow_contribution_for_hud())
-		var base_dmg := maxf(0.1, eff_dmg - ov_contrib)
-		var dmg_line := "主炮伤害 "
-		if ov_contrib > 0.005:
-			if absf(base_dmg - roundf(base_dmg)) < 0.05 and absf(ov_contrib - roundf(ov_contrib)) < 0.05:
-				dmg_line += "%d [color=%s][+%d][/color]" % [int(roundf(base_dmg)), C_FR, int(roundf(ov_contrib))]
-			elif absf(base_dmg - roundf(base_dmg)) < 0.05:
-				dmg_line += "%d [color=%s][+%.2f][/color]" % [int(roundf(base_dmg)), C_FR, ov_contrib]
-			else:
-				dmg_line += "%.1f [color=%s][+%.2f][/color]" % [base_dmg, C_FR, ov_contrib]
-		else:
-			if absf(eff_dmg - roundf(eff_dmg)) < 0.05:
-				dmg_line += "%d" % int(roundf(eff_dmg))
-			else:
-				dmg_line += "%.1f" % eff_dmg
-		main_lines.append(dmg_line)
-		var cap_h: float = 75.0
-		if _player.get("max_main_rof") != null:
-			cap_h = float(_player.max_main_rof)
-		if rof_theory > cap_h + 0.5:
-			main_lines.append("理论射速 %.0f发/秒 · 实际射速 %.0f发/秒（封顶 %.0f发/秒）" % [rof_theory, rof_actual, cap_h])
-		else:
-			main_lines.append("射速 %.0f发/秒" % rof_actual)
-		if fr_mult > 1.009:
-			main_lines.append("[color=%s]连击攻速×%.2f[/color]" % [C_FR, fr_mult])
-		main_lines.append("齐射：%d/%d 发 · %s" % [bc, bmax, mode_str])
-		main_lines.append("间隔 %.2fs · 下次 %.2fs" % [eff_iv, main_cd])
-		var base_spd := 1200.0
-		if _player.has_method("get_bullet_speed"):
-			base_spd = float(_player.get_bullet_speed())
-		elif "bullet_speed" in _player:
-			base_spd = float(_player.bullet_speed)
-		var eff_spd := base_spd * bs_mult
-		var spd_line := "弹速 %.0f" % eff_spd
-		if bs_mult > 1.009:
-			spd_line += "  [color=%s]基数%.0f · 连击+%.0f%%[/color]" % [C_BS, base_spd, (bs_mult - 1.0) * 100.0]
-		main_lines.append(spd_line)
-		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow"):
-			var ar := float(_player.arrow_auto_interval) if "arrow_auto_interval" in _player else 1.4
-			var ar_rem := 0.0
-			if _player.has_method("get_arrow_cd_remaining"):
-				ar_rem = float(_player.get_arrow_cd_remaining())
-			var ar_n := 1
-			if _player.has_method("get_arrow_shot_count"):
-				ar_n = int(_player.get_arrow_shot_count())
-			side_lines.append("弓箭 %.1f/%.1fs ×%d" % [ar_rem, ar, ar_n])
-		else:
-			side_lines.append("弓箭 —")
-		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb"):
-			var bm := float(_player.bomb_auto_interval) if "bomb_auto_interval" in _player else 2.5
-			var bm_rem := 0.0
-			if _player.has_method("get_bomb_cd_remaining"):
-				bm_rem = float(_player.get_bomb_cd_remaining())
-			var bm_n := 1
-			if _player.has_method("get_bomb_shot_count"):
-				bm_n = int(_player.get_bomb_shot_count())
-			side_lines.append("炸弹 %.1f/%.1fs ×%d" % [bm_rem, bm, bm_n])
-		else:
-			side_lines.append("炸弹 —")
-		if _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang"):
-			var air := 0
-			var vol := 1
-			if _player.has_method("get_boomerang_airborne"):
-				air = int(_player.get_boomerang_airborne())
-			if _player.has_method("get_boomerang_shot_count"):
-				vol = int(_player.get_boomerang_shot_count())
-			side_lines.append("回旋镖 场上%d 齐射%d" % [air, vol])
-		else:
-			side_lines.append("回旋镖 —")
-	if is_instance_valid(_main) and _main.has_method("get_spell_cooldown_remaining"):
-		var sp_r := float(_main.get_spell_cooldown_remaining())
-		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
-		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
-	var guard_n := 0
-	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
-		guard_n = int(_main.get_combo_guard_charges())
-	if guard_n <= 0:
-		_shield_stats.text = "无（受击会断连击）"
-	else:
-		_shield_stats.text = "%d 层 · 每次受击消耗 1 层免断连" % guard_n
-	_main_gun_stats.text = "\n".join(main_lines) if main_lines.size() > 0 else "—"
-	_side_weapon_stats.text = "\n".join(side_lines) if side_lines.size() > 0 else "—"
-	_spell_stats.text = spell_line
+	_side_weapon_textures["arrow"] = preload("res://assets/sprites/bullets/Arrow.png") as Texture2D
+	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
+	_side_weapon_textures["boomerang"] = preload("res://assets/sprites/bullets/Sickle.png") as Texture2D
 
 
-func _ensure_spell_button() -> void:
+func _ensure_left_slots_panel() -> void:
 	var root := get_node_or_null("Root") as Control
-	if root == null:
+	if root == null or _left_slots_vbox != null:
 		return
-	_spell_button = Button.new()
-	_spell_button.text = "符卡"
-	_spell_button.custom_minimum_size = Vector2(120, 56)
-	_spell_button.add_theme_font_size_override("font_size", 22)
-	if _pixel_bold_font != null:
-		_spell_button.add_theme_font_override("font", _pixel_bold_font)
-	_spell_button.anchor_left = 0.82
-	_spell_button.anchor_right = 0.98
-	_spell_button.anchor_top = 0.86
-	_spell_button.anchor_bottom = 0.94
-	# 不抢触摸：拖动经符卡区不断流；发动改由 Main 未处理输入里短按检测
-	_spell_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_spell_button.focus_mode = Control.FOCUS_NONE
-	_spell_button.pressed.connect(_on_spell_button_pressed)
-	root.add_child(_spell_button)
+	_left_slots_vbox = VBoxContainer.new()
+	_left_slots_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_left_slots_vbox.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_left_slots_vbox.anchor_left = 0.0
+	_left_slots_vbox.anchor_right = 0.0
+	_left_slots_vbox.anchor_top = 0.0
+	_left_slots_vbox.anchor_bottom = 0.0
+	_left_slots_vbox.offset_left = 16.0
+	_left_slots_vbox.offset_top = 156.0
+	_left_slots_vbox.offset_right = 88.0
+	_left_slots_vbox.offset_bottom = 308.0
+	_left_slots_vbox.add_theme_constant_override("separation", 12)
+	root.add_child(_left_slots_vbox)
+	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
+	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
+	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
+	_main_gun_slot.set_icon_texture(tex_gun)
+	_left_slots_vbox.add_child(_main_gun_slot)
+	_shield_slot = STATUS_SLOT_SCENE.instantiate()
+	_shield_slot.set_icon_texture(tex_shield)
+	_left_slots_vbox.add_child(_shield_slot)
+
+
+func _update_left_slots() -> void:
+	if _main_gun_slot == null or _shield_slot == null:
+		return
+	# 主炮：外圈 = 下次开火剩余时间/间隔，x N = 齐射弹数
+	if is_instance_valid(_player) and _player.has_method("get_main_fire_cd_remaining"):
+		var eff_iv: float = _player.get_effective_fire_interval() if _player.has_method("get_effective_fire_interval") else 0.2
+		var rem: float = _player.get_main_fire_cd_remaining()
+		var r: float = rem / eff_iv if eff_iv > 0.0 else 1.0
+		var bc: int = _player.get_bullet_count() if _player.has_method("get_bullet_count") else 1
+		_main_gun_slot.set_ratio(r)
+		_main_gun_slot.set_count(bc)
+	else:
+		_main_gun_slot.set_ratio(1.0)
+		_main_gun_slot.set_count(1)
+	# 护盾：外圈 = 有层数时满、无层数时空，x N = 护盾层数
+	var guard_n: int = 0
+	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
+		guard_n = _main.get_combo_guard_charges()
+	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
+	_shield_slot.set_count(maxi(0, guard_n))
+
+
+func _ensure_side_weapon_cd_panel() -> void:
+	var root := get_node_or_null("Root") as Control
+	if root == null or _side_weapon_cd_vbox != null:
+		return
+	_side_weapon_cd_vbox = VBoxContainer.new()
+	_side_weapon_cd_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_side_weapon_cd_vbox.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_side_weapon_cd_vbox.anchor_left = 1.0
+	_side_weapon_cd_vbox.anchor_right = 1.0
+	_side_weapon_cd_vbox.anchor_top = 0.0
+	_side_weapon_cd_vbox.anchor_bottom = 0.0
+	_side_weapon_cd_vbox.offset_left = -80.0
+	_side_weapon_cd_vbox.offset_top = 180.0
+	_side_weapon_cd_vbox.offset_right = -16.0
+	_side_weapon_cd_vbox.offset_bottom = 400.0
+	_side_weapon_cd_vbox.add_theme_constant_override("separation", 12)
+	root.add_child(_side_weapon_cd_vbox)
+	# 符卡冷却槽：固定放在右侧顶部，图标使用星形
+	_spell_cd_slot = STATUS_SLOT_SCENE.instantiate()
+	if _spell_cd_slot.has_method("set_icon_texture"):
+		_spell_cd_slot.set_icon_texture(preload("res://assets/ui/star/star4.png"))
+	_side_weapon_cd_vbox.add_child(_spell_cd_slot)
+
+
+func _update_side_weapon_cd_slots() -> void:
+	if _side_weapon_cd_vbox == null or not is_instance_valid(_player):
+		return
+	_update_spell_cd_slot()
+	var order: Array[String] = ["arrow", "bomb", "boomerang"]
+	for weapon_id in order:
+		var unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked(weapon_id)
+		if not unlocked:
+			if weapon_id in _side_weapon_slots:
+				var slot: Control = _side_weapon_slots[weapon_id]
+				_side_weapon_cd_vbox.remove_child(slot)
+				slot.queue_free()
+				_side_weapon_slots.erase(weapon_id)
+			continue
+		if weapon_id not in _side_weapon_slots:
+			var slot: Control = STATUS_SLOT_SCENE.instantiate()
+			var tex: Texture2D = _side_weapon_textures.get(weapon_id, null)
+			if slot.has_method("set_icon_texture") and tex != null:
+				slot.set_icon_texture(tex)
+			_side_weapon_cd_vbox.add_child(slot)
+			_side_weapon_slots[weapon_id] = slot
+			var idx := order.find(weapon_id)
+			if idx >= 0:
+				_side_weapon_cd_vbox.move_child(slot, mini(idx, _side_weapon_cd_vbox.get_child_count() - 1))
+		var slot_node: Control = _side_weapon_slots[weapon_id]
+		if not is_instance_valid(slot_node) or not slot_node.has_method("set_ratio"):
+			continue
+		var r: float = 1.0
+		var n: int = 1
+		if weapon_id == "arrow":
+			var total: float = _player.arrow_auto_interval if "arrow_auto_interval" in _player else 1.4
+			var rem: float = _player.get_arrow_cd_remaining() if _player.has_method("get_arrow_cd_remaining") else 0.0
+			r = rem / total if total > 0.0 else 1.0
+			n = _player.get_arrow_shot_count() if _player.has_method("get_arrow_shot_count") else 1
+		elif weapon_id == "bomb":
+			var total: float = _player.bomb_auto_interval if "bomb_auto_interval" in _player else 2.5
+			var rem: float = _player.get_bomb_cd_remaining() if _player.has_method("get_bomb_cd_remaining") else 0.0
+			r = rem / total if total > 0.0 else 1.0
+			n = _player.get_bomb_shot_count() if _player.has_method("get_bomb_shot_count") else 1
+		elif weapon_id == "boomerang":
+			var _air_unused: int = _player.get_boomerang_airborne() if _player.has_method("get_boomerang_airborne") else 0
+			var vol: int = _player.get_boomerang_shot_count() if _player.has_method("get_boomerang_shot_count") else 1
+			r = 0.0
+			n = vol
+		slot_node.set_ratio(r)
+		slot_node.set_count(n)
+
+
+func _update_spell_cd_slot() -> void:
+	if _spell_cd_slot == null or not is_instance_valid(_main):
+		return
+	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+	# 未自动符卡时不展示右侧符卡槽
+	if not has_auto:
+		_spell_cd_slot.visible = false
+		_spell_cd_slot.set_ratio(0.0)
+		_spell_cd_slot.set_count(0)
+		return
+	_spell_cd_slot.visible = true
+	if not _main.has_method("get_spell_cooldown_remaining"):
+		_spell_cd_slot.set_ratio(0.0)
+		_spell_cd_slot.set_count(0)
+		return
+	var cd := float(_main.get_spell_cooldown_remaining())
+	var total := 12.0
+	if _main.has_method("get_spell_cooldown_total"):
+		total = float(_main.get_spell_cooldown_total())
+	var r: float = 0.0
+	if total > 0.0:
+		r = clampf(cd / total, 0.0, 1.0)
+	_spell_cd_slot.set_ratio(r)
+	_spell_cd_slot.set_count(1)
+
+
+func _update_stats_label() -> void:
+	pass
 
 
 func get_spell_screen_rect() -> Rect2:
@@ -543,13 +551,23 @@ func _update_spell_button() -> void:
 		return
 	if not _main.has_method("get_spell_cooldown_remaining"):
 		return
+	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
 	var cd := float(_main.get_spell_cooldown_remaining())
-	if cd > 0.0:
-		_spell_button.disabled = true
-		_spell_button.text = "符卡 %.1fs" % cd
+	var total := 12.0
+	if _main.has_method("get_spell_cooldown_total"):
+		total = float(_main.get_spell_cooldown_total())
+	var progress := 1.0
+	if has_auto:
+		progress = 0.0
+	elif total > 0.0:
+		progress = clampf(1.0 - cd / total, 0.0, 1.0)
+	if _spell_button.has_method("set_progress"):
+		_spell_button.set_progress(progress)
+	# 未自动符卡时按钮始终可见，仅冷却完成后由星星显示“就绪感”
+	if has_auto:
+		_spell_button.visible = false
 	else:
-		_spell_button.disabled = false
-		_spell_button.text = "符卡"
+		_spell_button.visible = true
 
 
 func _on_spell_button_pressed() -> void:
@@ -576,8 +594,6 @@ func _ensure_spell_vfx_nodes() -> void:
 	_spell_notice_label.visible = false
 	_spell_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_spell_notice_label.text = "符卡发动!"
-	if _pixel_bold_font != null:
-		_spell_notice_label.add_theme_font_override("font", _pixel_bold_font)
 	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_spell_notice_label.add_theme_font_size_override("font_size", 44)
