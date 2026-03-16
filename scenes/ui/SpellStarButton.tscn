@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://5hppc0ylcbtl"]
 
-[ext_resource type="Script" uid="uid://d2toi63uawbip" path="res://scripts/ui/spell_star_button.gd" id="1"]
+[ext_resource type="Script" uid="uid://bkhph7nvp4cxu" path="res://scripts/ui/spell_star_button.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://ck42tfxkxaff" path="res://assets/ui/star/star0.png" id="2_jg7eg"]
 
 [node name="SpellStarButton" type="TextureButton" unique_id=1293916485]
@@ -19,10 +19,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.08, 0.08, 0.12, 0.75)
-z_index = 0
+color = Color(0.078431375, 0.078431375, 0.12156863, 0.5764706)
 
 [node name="StarIcon" type="TextureRect" parent="." unique_id=987654321]
+z_index = 1
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -38,4 +38,3 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_jg7eg")
 stretch_mode = 3
-z_index = 1
