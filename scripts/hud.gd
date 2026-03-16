@@ -499,9 +499,9 @@ func _update_side_weapon_cd_slots() -> void:
 			r = rem / total if total > 0.0 else 1.0
 			n = _player.get_bomb_shot_count() if _player.has_method("get_bomb_shot_count") else 1
 		elif weapon_id == "boomerang":
-			var air: int = _player.get_boomerang_airborne() if _player.has_method("get_boomerang_airborne") else 0
+			var _air_unused: int = _player.get_boomerang_airborne() if _player.has_method("get_boomerang_airborne") else 0
 			var vol: int = _player.get_boomerang_shot_count() if _player.has_method("get_boomerang_shot_count") else 1
-			r = 1.0 - (float(air) / float(vol)) if vol > 0 else 1.0
+			r = 0.0
 			n = vol
 		slot_node.set_ratio(r)
 		slot_node.set_count(n)
