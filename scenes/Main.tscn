@@ -116,10 +116,10 @@ text = "设置"
 
 [node name="LeftStatsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
 layout_mode = 0
-offset_left = 39.0
-offset_top = 349.0
-offset_right = 395.0
-offset_bottom = 621.0
+offset_left = 33.0
+offset_top = 319.0
+offset_right = 389.0
+offset_bottom = 591.0
 
 [node name="ScoreLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=268481878]
 unique_name_in_owner = true
