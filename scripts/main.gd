@@ -369,6 +369,8 @@ func record_player_damage(amount: float, _target: Node) -> void:
 func record_graze() -> void:
 	var gained := maxi(1, int(round(float(GRAZE_SCORE) * _score_multiplier)))
 	score += gained
+	# 擦弹也提供少量连击奖励：按一次“命中”的连击增量累加
+	_on_successful_hit()
 
 
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
