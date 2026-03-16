@@ -27,7 +27,7 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-var _spell_button: Button = null
+@onready var _spell_button: TextureButton = %SpellStarButton
 
 # 左侧主炮/护盾槽位：与右侧副武器相同展示方式（方形图标 + 外圈进度 + x N）
 var _left_slots_vbox: VBoxContainer = null
@@ -73,7 +73,6 @@ func _ready() -> void:
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
 	
-	_ensure_spell_button()
 	_ensure_spell_vfx_nodes()
 	_ensure_side_weapon_textures()
 	_ensure_side_weapon_cd_panel()
@@ -511,27 +510,6 @@ func _update_stats_label() -> void:
 	pass
 
 
-func _ensure_spell_button() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null:
-		return
-	_spell_button = Button.new()
-	_spell_button.text = "符卡"
-	_spell_button.custom_minimum_size = Vector2(120, 56)
-	_spell_button.add_theme_font_size_override("font_size", 22)
-	if _pixel_bold_font != null:
-		_spell_button.add_theme_font_override("font", _pixel_bold_font)
-	_spell_button.anchor_left = 0.82
-	_spell_button.anchor_right = 0.98
-	_spell_button.anchor_top = 0.86
-	_spell_button.anchor_bottom = 0.94
-	# 不抢触摸：拖动经符卡区不断流；发动改由 Main 未处理输入里短按检测
-	_spell_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_spell_button.focus_mode = Control.FOCUS_NONE
-	_spell_button.pressed.connect(_on_spell_button_pressed)
-	root.add_child(_spell_button)
-
-
 func get_spell_screen_rect() -> Rect2:
 	if _spell_button == null or not is_instance_valid(_spell_button):
 		return Rect2()
@@ -544,12 +522,14 @@ func _update_spell_button() -> void:
 	if not _main.has_method("get_spell_cooldown_remaining"):
 		return
 	var cd := float(_main.get_spell_cooldown_remaining())
-	if cd > 0.0:
-		_spell_button.disabled = true
-		_spell_button.text = "符卡 %.1fs" % cd
-	else:
-		_spell_button.disabled = false
-		_spell_button.text = "符卡"
+	var total := 12.0
+	if _main.has_method("get_spell_cooldown_total"):
+		total = float(_main.get_spell_cooldown_total())
+	var progress := 1.0
+	if total > 0.0:
+		progress = clampf(1.0 - cd / total, 0.0, 1.0)
+	if _spell_button.has_method("set_progress"):
+		_spell_button.set_progress(progress)
 
 
 func _on_spell_button_pressed() -> void:

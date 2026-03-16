@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://5hppc0ylcbtl"]
+
+[ext_resource type="Script" uid="uid://sb0d1j0f6p8t" path="res://scripts/ui/spell_star_button.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://ck42tfxkxaff" path="res://assets/ui/star/star0.png" id="2_jg7eg"]
+
+[node name="SpellStarButton" type="TextureButton" unique_id=1293916485]
+offset_right = 25.0
+offset_bottom = 25.0
+scale = Vector2(5.5, 5.5)
+mouse_filter = 2
+texture_normal = ExtResource("2_jg7eg")
+stretch_mode = 3
+script = ExtResource("1")

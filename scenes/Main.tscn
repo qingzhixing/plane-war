@@ -13,6 +13,7 @@
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
 [ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
+[ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -74,6 +75,22 @@ theme_override_font_sizes/font_size = 32
 text = "Combo Display Bug"
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="SpellStarButton" parent="HUD/Root" unique_id=2140247232 instance=ExtResource("14_spell_star_button")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -141.0
+offset_top = -144.0
+offset_right = -115.48816
+offset_bottom = -118.80322
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(3.175, 3.175)
 
 [node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root" unique_id=1840417451]
 layout_mode = 0
