@@ -60,13 +60,8 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for n in [
-		get_node_or_null("Root/LeftStatsVBox/SpellTitleLabel"),
-		_spell_stats,
-	]:
-		if n is Control:
-			(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
-	call_deferred("_update_stats_label")
+	if _spell_stats != null:
+		_spell_stats.visible = false
 	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -130,7 +125,6 @@ func _process(delta: float) -> void:
 		_update_spell_button()
 	_update_left_slots()
 	_update_side_weapon_cd_slots()
-	_update_stats_label()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -518,14 +512,7 @@ func _update_side_weapon_cd_slots() -> void:
 
 
 func _update_stats_label() -> void:
-	if _spell_stats == null:
-		return
-	var spell_line := "—"
-	if is_instance_valid(_main) and _main.has_method("get_spell_cooldown_remaining"):
-		var sp_r := float(_main.get_spell_cooldown_remaining())
-		var sp_t := float(_main.get_spell_cooldown_total()) if _main.has_method("get_spell_cooldown_total") else 12.0
-		spell_line = "冷却 %.1f / %.1fs" % [sp_r, sp_t]
-	_spell_stats.text = spell_line
+	pass
 
 
 func _ensure_spell_button() -> void:
