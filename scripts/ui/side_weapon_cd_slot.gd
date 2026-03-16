@@ -58,7 +58,19 @@ func _draw() -> void:
 	var icon_rect := Rect2(center.x - ICON_SIZE * 0.5, center.y - ICON_SIZE * 0.5, ICON_SIZE, ICON_SIZE)
 	draw_rect(icon_rect, Color(0.15, 0.18, 0.22, 0.95))
 	if texture != null:
-		draw_texture_rect(texture, icon_rect, false)
+		var tw: float = float(texture.get_width())
+		var th: float = float(texture.get_height())
+		if tw > 0.0 and th > 0.0:
+			var s: float = min(ICON_SIZE / tw, ICON_SIZE / th)
+			var w: float = tw * s
+			var h: float = th * s
+			var tex_rect := Rect2(
+				center.x - w * 0.5,
+				center.y - h * 0.5,
+				w,
+				h
+			)
+			draw_texture_rect(texture, tex_rect, false)
 	# 外圈进度条：先画整圈轨道，再画当前比例弧
 	var track_color := Color(0.25, 0.28, 0.35, 0.9)
 	var fill_color := Color(0.4, 0.75, 0.5, 0.95)
