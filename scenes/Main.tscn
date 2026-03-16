@@ -100,7 +100,7 @@ text = "设置"
 [node name="LeftStatsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 156.0
+offset_top = 308.0
 offset_right = 372.0
 offset_bottom = 580.0
 
@@ -115,51 +115,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "DPS: 0  Max: 0"
-
-[node name="ShieldTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010009]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.95, 0.85, 1)
-theme_override_font_sizes/font_size = 22
-text = "稳态护盾"
-
-[node name="ShieldStatsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010010]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.95, 0.92, 1)
-theme_override_font_sizes/font_size = 19
-text = "无"
-
-[node name="MainGunTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010001]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
-theme_override_font_sizes/font_size = 22
-text = "主炮"
-
-[node name="MainGunStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010002]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 88)
-layout_mode = 2
-theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
-theme_override_font_sizes/normal_font_size = 19
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-
-[node name="SideWeaponTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010005]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.7, 0.55, 1)
-theme_override_font_sizes/font_size = 22
-text = "副武器"
-
-[node name="SideWeaponStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010006]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 96)
-layout_mode = 2
-theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
-theme_override_font_sizes/normal_font_size = 19
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
 
 [node name="SpellTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010007]
 layout_mode = 2
