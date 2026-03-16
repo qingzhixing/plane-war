@@ -55,19 +55,24 @@
   - `DpsLabel`：当前 DPS 与当局最高 DPS，放在 Score 下方，以较小字号显示「DPS: 123  Max: 456」。
   - **`StatsLabel`（属性条）**：与 DPS 同区，多行小字**实时**展示局内数值，便于对照强化与手感；建议包含但不限于：
     - 主武器：**射速（发/秒）**、**齐射弹数**、主炮间隔倒计时（可选）
-    - 副武器：**弓箭 / 炸弹** 的冷却剩余与周期（未解锁则显示「—」）
-    - **回旋镖**：场上枚数、齐射数（无固定 CD 时仍展示状态）
+    - 副武器：**右侧独立 CD 条**（见下）；左侧 **SideWeaponStatsLabel** 仅展示已解锁副武器名称（如「弓箭 · 炸弹 · 回旋镖」），不再展示冷却与齐射数。
+    - **回旋镖**：在右侧副武器 CD 条中以「就绪/未就绪」环显示；左侧可保留简要说明。
     - **符卡**：冷却剩余 / 总冷却（与 `Main` 一致）
     - 主武器模式（机炮/弓箭）等与战斗直接相关的只读属性
+  - **副武器 CD 展示（右侧）**：
+    - 位置：**屏幕右侧**，每次新获得一种副武器即在该区域**新增一个**副武器 CD 槽位。
+    - 单个槽位：**正方形武器图标**（与子弹/副武器资源一致）+ **外圈一圈进度条**表示冷却（顺时针或逆时针填充均可）；槽位下方或旁侧用 **「x」+ 数字** 表示该副武器齐射数（如 x1、x2、x3）。
+    - 有固定 CD 的副武器（弓箭、炸弹）：进度条 = 剩余 CD / 总 CD，满为就绪。
+    - 回旋镖：无固定 CD，可用环的「已就绪」（全满或全空约定）表示当前波次已全部回收、可发射下一波；齐射数同样用「x N」表示。
   - 布局：**左侧 `LeftStatsVBox`**（Score≈28、DPS≈26、分区标题≈22、正文≈19）：DPS 下 **`ShieldTitleLabel` + `ShieldStatsLabel`**（稳态护盾层数，0 层写「无」）；再下 **主炮 / 副武器 / 符卡**（**不再单独「攻速溢出转化」分区**）。
     - **MainGunTitleLabel**「主炮」→ **MainGunStatsLabel**：
       - **主炮伤害**：单发有效伤害；若有攻速溢出转化，写作 **主炮伤害 _基础_ [+_溢出_]**（基础 = 不含溢出转化的部分，[+…] = 溢出按规则折算进乘区后的加成，与升级说明一致）。
       - **射速**：未超 `max_main_rof` 时只显示一行 **射速 N 发/秒**；**仅当理论射速超过上限** 时再显示 **理论 / 实际** 并标明 **封顶 N 发/秒**。
       - 齐射、间隔、**弹速基数与连击弹速 Buff** 等照旧。
-    - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（弓箭、炸弹、回旋镖）
+    - **SideWeaponTitleLabel**「副武器」→ **SideWeaponStatsLabel**（仅列出已解锁副武器名称，如「弓箭 · 炸弹 · 回旋镖」；具体 CD 与齐射数见右侧 CD 条）
     - **SpellTitleLabel**「符卡」→ **SpellStatsLabel**（冷却）
   - 各块 `mouse_filter = IGNORE`；内容区 `bbcode_enabled`、`fit_content`、`custom_minimum_size` 保证可见。
-> 实现约定：`hud.gd` 以 **`%ShieldStatsLabel`**（护盾层数）与 **`%MainGunStatsLabel`** / **`%SideWeaponStatsLabel`** / **`%SpellStatsLabel`** 引用内容区；标题仅场景摆字（无 `%OverflowStatsLabel`）。
+> 实现约定：`hud.gd` 以 **`%ShieldStatsLabel`**（护盾层数）与 **`%MainGunStatsLabel`** / **`%SideWeaponStatsLabel`** / **`%SpellStatsLabel`** 引用内容区；右侧副武器 CD 条由 HUD 脚本动态创建（每解锁一种副武器添加一个槽位：正方形图标 + 外圈 CD 环 + 「x N」）。
 
 ### Boss HUD
 
