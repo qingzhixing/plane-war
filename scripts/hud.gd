@@ -27,7 +27,6 @@ var _spell_notice_label: Label = null
 @onready var _score_label: Label = %ScoreLabel
 @onready var _combo_label: Label = %ComboLabel
 @onready var _dps_label: Label = %DpsLabel
-@onready var _spell_stats: RichTextLabel = %SpellStatsLabel
 var _spell_button: Button = null
 
 # 左侧主炮/护盾槽位：与右侧副武器相同展示方式（方形图标 + 外圈进度 + x N）
@@ -39,6 +38,8 @@ var _shield_slot: Control = null
 var _side_weapon_cd_vbox: VBoxContainer = null
 var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
+
+const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
 
 
 func _ready() -> void:
@@ -60,9 +61,6 @@ func _ready() -> void:
 	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if _spell_stats != null:
-		_spell_stats.visible = false
-	
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -411,13 +409,12 @@ func _ensure_left_slots_panel() -> void:
 	_left_slots_vbox.offset_bottom = 308.0
 	_left_slots_vbox.add_theme_constant_override("separation", 12)
 	root.add_child(_left_slots_vbox)
-	var SlotScript: GDScript = preload("res://scripts/ui/side_weapon_cd_slot.gd") as GDScript
 	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
-	_main_gun_slot = SlotScript.new()
+	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
 	_main_gun_slot.set_icon_texture(tex_gun)
 	_left_slots_vbox.add_child(_main_gun_slot)
-	_shield_slot = SlotScript.new()
+	_shield_slot = STATUS_SLOT_SCENE.instantiate()
 	_shield_slot.set_icon_texture(tex_shield)
 	_left_slots_vbox.add_child(_shield_slot)
 
@@ -477,8 +474,7 @@ func _update_side_weapon_cd_slots() -> void:
 				_side_weapon_slots.erase(weapon_id)
 			continue
 		if weapon_id not in _side_weapon_slots:
-			var SlotScript: GDScript = preload("res://scripts/ui/side_weapon_cd_slot.gd") as GDScript
-			var slot: Control = SlotScript.new()
+			var slot: Control = STATUS_SLOT_SCENE.instantiate()
 			var tex: Texture2D = _side_weapon_textures.get(weapon_id, null)
 			if slot.has_method("set_icon_texture") and tex != null:
 				slot.set_icon_texture(tex)

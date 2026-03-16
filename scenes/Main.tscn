@@ -116,22 +116,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "DPS: 0  Max: 0"
 
-[node name="SpellTitleLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=2100010007]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 22
-text = "符卡"
-
-[node name="SpellStatsLabel" type="RichTextLabel" parent="HUD/Root/LeftStatsVBox" unique_id=2100010008]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 38)
-layout_mode = 2
-theme_override_colors/default_color = Color(0.82, 0.88, 0.96, 0.98)
-theme_override_font_sizes/normal_font_size = 19
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-
 [node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
 process_mode = 3
 script = ExtResource("13_post_boss")
