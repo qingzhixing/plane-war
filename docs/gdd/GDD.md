@@ -6,7 +6,7 @@
 ## 文档结构
 
 - `docs/gdd/sections/01_overview.md`：概览与设计目标
-- `docs/gdd/sections/02_platform_and_ci.md`：跨平台目标与 GitHub Actions 自动构建要求
+- `docs/gdd/sections/02_platform_and_ci.md`：跨平台目标与发布方式（手动/可选 CI）
 - `docs/gdd/sections/03_core_loop_and_controls.md`：核心循环、失败与继续、输入与手感
 - `docs/gdd/sections/04_numbers_and_combat_rules.md`：数值框架、受击/判定、战斗规则
 - `docs/gdd/sections/05_level_structure.md`：2–5 分钟波次制关卡结构与可读性原则
@@ -18,6 +18,7 @@
 - `docs/gdd/sections/10_mvp_acceptance_and_milestones.md`：MVP 验收与里程碑
 - `docs/gdd/sections/11_art_and_assets.md`：占位美术与资源命名约定
 - `docs/gdd/sections/12_technical_notes.md`：技术栈与项目结构（Godot 4）
+- `docs/gdd/sections/13_release_and_metadata.md`：版本发布信息与检查清单
 
 ## 快速摘要（当前已确认需求）
 
@@ -41,4 +42,3 @@
 - **连击系统**：
   - 玩家在限定时间窗口内持续命中/击杀敌人会提升连击数，连击数越高，对应的得分加成越大。
   - 长时间未命中或玩家受击会导致连击断掉，清空连击加成。
-

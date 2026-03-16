@@ -287,8 +287,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
-bbcode_enabled = true
-text = "[b]plane-war[/b]  [color=#8af]v0.1.1[/color]
+ bbcode_enabled = true
+ text = "[b]plane-war[/b]  [color=#8af]v0.2.1[/color]
 竖屏弹幕射击小品：波次清场、三选一强化、Boss 战；以评分 / 连击 / DPS 为反馈核心。
 
 [b]开发者[/b]
