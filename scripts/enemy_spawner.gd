@@ -3,8 +3,8 @@ extends Node
 @export var enemy_scene: PackedScene
 @export var enemy_scene_turret: PackedScene
 @export var enemy_scene_elite: PackedScene
-@export var enemies_per_wave_base: int = 4
-@export var enemies_per_wave_increment: int = 2
+@export var enemies_per_wave_base: int = 6
+@export var enemies_per_wave_increment: int = 3
 
 var _remaining_to_spawn: int = 0
 var _timer: Timer
