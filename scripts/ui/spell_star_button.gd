@@ -34,7 +34,7 @@ func set_progress(value: float) -> void:
 
 
 func _disabled_by_progress() -> void:
-	# 冷却未完成时禁用，满进度（1.0）时可点击
+	# 仅用于控制可点状态；星形显隐由 HUD 决定（通过 visible 控制整个按钮）
 	disabled = _progress < 1.0
 
 
@@ -44,3 +44,5 @@ func _update_icon() -> void:
 	var idx: int = int(round(_progress * float(_frames.size() - 1)))
 	idx = clampi(idx, 0, _frames.size() - 1)
 	_icon.texture = _frames[idx]
+	# 冷却中只显示底框，星星隐藏；冷却完成（≈100%）再显示星星
+	_icon.visible = _progress >= 0.999
