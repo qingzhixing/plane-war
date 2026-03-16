@@ -13,18 +13,13 @@ var texture: Texture2D
 var ratio: float = 1.0  # 剩余 CD 比例或就绪度
 var count: int = 1
 
-var _count_label: Label
+@onready var _count_label: Label = $CountLabel
 
 func _init() -> void:
 	custom_minimum_size = Vector2(56, 72)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _ready() -> void:
-	_count_label = Label.new()
-	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_count_label.add_theme_font_size_override("font_size", 18)
-	_count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_count_label)
 	_update_count_text()
 	_fit_count_label()
 
