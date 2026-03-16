@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh4jmqayun8c0"
-path="res://.godot/imported/Heart.png-937d8a1966a4949eaae46f01c378042f.ctex"
+uid="uid://cjrgawlq18lna"
+path="res://.godot/imported/Shield.svg-a93eb68458898dc64c805c36224c3766.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/Heart.png"
-dest_files=["res://.godot/imported/Heart.png-937d8a1966a4949eaae46f01c378042f.ctex"]
+source_file="res://assets/ui/Shield.svg"
+dest_files=["res://.godot/imported/Shield.svg-a93eb68458898dc64c805c36224c3766.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
