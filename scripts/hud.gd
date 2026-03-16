@@ -521,12 +521,16 @@ func _update_spell_button() -> void:
 		return
 	if not _main.has_method("get_spell_cooldown_remaining"):
 		return
+	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
 	var cd := float(_main.get_spell_cooldown_remaining())
 	var total := 12.0
 	if _main.has_method("get_spell_cooldown_total"):
 		total = float(_main.get_spell_cooldown_total())
 	var progress := 1.0
-	if total > 0.0:
+	if has_auto:
+		# 自动符卡：按钮始终视为未充能，保持禁用和隐藏
+		progress = 0.0
+	elif total > 0.0:
 		progress = clampf(1.0 - cd / total, 0.0, 1.0)
 	if _spell_button.has_method("set_progress"):
 		_spell_button.set_progress(progress)

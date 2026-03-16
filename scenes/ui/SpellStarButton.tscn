@@ -20,6 +20,10 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.08, 0.08, 0.12, 0.75)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [node name="StarIcon" type="TextureRect" parent="." unique_id=475180211]
 layout_mode = 1
