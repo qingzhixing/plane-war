@@ -458,10 +458,10 @@ func _ensure_side_weapon_cd_panel() -> void:
 	_side_weapon_cd_vbox.offset_bottom = 400.0
 	_side_weapon_cd_vbox.add_theme_constant_override("separation", 12)
 	root.add_child(_side_weapon_cd_vbox)
-	# 符卡冷却槽：固定放在右侧顶部
+	# 符卡冷却槽：固定放在右侧顶部，图标使用星形
 	_spell_cd_slot = STATUS_SLOT_SCENE.instantiate()
 	if _spell_cd_slot.has_method("set_icon_texture"):
-		_spell_cd_slot.set_icon_texture(preload("res://assets/sprites/bullets/spell_bullet.png"))
+		_spell_cd_slot.set_icon_texture(preload("res://assets/ui/star/star4.png"))
 	_side_weapon_cd_vbox.add_child(_spell_cd_slot)
 
 
@@ -558,9 +558,11 @@ func _update_spell_button() -> void:
 		progress = clampf(1.0 - cd / total, 0.0, 1.0)
 	if _spell_button.has_method("set_progress"):
 		_spell_button.set_progress(progress)
-	# 仅在未自动符卡且冷却完成时显示按钮
-	var is_ready := (not has_auto) and progress >= 0.999
-	_spell_button.visible = is_ready
+	# 未自动符卡时按钮始终可见，仅冷却完成后由星星显示“就绪感”
+	if has_auto:
+		_spell_button.visible = false
+	else:
+		_spell_button.visible = true
 
 
 func _on_spell_button_pressed() -> void:
