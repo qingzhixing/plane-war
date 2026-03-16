@@ -388,7 +388,7 @@ func _ensure_side_weapon_textures() -> void:
 	if _side_weapon_textures.size() > 0:
 		return
 	_side_weapon_textures["arrow"] = preload("res://assets/sprites/bullets/Arrow.png") as Texture2D
-	_side_weapon_textures["bomb"] = preload("res://assets/sprites/bullets/Bomb.png") as Texture2D
+	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
 	_side_weapon_textures["boomerang"] = preload("res://assets/sprites/bullets/Sickle.png") as Texture2D
 
 
