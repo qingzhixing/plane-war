@@ -6,6 +6,7 @@ extends TextureButton
 
 var _progress: float = 0.0
 var _frames: Array[Texture2D] = []
+@onready var _icon: TextureRect = $StarIcon
 
 
 func _ready() -> void:
@@ -38,8 +39,8 @@ func _disabled_by_progress() -> void:
 
 
 func _update_icon() -> void:
-	if _frames.is_empty():
+	if _icon == null or _frames.is_empty():
 		return
 	var idx: int = int(round(_progress * float(_frames.size() - 1)))
 	idx = clampi(idx, 0, _frames.size() - 1)
-	texture_normal = _frames[idx]
+	_icon.texture = _frames[idx]
