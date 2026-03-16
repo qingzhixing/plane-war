@@ -6,7 +6,7 @@
 [node name="SpellStarButton" type="TextureButton" unique_id=1293916485]
 offset_right = 25.0
 offset_bottom = 25.0
-scale = Vector2(5.5, 5.5)
+scale = Vector2(6, 6)
 mouse_filter = 2
 stretch_mode = 3
 script = ExtResource("1")
@@ -20,12 +20,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.08, 0.08, 0.12, 0.75)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
 
-[node name="StarIcon" type="TextureRect" parent="." unique_id=475180211]
+[node name="NormalIcon" type="TextureRect" parent="." unique_id=475180211]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -40,4 +36,20 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_jg7eg")
+stretch_mode = 3
+
+[node name="StarIcon" type="TextureRect" parent="." unique_id=987654321]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 stretch_mode = 3

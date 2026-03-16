@@ -6,7 +6,8 @@ extends TextureButton
 
 var _progress: float = 0.0
 var _frames: Array[Texture2D] = []
-@onready var _icon: TextureRect = $StarIcon
+@onready var _normal_icon: TextureRect = $NormalIcon
+@onready var _star_icon: TextureRect = $StarIcon
 
 
 func _ready() -> void:
@@ -39,10 +40,17 @@ func _disabled_by_progress() -> void:
 
 
 func _update_icon() -> void:
-	if _icon == null or _frames.is_empty():
+	if _normal_icon == null or _star_icon == null or _frames.is_empty():
 		return
-	var idx: int = int(round(_progress * float(_frames.size() - 1)))
-	idx = clampi(idx, 0, _frames.size() - 1)
-	_icon.texture = _frames[idx]
-	# 冷却中只显示底框，星星隐藏；冷却完成（≈100%）再显示星星
-	_icon.visible = _progress >= 0.999
+	var idx: int = int(floor(_progress * float(_frames.size()))) # 0~frames.size()
+	idx = clampi(idx, 0, _frames.size())
+	# 冷却中：用 NormalIcon 展示 star0~star3，隐藏 StarIcon
+	if idx < _frames.size() - 1:
+		_normal_icon.texture = _frames[idx]
+		_normal_icon.visible = true
+		_star_icon.visible = false
+	else:
+		# 冷却完成：隐藏普通贴图，仅显示满星 StarIcon
+		_normal_icon.visible = false
+		_star_icon.texture = _frames[_frames.size() - 1]
+		_star_icon.visible = true
