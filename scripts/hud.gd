@@ -38,6 +38,7 @@ var _shield_slot: Control = null
 var _side_weapon_cd_vbox: VBoxContainer = null
 var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
+var _spell_cd_slot: Control = null
 
 const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
 
@@ -457,11 +458,17 @@ func _ensure_side_weapon_cd_panel() -> void:
 	_side_weapon_cd_vbox.offset_bottom = 400.0
 	_side_weapon_cd_vbox.add_theme_constant_override("separation", 12)
 	root.add_child(_side_weapon_cd_vbox)
+	# 符卡冷却槽：固定放在右侧顶部
+	_spell_cd_slot = STATUS_SLOT_SCENE.instantiate()
+	if _spell_cd_slot.has_method("set_icon_texture"):
+		_spell_cd_slot.set_icon_texture(preload("res://assets/sprites/bullets/spell_bullet.png"))
+	_side_weapon_cd_vbox.add_child(_spell_cd_slot)
 
 
 func _update_side_weapon_cd_slots() -> void:
 	if _side_weapon_cd_vbox == null or not is_instance_valid(_player):
 		return
+	_update_spell_cd_slot()
 	var order: Array[String] = ["arrow", "bomb", "boomerang"]
 	for weapon_id in order:
 		var unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked(weapon_id)
@@ -506,6 +513,24 @@ func _update_side_weapon_cd_slots() -> void:
 		slot_node.set_count(n)
 
 
+func _update_spell_cd_slot() -> void:
+	if _spell_cd_slot == null or not is_instance_valid(_main):
+		return
+	if not _main.has_method("get_spell_cooldown_remaining"):
+		_spell_cd_slot.set_ratio(0.0)
+		_spell_cd_slot.set_count(0)
+		return
+	var cd := float(_main.get_spell_cooldown_remaining())
+	var total := 12.0
+	if _main.has_method("get_spell_cooldown_total"):
+		total = float(_main.get_spell_cooldown_total())
+	var r: float = 0.0
+	if total > 0.0:
+		r = clampf(cd / total, 0.0, 1.0)
+	_spell_cd_slot.set_ratio(r)
+	_spell_cd_slot.set_count(1)
+
+
 func _update_stats_label() -> void:
 	pass
 
@@ -528,12 +553,14 @@ func _update_spell_button() -> void:
 		total = float(_main.get_spell_cooldown_total())
 	var progress := 1.0
 	if has_auto:
-		# 自动符卡：按钮始终视为未充能，保持禁用和隐藏
 		progress = 0.0
 	elif total > 0.0:
 		progress = clampf(1.0 - cd / total, 0.0, 1.0)
 	if _spell_button.has_method("set_progress"):
 		_spell_button.set_progress(progress)
+	# 仅在未自动符卡且冷却完成时显示按钮
+	var is_ready := (not has_auto) and progress >= 0.999
+	_spell_button.visible = is_ready
 
 
 func _on_spell_button_pressed() -> void:

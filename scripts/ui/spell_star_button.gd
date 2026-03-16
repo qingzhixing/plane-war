@@ -36,8 +36,6 @@ func set_progress(value: float) -> void:
 func _disabled_by_progress() -> void:
 	# 冷却未完成时禁用，满进度（1.0）时可点击
 	disabled = _progress < 1.0
-	if _icon != null:
-		_icon.visible = not disabled
 
 
 func _update_icon() -> void:
