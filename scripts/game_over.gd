@@ -59,6 +59,12 @@ func show_game_over() -> void:
 		if _main.has_method("finalize_battle_records"):
 			diff = _main.finalize_battle_records()
 		var lines: Array[String] = []
+		# 若因生命归零触发结算，在顶部显示明显的死亡提示
+		var is_dead := false
+		if _main.has_method("get_lives_remaining"):
+			is_dead = _main.get_lives_remaining() <= 0
+		if is_dead:
+			lines.append("[color=#ff5555]You Dead![/color]")
 		if _main.has_method("get_score"):
 			var s: int = _main.get_score()
 			var best_s: int = _main.get_best_score() if _main.has_method("get_best_score") else s

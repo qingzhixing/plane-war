@@ -29,6 +29,7 @@ var _score_multiplier: float = 1.0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
+var _lives_remaining: int = 2
 var _spell_cooldown_scale: float = 1.0
 ## 一次性：自动符卡
 var _spell_auto: bool = false
@@ -115,6 +116,9 @@ func on_wave_cleared() -> void:
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	# 波次结束：若当前生命未满 2 条，则在进入升级前自动恢复 1 命（不超过 2）
+	if _lives_remaining < 2:
+		_lives_remaining += 1
 	# 续战：每波清场 → 升级（第 7 波小怪升级后再开 Boss，不在此弹「接着玩」）
 	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
 		_waiting_upgrade_choice = true
@@ -200,13 +204,27 @@ func apply_upgrade(upgrade_id: String) -> void:
 				p_guard.set_combo_guard_shield_visible(true)
 			return
 		"spell_cooldown", "bomb_cooldown":
-			_spell_cooldown_scale = maxf(0.45, _spell_cooldown_scale * 0.85)
+			var old_scale := _spell_cooldown_scale
+			var new_scale := maxf(0.45, _spell_cooldown_scale * 0.85)
+			_spell_cooldown_scale = new_scale
+			# 同步剩余冷却：按相同倍率缩短，保持当前进度不变，且不超过新最大冷却
+			if _spell_cooldown_remaining > 0.0 and old_scale > 0.0:
+				var factor := new_scale / old_scale
+				var new_total := _SPELL_COOLDOWN_SECONDS * new_scale
+				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor, 0.0, new_total)
 			return
 		"spell_auto", "bomb_auto":
 			if _spell_auto:
 				return
 			_spell_auto = true
-			_spell_cooldown_scale = maxf(0.2, _spell_cooldown_scale * 0.5)
+			var old_scale_auto := _spell_cooldown_scale
+			var new_scale_auto := maxf(0.2, _spell_cooldown_scale * 0.5)
+			_spell_cooldown_scale = new_scale_auto
+			# 自动符卡同时强力缩短冷却：剩余时间同样按倍率缩短，避免实际等待时间变长
+			if _spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
+				var factor_auto := new_scale_auto / old_scale_auto
+				var new_total_auto := _SPELL_COOLDOWN_SECONDS * new_scale_auto
+				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
 			if _spell_cooldown_remaining <= 0.0:
 				try_use_spell()
 			return
@@ -371,6 +389,9 @@ func record_graze() -> void:
 	score += gained
 	# 擦弹也提供少量连击奖励：按一次“命中”的连击增量累加
 	_on_successful_hit()
+	# 擦弹额外加速符卡冷却：每次擦弹减少 0.05 秒剩余冷却（若当前已无冷却则无效果）
+	if _spell_cooldown_remaining > 0.0:
+		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - 0.05)
 
 
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
@@ -387,6 +408,10 @@ func get_combo_guard_charges() -> int:
 	return _combo_guard_charges
 
 
+func get_lives_remaining() -> int:
+	return _lives_remaining
+
+
 func on_player_hit() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
@@ -400,8 +425,18 @@ func on_player_hit() -> void:
 			if p_hit.has_method("set_combo_guard_shield_visible"):
 				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
+	# 扣命：稳态护盾未挡下时，实际消耗一条命；本次扣命后 Life = 0 则立即结算
+	_lives_remaining = maxi(0, _lives_remaining - 1)
+	if _lives_remaining <= 0:
+		get_tree().call_group("game_over_ui", "show_game_over")
+		return
+	# 受击对连击的惩罚：Combo ×0.7 向下取整，小于等于 0 视为连击断档
 	if combo > 0:
-		combo = 0
+		var new_combo := int(floor(float(combo) * 0.7))
+		if new_combo <= 0:
+			combo = 0
+		else:
+			combo = new_combo
 
 
 func _on_successful_hit() -> void:

@@ -39,7 +39,11 @@ var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
 var _spell_cd_slot: Control = null
 
+# 生命展示：左侧 Life 槽位（与护盾/主炮同款）
+var _life_slot: Control = null
+
 const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
+const LIFE_ICON: Texture2D = preload("res://assets/ui/heart.svg")
 
 
 func _ready() -> void:
@@ -408,16 +412,21 @@ func _ensure_left_slots_panel() -> void:
 	root.add_child(_left_slots_vbox)
 	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
+	var tex_life: Texture2D = LIFE_ICON
 	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
 	_main_gun_slot.set_icon_texture(tex_gun)
 	_left_slots_vbox.add_child(_main_gun_slot)
 	_shield_slot = STATUS_SLOT_SCENE.instantiate()
 	_shield_slot.set_icon_texture(tex_shield)
 	_left_slots_vbox.add_child(_shield_slot)
+	_life_slot = STATUS_SLOT_SCENE.instantiate()
+	if tex_life != null:
+		_life_slot.set_icon_texture(tex_life)
+	_left_slots_vbox.add_child(_life_slot)
 
 
 func _update_left_slots() -> void:
-	if _main_gun_slot == null or _shield_slot == null:
+	if _main_gun_slot == null or _shield_slot == null or _life_slot == null:
 		return
 	# 主炮：外圈 = 下次开火剩余时间/间隔，x N = 齐射弹数
 	if is_instance_valid(_player) and _player.has_method("get_main_fire_cd_remaining"):
@@ -436,6 +445,14 @@ func _update_left_slots() -> void:
 		guard_n = _main.get_combo_guard_charges()
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
+
+	# 生命：外圈 = 有生命时满、无生命时空，x N = 剩余命数
+	var lives: int = 0
+	if is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
+		lives = _main.get_lives_remaining()
+	# 生命不展示冷却环，仅用图标 + xN 表示剩余命数
+	_life_slot.set_ratio(0.0)
+	_life_slot.set_count(maxi(0, lives))
 
 
 func _ensure_side_weapon_cd_panel() -> void:
