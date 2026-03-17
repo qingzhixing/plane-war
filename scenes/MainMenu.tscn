@@ -288,17 +288,16 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
  bbcode_enabled = true
- text = "[b]plane-war[/b]  [color=#8af]v0.2.2[/color]
-竖屏弹幕射击小品：波次清场、三选一强化、Boss 战；采用 2 条命离散生命值系统，以评分 / 连击 / DPS 为反馈核心。
+ text = "[b]plane-war 更新日志（节选）[/b]
+[color=#8af]v0.2.2[/color] - 2026-03-17
+- 引入 2 条命离散生命值系统，生命归零当次立刻结算本局。
+- 每波结束若生命未满 2 条，会自动恢复 1 命。
+- HUD 补全生命展示，并加强死亡结算提示。
 
-[b]开发者[/b]
-qingzhixing
+[color=#8af]v0.2.1[/color] - 2026-03-16
+- 新增发版检查清单章节，对齐工程与导出版本号。
 
-[b]技术[/b]
-Godot Engine 4.x · GDScript
-
-[b]开源[/b]
-源码与议题见 GitHub（下方按钮可在浏览器打开）。"
+完整更新记录请见下方 GitHub 按钮。"
 fit_content = true
 scroll_active = false
 
