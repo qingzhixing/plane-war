@@ -8,6 +8,22 @@
 - 平台目标：Windows + Android
 - 脚本语言：优先使用 **GDScript**（如需改为 C#，在本节补充说明）
 
+## 多语言与本地化（Localization）
+
+- **当前目标语言**：简体中文（`zh_CN`）+ 英文（`en`）。
+- **实现方式**：
+  - 使用 Godot 自带的 `TranslationServer` 与 CSV 翻译表（如 `res://i18n/ui.csv`）；
+  - 以当前场景中的中文文案作为「原文键」，CSV 中维护对应的英文翻译；
+  - 脚本动态创建的 UI 文本统一使用 `tr("原文")` 包装，便于之后继续扩展语言。
+- **语言切换入口**：
+  - 在设置菜单中新增「语言 / Language」选项（`OptionButton`），至少提供：
+    - 简体中文（`zh_CN`）
+    - English（`en`）
+  - 切换时调用 `TranslationServer.set_locale(...)`，即时更新当前局内 UI。
+- **持久化方案**：
+  - 在 `user://settings.cfg` 中新增 `settings/locale` 字段，用于记录玩家上次选择的语言；
+  - 启动游戏时先从该字段读取并设置语言；若没有记录，则默认使用简体中文（`zh_CN`，与当前实现一致）。
+
 ## 项目结构（建议）
 
 - 启动 / 主菜单：`res://scenes/MainMenu.tscn` → 开始游戏后进入 `res://scenes/Main.tscn`；关于页 `AboutUI` + `scripts/about_ui.gd`（`OS.shell_open` 打开 GitHub）。
