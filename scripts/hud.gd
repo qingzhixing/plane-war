@@ -39,9 +39,8 @@ var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
 var _spell_cd_slot: Control = null
 
-# 生命展示：左侧心形图标
-var _lives_hbox: HBoxContainer = null
-var _life_icons: Array[TextureRect] = []
+# 生命展示：左侧 Life 槽位（与护盾/主炮同款）
+var _life_slot: Control = null
 
 const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
 const LIFE_ICON: Texture2D = preload("res://assets/ui/heart.svg")
@@ -82,7 +81,6 @@ func _ready() -> void:
 	_ensure_side_weapon_textures()
 	_ensure_side_weapon_cd_panel()
 	_ensure_left_slots_panel()
-	_ensure_lives_panel()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
@@ -126,7 +124,6 @@ func _process(delta: float) -> void:
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 		_update_spell_button()
-		_update_lives_panel()
 	_update_left_slots()
 	_update_side_weapon_cd_slots()
 
@@ -415,16 +412,21 @@ func _ensure_left_slots_panel() -> void:
 	root.add_child(_left_slots_vbox)
 	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
+	var tex_life: Texture2D = LIFE_ICON
 	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
 	_main_gun_slot.set_icon_texture(tex_gun)
 	_left_slots_vbox.add_child(_main_gun_slot)
 	_shield_slot = STATUS_SLOT_SCENE.instantiate()
 	_shield_slot.set_icon_texture(tex_shield)
 	_left_slots_vbox.add_child(_shield_slot)
+	_life_slot = STATUS_SLOT_SCENE.instantiate()
+	if tex_life != null:
+		_life_slot.set_icon_texture(tex_life)
+	_left_slots_vbox.add_child(_life_slot)
 
 
 func _update_left_slots() -> void:
-	if _main_gun_slot == null or _shield_slot == null:
+	if _main_gun_slot == null or _shield_slot == null or _life_slot == null:
 		return
 	# 主炮：外圈 = 下次开火剩余时间/间隔，x N = 齐射弹数
 	if is_instance_valid(_player) and _player.has_method("get_main_fire_cd_remaining"):
@@ -443,6 +445,14 @@ func _update_left_slots() -> void:
 		guard_n = _main.get_combo_guard_charges()
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
+
+	# 生命：外圈 = 有生命时满、无生命时空，x N = 剩余命数
+	var lives: int = 0
+	if is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
+		lives = _main.get_lives_remaining()
+	# 生命不展示冷却环，仅用图标 + xN 表示剩余命数
+	_life_slot.set_ratio(0.0)
+	_life_slot.set_count(maxi(0, lives))
 
 
 func _ensure_side_weapon_cd_panel() -> void:
@@ -515,54 +525,6 @@ func _update_side_weapon_cd_slots() -> void:
 			n = vol
 		slot_node.set_ratio(r)
 		slot_node.set_count(n)
-
-
-func _ensure_lives_panel() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null or _lives_hbox != null:
-		return
-	_lives_hbox = HBoxContainer.new()
-	_lives_hbox.name = "LivesPanel"
-	_lives_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lives_hbox.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_lives_hbox.anchor_left = 0.0
-	_lives_hbox.anchor_right = 0.0
-	_lives_hbox.anchor_top = 0.0
-	_lives_hbox.anchor_bottom = 0.0
-	_lives_hbox.offset_left = 16.0
-	_lives_hbox.offset_top = 108.0
-	_lives_hbox.offset_right = 120.0
-	_lives_hbox.offset_bottom = 148.0
-	_lives_hbox.add_theme_constant_override("separation", 4)
-	root.add_child(_lives_hbox)
-
-	_life_icons.clear()
-	var max_lives := 2
-	for i in max_lives:
-		var icon := TextureRect.new()
-		icon.texture = LIFE_ICON
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		icon.custom_minimum_size = Vector2(28, 28)
-		_lives_hbox.add_child(icon)
-		_life_icons.append(icon)
-
-
-func _update_lives_panel() -> void:
-	if _lives_hbox == null or not is_instance_valid(_main):
-		return
-	if not _main.has_method("get_lives_remaining"):
-		for icon in _life_icons:
-			if icon != null:
-				icon.visible = false
-		return
-	var lives: int = _main.get_lives_remaining()
-	lives = maxi(0, lives)
-	for i in _life_icons.size():
-		var icon := _life_icons[i]
-		if icon == null:
-			continue
-		icon.visible = i < lives
 
 
 func _update_spell_cd_slot() -> void:
