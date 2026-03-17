@@ -29,6 +29,7 @@ var _score_multiplier: float = 1.0
 var _combo_gain_per_hit: int = 1
 var _combo_guard_charges: int = 0
 var _last_combo_buff_tier: int = -1
+var _lives_remaining: int = 2
 var _spell_cooldown_scale: float = 1.0
 ## 一次性：自动符卡
 var _spell_auto: bool = false
@@ -404,6 +405,10 @@ func get_combo_guard_charges() -> int:
 	return _combo_guard_charges
 
 
+func get_lives_remaining() -> int:
+	return _lives_remaining
+
+
 func on_player_hit() -> void:
 	var audio := get_tree().get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_player_hurt"):
@@ -417,8 +422,19 @@ func on_player_hit() -> void:
 			if p_hit.has_method("set_combo_guard_shield_visible"):
 				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
+	# 扣命：稳态护盾未挡下时，实际消耗一条命；命耗尽后下次受击直接结算本局
+	if _lives_remaining > 0:
+		_lives_remaining -= 1
+	else:
+		get_tree().call_group("game_over_ui", "show_game_over")
+		return
+	# 受击对连击的惩罚：Combo ×0.7 向下取整，小于等于 0 视为连击断档
 	if combo > 0:
-		combo = 0
+		var new_combo := int(floor(float(combo) * 0.7))
+		if new_combo <= 0:
+			combo = 0
+		else:
+			combo = new_combo
 
 
 func _on_successful_hit() -> void:
