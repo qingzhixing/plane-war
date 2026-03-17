@@ -412,6 +412,12 @@ func _load_extra_settings() -> void:
 			_scale_option.select(0)
 	_apply_scale_percent(scale_percent)
 	_apply_locale(locale)
+	# 同步语言下拉框显示与当前 locale 一致
+	if _language_option != null:
+		if locale.begins_with("en"):
+			_language_option.select(1)
+		else:
+			_language_option.select(0)
 
 
 func _save_extra_settings() -> void:
