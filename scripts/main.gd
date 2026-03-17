@@ -116,6 +116,9 @@ func on_wave_cleared() -> void:
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
 			b.queue_free()
+	# 波次结束：若当前生命未满 2 条，则在进入升级前自动恢复 1 命（不超过 2）
+	if _lives_remaining < 2:
+		_lives_remaining += 1
 	# 续战：每波清场 → 升级（第 7 波小怪升级后再开 Boss，不在此弹「接着玩」）
 	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
 		_waiting_upgrade_choice = true
