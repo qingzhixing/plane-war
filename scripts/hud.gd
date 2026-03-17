@@ -38,9 +38,13 @@ var _side_weapon_cd_vbox: VBoxContainer = null
 var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
 var _spell_cd_slot: Control = null
-var _lives_label: Label = null
+
+# 生命展示：左侧心形图标
+var _lives_hbox: HBoxContainer = null
+var _life_icons: Array[TextureRect] = []
 
 const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
+const LIFE_ICON: Texture2D = preload("res://assets/ui/heart.svg")
 
 
 func _ready() -> void:
@@ -78,7 +82,7 @@ func _ready() -> void:
 	_ensure_side_weapon_textures()
 	_ensure_side_weapon_cd_panel()
 	_ensure_left_slots_panel()
-	_ensure_lives_label()
+	_ensure_lives_panel()
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
@@ -122,7 +126,7 @@ func _process(delta: float) -> void:
 		if _dps_label != null:
 			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
 		_update_spell_button()
-		_update_lives_label()
+		_update_lives_panel()
 	_update_left_slots()
 	_update_side_weapon_cd_slots()
 
@@ -513,35 +517,52 @@ func _update_side_weapon_cd_slots() -> void:
 		slot_node.set_count(n)
 
 
-func _ensure_lives_label() -> void:
+func _ensure_lives_panel() -> void:
 	var root := get_node_or_null("Root") as Control
-	if root == null or _lives_label != null:
+	if root == null or _lives_hbox != null:
 		return
-	_lives_label = Label.new()
-	_lives_label.name = "LivesLabel"
-	_lives_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lives_label.add_theme_font_size_override("font_size", 26)
-	_lives_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_lives_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_lives_label.anchor_left = 0.0
-	_lives_label.anchor_right = 0.0
-	_lives_label.anchor_top = 0.0
-	_lives_label.anchor_bottom = 0.0
-	_lives_label.offset_left = 16.0
-	_lives_label.offset_top = 112.0
-	_lives_label.offset_right = 200.0
-	_lives_label.offset_bottom = 146.0
-	root.add_child(_lives_label)
+	_lives_hbox = HBoxContainer.new()
+	_lives_hbox.name = "LivesPanel"
+	_lives_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_lives_hbox.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_lives_hbox.anchor_left = 0.0
+	_lives_hbox.anchor_right = 0.0
+	_lives_hbox.anchor_top = 0.0
+	_lives_hbox.anchor_bottom = 0.0
+	_lives_hbox.offset_left = 16.0
+	_lives_hbox.offset_top = 108.0
+	_lives_hbox.offset_right = 120.0
+	_lives_hbox.offset_bottom = 148.0
+	_lives_hbox.add_theme_constant_override("separation", 4)
+	root.add_child(_lives_hbox)
+
+	_life_icons.clear()
+	var max_lives := 2
+	for i in max_lives:
+		var icon := TextureRect.new()
+		icon.texture = LIFE_ICON
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.custom_minimum_size = Vector2(28, 28)
+		_lives_hbox.add_child(icon)
+		_life_icons.append(icon)
 
 
-func _update_lives_label() -> void:
-	if _lives_label == null or not is_instance_valid(_main):
+func _update_lives_panel() -> void:
+	if _lives_hbox == null or not is_instance_valid(_main):
 		return
 	if not _main.has_method("get_lives_remaining"):
-		_lives_label.text = ""
+		for icon in _life_icons:
+			if icon != null:
+				icon.visible = false
 		return
 	var lives: int = _main.get_lives_remaining()
-	_lives_label.text = "Life x%d" % maxi(0, lives)
+	lives = maxi(0, lives)
+	for i in _life_icons.size():
+		var icon := _life_icons[i]
+		if icon == null:
+			continue
+		icon.visible = i < lives
 
 
 func _update_spell_cd_slot() -> void:
