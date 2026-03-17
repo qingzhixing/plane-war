@@ -3,6 +3,6 @@
 /android/
 .vscode/
 target/
-
 # README 截图目录：已由 .gdignore 排除导入；若本地曾生成过 import，勿提交
 docs/picture/*.import
+wxgame
