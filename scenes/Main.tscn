@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/game_over.gd" id="5_game_over"]
 [ext_resource type="Script" uid="uid://cmpx7cpm1wjx" path="res://scripts/main.gd" id="6_main"]
 [ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
+[ext_resource type="FontFile" uid="uid://f7l5i1xl7ed6" path="res://assets/font/PixelOperator8-Bold.ttf" id="8_3p2gp"]
 [ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
 [ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
@@ -63,17 +64,17 @@ horizontal_alignment = 2
 [node name="ComboLabel" type="Label" parent="HUD/Root" unique_id=1529816770]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = -1
 anchor_right = 1.0
-offset_left = -298.0
-offset_top = 58.0
-offset_right = -16.0
-offset_bottom = 102.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 317.0
+offset_bottom = -867.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 32
+theme_override_fonts/font = ExtResource("8_3p2gp")
+theme_override_font_sizes/font_size = 34
 text = "Combo Display Bug"
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SpellStarButton" parent="HUD/Root" unique_id=2140247232 instance=ExtResource("14_spell_star_button")]
@@ -116,22 +117,26 @@ text = "设置"
 
 [node name="LeftStatsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
 layout_mode = 0
-offset_left = 33.0
-offset_top = 319.0
-offset_right = 389.0
-offset_bottom = 591.0
+offset_left = 357.0
+offset_top = 67.0
+offset_right = 713.0
+offset_bottom = 339.0
 
 [node name="ScoreLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=268481878]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Score: 0"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="DpsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=1153599571]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "DPS: 0  Max: 0"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
 process_mode = 3

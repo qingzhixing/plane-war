@@ -200,13 +200,27 @@ func apply_upgrade(upgrade_id: String) -> void:
 				p_guard.set_combo_guard_shield_visible(true)
 			return
 		"spell_cooldown", "bomb_cooldown":
-			_spell_cooldown_scale = maxf(0.45, _spell_cooldown_scale * 0.85)
+			var old_scale := _spell_cooldown_scale
+			var new_scale := maxf(0.45, _spell_cooldown_scale * 0.85)
+			_spell_cooldown_scale = new_scale
+			# 同步剩余冷却：按相同倍率缩短，保持当前进度不变，且不超过新最大冷却
+			if _spell_cooldown_remaining > 0.0 and old_scale > 0.0:
+				var factor := new_scale / old_scale
+				var new_total := _SPELL_COOLDOWN_SECONDS * new_scale
+				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor, 0.0, new_total)
 			return
 		"spell_auto", "bomb_auto":
 			if _spell_auto:
 				return
 			_spell_auto = true
-			_spell_cooldown_scale = maxf(0.2, _spell_cooldown_scale * 0.5)
+			var old_scale_auto := _spell_cooldown_scale
+			var new_scale_auto := maxf(0.2, _spell_cooldown_scale * 0.5)
+			_spell_cooldown_scale = new_scale_auto
+			# 自动符卡同时强力缩短冷却：剩余时间同样按倍率缩短，避免实际等待时间变长
+			if _spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
+				var factor_auto := new_scale_auto / old_scale_auto
+				var new_total_auto := _SPELL_COOLDOWN_SECONDS * new_scale_auto
+				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
 			if _spell_cooldown_remaining <= 0.0:
 				try_use_spell()
 			return
