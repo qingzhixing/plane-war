@@ -5,21 +5,21 @@ const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 # 与 UpgradeUI + Main.apply_upgrade 对齐；含仅 Main 处理的词条
 const _ALL: Array[Dictionary] = [
-	{"id": "fire_rate", "name": "速射机炮", "desc": "间隔×0.85；溢出攻速%转伤"},
-	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
-	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
-	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
-	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
-	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
-	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射 +1 / 解锁"},
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖 / 齐射 +1"},
-	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
-	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
-	{"id": "spell_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
-	{"id": "spell_auto", "name": "自动符卡", "desc": "一次性 冷却-50% 自动放"},
-	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器 / 齐射 +1"},
-	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
-	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
+	{"id": "fire_rate", "name_key": "upgrade_fire_rate_name", "desc_key": "upgrade_fire_rate_desc"},
+	{"id": "damage_percent", "name_key": "upgrade_damage_percent_name", "desc_key": "upgrade_damage_percent_desc"},
+	{"id": "multi_shot", "name_key": "upgrade_multi_shot_name", "desc_key": "upgrade_multi_shot_desc"},
+	{"id": "bullet_speed", "name_key": "upgrade_bullet_speed_name", "desc_key": "upgrade_bullet_speed_desc"},
+	{"id": "spread_focus", "name_key": "upgrade_spread_focus_name", "desc_key": "upgrade_spread_focus_desc"},
+	{"id": "arrow_cooldown", "name_key": "upgrade_arrow_cooldown_name", "desc_key": "upgrade_arrow_cooldown_desc"},
+	{"id": "arrow_multi", "name_key": "upgrade_arrow_multi_name", "desc_key": "upgrade_arrow_multi_desc"},
+	{"id": "boomerang_multi", "name_key": "upgrade_boomerang_multi_name", "desc_key": "upgrade_boomerang_multi_desc"},
+	{"id": "combo_boost", "name_key": "upgrade_combo_boost_name", "desc_key": "upgrade_combo_boost_desc"},
+	{"id": "combo_guard", "name_key": "upgrade_combo_guard_name", "desc_key": "upgrade_combo_guard_desc"},
+	{"id": "spell_cooldown", "name_key": "upgrade_spell_cooldown_name", "desc_key": "upgrade_spell_cooldown_desc"},
+	{"id": "spell_auto", "name_key": "upgrade_spell_auto_name", "desc_key": "upgrade_spell_auto_desc"},
+	{"id": "bomb_multi", "name_key": "upgrade_bomb_multi_name", "desc_key": "upgrade_bomb_multi_desc"},
+	{"id": "bomb_side_cooldown", "name_key": "upgrade_bomb_side_cooldown_name", "desc_key": "upgrade_bomb_side_cooldown_desc"},
+	{"id": "score_up", "name_key": "upgrade_score_up_name", "desc_key": "upgrade_score_up_desc"},
 ]
 
 var _main: Node
@@ -113,7 +113,7 @@ func _build_ui() -> void:
 	for u in _ALL:
 		var id: String = u["id"]
 		var b := Button.new()
-		b.text = "%s — %s" % [u["name"], u["desc"]]
+		b.text = "%s — %s" % [tr(u["name_key"]), tr(u["desc_key"])]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(0, 44)
 		b.pressed.connect(_on_pick.bind(id))

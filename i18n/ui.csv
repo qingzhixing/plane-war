@@ -41,7 +41,37 @@ SFX 音量,SFX Volume,SFX 音量
 语言,Language,语言
 简体中文,Simplified Chinese,简体中文
 English,English,English
-升级！选一个强化,Level up! Pick one upgrade,升级！选一个强化
+upgrade_pick_title,Level up! Pick one upgrade,升级！选一个强化
 调试：自选升级（点关闭返回）,Debug: Pick upgrades (close to return),调试：自选升级（点关闭返回）
 关闭,Close,关闭
 点击条目立即生效，可重复叠加,Click entries to apply immediately; can stack multiple times,点击条目立即生效，可重复叠加
+upgrade_fire_rate_name,High-speed cannon,速射机炮
+upgrade_fire_rate_desc,Main gun interval -15%; overflow attack speed converts to damage,主武器间隔 -15%；超 75发/秒 的攻速按%转攻击力
+upgrade_damage_percent_name,High-explosive rounds,高爆弹头
+upgrade_damage_percent_desc,Main gun damage +20%,主武器伤害 +20%
+upgrade_multi_shot_name,Twin barrels,双联机炮
+upgrade_multi_shot_desc,Main gun bullet count +1,主武器弹数 +1
+upgrade_bullet_speed_name,High-velocity rounds,高初速弹体
+upgrade_bullet_speed_desc,Main gun bullet speed +12%,主武器弹速 +12%
+upgrade_spread_focus_name,Focused fire,火力收束
+upgrade_spread_focus_desc,Narrower main gun spread,主武器弹道更集中
+upgrade_arrow_cooldown_name,Light quiver,轻量箭袋
+upgrade_arrow_cooldown_desc,Arrow cooldown -20%,弓箭冷却 -20%
+upgrade_arrow_multi_name,Barrage arrows,齐射箭矢
+upgrade_arrow_multi_desc,Unlock arrows; multishot +1; high damage arrows can destroy enemy bullets,解锁弓箭；齐射+1；箭矢高伤且可撞毁敌弹
+upgrade_boomerang_multi_name,Twin boomerangs,双刃回旋
+upgrade_boomerang_multi_desc,Unlock boomerangs; if unlocked, boomerang multishot +1 (next wave after all return),解锁回旋镖；已解锁则回旋镖齐射 +1（全数回收后再射下一波）
+upgrade_bomb_multi_name,Mounted bombs,挂载炸弹
+upgrade_bomb_multi_desc,Unlock bomb side weapon, multishot +1; fires upward and only hits enemies,解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机
+upgrade_bomb_side_cooldown_name,Bomb reload,炸弹装填
+upgrade_bomb_side_cooldown_desc,Bomb side weapon cooldown -20%,炸弹副武器冷却 -20%
+upgrade_combo_boost_name,Rhythm boost,节奏推进
+upgrade_combo_boost_desc,Each hit grants +1 combo,每次命中连击 +1
+upgrade_combo_guard_name,Steady shield,稳态护盾
+upgrade_combo_guard_desc,Shield +1 layer; consuming 1 layer prevents combo loss on hit,护盾 +1 层；受击时消耗 1 层代替断连，可叠加
+upgrade_spell_cooldown_name,Spell charge,符卡充能
+upgrade_spell_cooldown_desc,Spell cooldown -15%,符卡冷却 -15%
+upgrade_spell_auto_name,Auto spell,自动符卡
+upgrade_spell_auto_desc,[One-shot] spell cooldown -50% more and auto-cast when ready,【一次性】符卡冷却再 -50%，冷却结束自动释放
+upgrade_score_up_name,Score booster,评分增幅
+upgrade_score_up_desc,Score multiplier +15%,评分乘区 +15%
