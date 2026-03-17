@@ -385,6 +385,9 @@ func record_graze() -> void:
 	score += gained
 	# 擦弹也提供少量连击奖励：按一次“命中”的连击增量累加
 	_on_successful_hit()
+	# 擦弹额外加速符卡冷却：每次擦弹减少 0.05 秒剩余冷却（若当前已无冷却则无效果）
+	if _spell_cooldown_remaining > 0.0:
+		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - 0.05)
 
 
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
