@@ -113,10 +113,19 @@ func _build_ui() -> void:
 	for u in _ALL:
 		var id: String = u["id"]
 		var b := Button.new()
-		b.text = "%s — %s" % [tr(u["name_key"]), tr(u["desc_key"])]
+		b.text = ""
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(0, 44)
 		b.pressed.connect(_on_pick.bind(id))
+		var lbl := Label.new()
+		lbl.text = "%s — %s" % [tr(u["name_key"]), tr(u["desc_key"])]
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(lbl)
+		lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+		lbl.set_offsets_preset(Control.PRESET_FULL_RECT)
 		list.add_child(b)
 
 
