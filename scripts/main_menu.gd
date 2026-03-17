@@ -5,6 +5,9 @@ extends Control
 
 
 func _ready() -> void:
+	# 默认语言：简体中文（若未手动选择过语言）
+	if TranslationServer.get_locale() == "" or TranslationServer.get_locale().begins_with("en"):
+		TranslationServer.set_locale("zh_CN")
 	if game_scene == null:
 		game_scene = load("res://scenes/Main.tscn") as PackedScene
 
