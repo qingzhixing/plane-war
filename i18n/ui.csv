@@ -15,9 +15,17 @@ keys,en,zh_CN
 在浏览器打开 GitHub 仓库,Open GitHub repo in browser,在浏览器打开 GitHub 仓库
 第 1 波,Wave 1,第 1 波
 暂停,Pause,暂停
+继续,Continue,继续
 结算,Summary,结算
 重新开始,Restart,重新开始
 主菜单,Main Menu,主菜单
+本局结算,Settle this run,本局结算
+继续挑战,Continue challenge,继续挑战
+Boss 击破,Boss Defeated,Boss 击破
+当前威胁 %d。继续：威胁+1、护盾+1，连续 3 次三选一后进续战 8 波（7 波小怪 + 第 8 波 Boss）。,Current threat %d. Continue: threat+1, shield+1, then three upgrade choices followed by 8 more waves (7 mobs + 1 Boss).,当前威胁 %d。继续：威胁+1、护盾+1，连续 3 次三选一后进续战 8 波（7 波小怪 + 第 8 波 Boss）。
+续战一轮结束,Extension block finished,续战一轮结束
+已完成一轮续战（威胁 %d）。结算或接着玩（再威胁+1、护盾+1、3 次三选一后 8 波含 Boss）。,One extension block complete (threat %d). Settle now or keep playing (threat+1, shield+1, three upgrade choices then 8 more waves with Boss).,已完成一轮续战（威胁 %d）。结算或接着玩（再威胁+1、护盾+1、3 次三选一后 8 波含 Boss）。
+接着玩,Keep playing,接着玩
 设置标题,Settings,设置
 BGM 音量,BGM Volume,BGM 音量
 SFX 音量,SFX Volume,SFX 音量
