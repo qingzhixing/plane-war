@@ -288,7 +288,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
  bbcode_enabled = true
- text = "[b]plane-war[/b]  [color=#8af]v0.2.1[/color]
+ text = "[b]plane-war[/b]  [color=#8af]v0.2.2[/color]
 竖屏弹幕射击小品：波次清场、三选一强化、Boss 战；采用 2 条命离散生命值系统，以评分 / 连击 / DPS 为反馈核心。
 
 [b]开发者[/b]
