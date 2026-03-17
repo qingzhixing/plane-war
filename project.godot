@@ -35,6 +35,10 @@ window/handheld/orientation=1
 
 project/assembly_name="plane-war"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://i18n/ui.en.translation", "res://i18n/ui.zh_CN.translation")
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

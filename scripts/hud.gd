@@ -167,9 +167,9 @@ func _on_settings_button_pressed() -> void:
 
 func _update_pause_button_text() -> void:
 	if _is_paused:
-		_pause_button.text = "继续"
+		_pause_button.text = tr("继续")
 	else:
-		_pause_button.text = "暂停"
+		_pause_button.text = tr("暂停")
 
 
 func _update_combo_visual(combo: int) -> void:
