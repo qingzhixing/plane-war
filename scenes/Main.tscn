@@ -85,13 +85,12 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -141.0
-offset_top = -144.0
-offset_right = -115.48816
-offset_bottom = -118.80322
+offset_left = -190.99994
+offset_top = -206.0
+offset_right = -165.4881
+offset_bottom = -180.80322
 grow_horizontal = 0
 grow_vertical = 0
-scale = Vector2(3.175, 3.175)
 
 [node name="TopLeftButtons" type="VBoxContainer" parent="HUD/Root" unique_id=1840417451]
 layout_mode = 0
