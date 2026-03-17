@@ -422,10 +422,9 @@ func on_player_hit() -> void:
 			if p_hit.has_method("set_combo_guard_shield_visible"):
 				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
-	# 扣命：稳态护盾未挡下时，实际消耗一条命；命耗尽后下次受击直接结算本局
-	if _lives_remaining > 0:
-		_lives_remaining -= 1
-	else:
+	# 扣命：稳态护盾未挡下时，实际消耗一条命；本次扣命后 Life = 0 则立即结算
+	_lives_remaining = maxi(0, _lives_remaining - 1)
+	if _lives_remaining <= 0:
 		get_tree().call_group("game_over_ui", "show_game_over")
 		return
 	# 受击对连击的惩罚：Combo ×0.7 向下取整，小于等于 0 视为连击断档
