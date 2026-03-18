@@ -1,5 +1,7 @@
-extends CanvasLayer
+extends ModalPanel
 ## 主线 Boss 击破 / 续战块结束（第 8 波 Boss 后）：结算 vs 继续
+
+class_name PostBossChoicePanel
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
@@ -9,10 +11,16 @@ var _after_block: bool = false
 
 
 func _ready() -> void:
-	layer = 120
-	visible = false
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	super._ready()
 	_build_ui()
+
+
+func get_panel_layer() -> int:
+	return 120
+
+
+func allows_cancel_action() -> bool:
+	return false
 
 
 func _build_ui() -> void:
@@ -79,7 +87,7 @@ func bind_main(m: Node) -> void:
 
 func show_choice() -> void:
 	_after_block = false
-	visible = true
+	open_panel()
 	if _title_label != null:
 		_title_label.text = "Boss 击破"
 	var tier := 0
@@ -95,7 +103,7 @@ func show_choice() -> void:
 
 func show_choice_after_block() -> void:
 	_after_block = true
-	visible = true
+	open_panel()
 	if _title_label != null:
 		_title_label.text = "续战一轮结束"
 	var tier := 0
@@ -110,13 +118,13 @@ func show_choice_after_block() -> void:
 
 
 func _on_settle() -> void:
-	visible = false
+	close_panel()
 	get_tree().paused = true
 	get_tree().call_group("game_over_ui", "show_game_over")
 
 
 func _on_continue() -> void:
-	visible = false
+	close_panel()
 	if _main == null:
 		return
 	if _after_block:

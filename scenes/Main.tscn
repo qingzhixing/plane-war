@@ -10,7 +10,7 @@
 [ext_resource type="FontFile" uid="uid://f7l5i1xl7ed6" path="res://assets/font/PixelOperator8-Bold.ttf" id="8_3p2gp"]
 [ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
-[ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossHud.tscn" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
 [ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
@@ -208,9 +208,7 @@ script = ExtResource("7_upgrade_ui")
 process_mode = 3
 script = ExtResource("8_settings_ui")
 
-[node name="BossHUD" type="CanvasLayer" parent="." unique_id=426736218]
-process_mode = 3
-script = ExtResource("10_boss_hud")
+[node name="BossHUD" parent="." unique_id=426736218 instance=ExtResource("10_boss_hud")]
 
 [node name="DebugUpgradePicker" type="CanvasLayer" parent="." unique_id=1720892747]
 process_mode = 4

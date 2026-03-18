@@ -1,4 +1,6 @@
-extends CanvasLayer
+extends ModalPanel
+
+class_name GameOverPanel
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
@@ -12,11 +14,10 @@ var _restart_btn: Button
 var _main_menu_btn: Button
 
 func _ready() -> void:
+	super._ready()
 	add_to_group("game_over_ui") 
 	if main_path != NodePath(""):
 		_main = get_node(main_path)
-
-	visible = false
 
 	# 复用场景中已有的 GameOver UI 结构：GameOver/Root/... 节点
 	var root := get_node_or_null("Root")
@@ -51,6 +52,14 @@ func _ready() -> void:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 	if _main_menu_btn != null:
 		_main_menu_btn.pressed.connect(_on_main_menu_pressed)
+
+
+func get_panel_layer() -> int:
+	return 121
+
+
+func allows_cancel_action() -> bool:
+	return false
 
 func show_game_over() -> void:
 	# 更新结算信息：以评分与表现为核心
@@ -96,7 +105,7 @@ func show_game_over() -> void:
 	var root := get_node_or_null("Root")
 	if root is Control:
 		root.visible = true
-	visible = true
+	open_panel()
 	get_tree().paused = true
 
 func _on_continue_pressed() -> void:
@@ -104,11 +113,13 @@ func _on_continue_pressed() -> void:
 	pass
 
 func _on_restart_pressed() -> void:
+	close_panel()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 
 func _on_main_menu_pressed() -> void:
+	close_panel()
 	get_tree().paused = false
 	if Engine.has_singleton("SceneManager"):
 		var mgr := Engine.get_singleton("SceneManager")
@@ -120,3 +131,10 @@ func _on_main_menu_pressed() -> void:
 		var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
 		if err != OK:
 			tree.reload_current_scene()
+
+
+func close_panel() -> void:
+	var root := get_node_or_null("Root")
+	if root is Control:
+		root.visible = false
+	super.close_panel()
