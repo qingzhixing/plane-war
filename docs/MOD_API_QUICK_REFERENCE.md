@@ -1,4 +1,4 @@
-# Plane War Mod API 速查（一期）
+# Plane War Mod API 速查（一期 + 二期 + 三期）
 
 面向 Mod 作者的快速参考文档。  
 本页聚焦当前项目实际可用的扩展点：事件、注册接口、字段约束与最小模板。
@@ -35,6 +35,10 @@ func _init() -> void:
 - `after_main_shot`
 - `process_mod_weapons`
 - `collect_upgrade_entries`
+- `before_apply_upgrade`
+- `after_apply_upgrade`
+- `before_apply_main_upgrade`
+- `after_apply_main_upgrade`
 
 注册方式：
 
@@ -158,6 +162,66 @@ func _handler(payload: Dictionary) -> Dictionary:
 
 ---
 
+### 3.7 `before_apply_upgrade`
+
+触发点：玩家升级应用前。  
+输入字段：
+
+- `player: Node`
+- `upgrade_id: String`
+- `cancel: bool`
+
+常用输出字段：
+
+- `upgrade_id`：可改写为另一个升级 ID（升级重定向）。
+- `cancel = true`：取消本次升级应用（不会执行内建效果或 Mod 效果处理器）。
+
+---
+
+### 3.8 `after_apply_upgrade`
+
+触发点：玩家升级处理后。  
+输入字段：
+
+- `player: Node`
+- `original_upgrade_id: String`
+- `resolved_upgrade_id: String`
+- `applied: bool`
+- `cancelled: bool`
+
+用于统计、日志、成就、联动后处理。
+
+---
+
+### 3.9 `before_apply_main_upgrade`
+
+触发点：Main 侧升级应用前。  
+输入字段：
+
+- `main: Node`
+- `upgrade_id: String`
+- `cancel: bool`
+
+常用输出字段：
+
+- `upgrade_id`：可重定向升级 ID。
+- `cancel = true`：取消本次 Main 侧升级应用。
+
+---
+
+### 3.10 `after_apply_main_upgrade`
+
+触发点：Main 侧升级处理后。  
+输入字段：
+
+- `main: Node`
+- `original_upgrade_id: String`
+- `resolved_upgrade_id: String`
+- `applied: bool`
+- `cancelled: bool`
+
+---
+
 ## 4. 注册接口速查
 
 ### 4.1 注册敌人
@@ -177,6 +241,7 @@ ModExtensionBridge.register_enemy_entry(
 规则：
 
 - `enemy_id` 不能为空，且不可重复。
+- 第三个参数 `replace_existing=true` 可覆盖同 ID 旧条目。
 - `scene` 必须是 `PackedScene`。
 - `weight` 会参与 mod 敌人候选加权。
 - `wave_min` 小于当前波次时才可参与。
@@ -198,6 +263,7 @@ ModExtensionBridge.register_upgrade_entry(
 ```
 
 第二个参数 `direct_combat` 为 `true` 时，会被标记为直接战斗类升级。
+第三个参数 `replace_existing=true` 可覆盖同 ID 旧条目。
 
 ---
 
@@ -234,6 +300,60 @@ ModExtensionBridge.register_weapon_entry("my_weapon", {"id": "my_weapon"})
 ```
 
 当前核心战斗流程里尚未直接消费该注册表，可视为预留能力。
+
+---
+
+### 4.6 事件处理器管理（二期）
+
+```gdscript
+ModExtensionBridge.unregister_event_handler("before_main_shot", _before_main_shot)
+ModExtensionBridge.clear_event_handlers("before_main_shot")
+ModExtensionBridge.clear_event_handlers() # 清空所有事件处理器
+var n := ModExtensionBridge.get_event_handler_count("before_main_shot")
+```
+
+适合热更新、切换模式、临时订阅后回收。
+
+---
+
+### 4.7 升级效果处理器管理（二期）
+
+```gdscript
+ModExtensionBridge.unregister_upgrade_effect_handler(_apply_upgrade)
+ModExtensionBridge.clear_upgrade_effect_handlers()
+var n := ModExtensionBridge.get_upgrade_effect_handler_count()
+```
+
+用于动态卸载或重新装配升级效果逻辑。
+
+---
+
+### 4.8 Main 升级效果处理器
+
+```gdscript
+ModExtensionBridge.register_main_upgrade_effect_handler(_apply_main_upgrade)
+ModExtensionBridge.unregister_main_upgrade_effect_handler(_apply_main_upgrade)
+ModExtensionBridge.clear_main_upgrade_effect_handlers()
+```
+
+处理器签名：
+
+```gdscript
+func _apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
+    return false
+```
+
+---
+
+### 4.9 注册表快照与清理
+
+```gdscript
+var stats := ModExtensionBridge.get_registry_stats()
+var enemies := ModExtensionBridge.get_registered_enemy_entries()
+ModExtensionBridge.clear_enemy_registry()
+ModExtensionBridge.clear_weapon_registry()
+ModExtensionBridge.clear_upgrade_registry()
+```
 
 ---
 
