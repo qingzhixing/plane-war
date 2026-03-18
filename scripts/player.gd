@@ -250,19 +250,19 @@ func _spawn_bomb_shot() -> void:
 		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.72, 0, "bullet", "straight", side_offset)
 
 
-func _spawn_boomerang_volley() -> void:
-	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null or _boomerang_airborne > 0:
+func _spawn_single_boomerang() -> void:
+	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
 		return
-	var n: int = maxi(1, _boomerang_shot_count)
-	_boomerang_airborne = n
-	var spread := 0.18
-	for i in n:
-		var angle: float = (i - (n - 1) * 0.5) * spread
-		var dir := Vector2(sin(angle), -cos(angle))
-		if dir.y > 0.0:
-			dir.y = -dir.y
-		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
-		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
+	if _boomerang_airborne >= _boomerang_shot_count:
+		return
+	var dir := _boomerang_aim_dir()
+	if dir == Vector2.ZERO:
+		dir = Vector2(0, -1)
+	if dir.y > 0.0:
+		dir.y = -dir.y
+	var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0
+	_boomerang_airborne = maxi(0, _boomerang_airborne + 1)
+	_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
 
 
 func _boomerang_aim_dir() -> Vector2:
@@ -280,8 +280,8 @@ func _boomerang_aim_dir() -> Vector2:
 
 func on_boomerang_returned() -> void:
 	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
-	if _boomerang_airborne == 0 and has_weapon_unlocked("boomerang"):
-		call_deferred("_spawn_boomerang_volley")
+	if has_weapon_unlocked("boomerang"):
+		call_deferred("_spawn_single_boomerang")
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -510,9 +510,10 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"boomerang_multi":
 			if not has_weapon_unlocked("boomerang"):
 				_weapon_unlocked["boomerang"] = true
-				call_deferred("_spawn_boomerang_volley")
+				call_deferred("_spawn_single_boomerang")
 			else:
 				_boomerang_shot_count = mini(6, _boomerang_shot_count + 1)
+				call_deferred("_spawn_single_boomerang")
 		"bomb_multi", "bomb_weapon":
 			if not has_weapon_unlocked("bomb"):
 				_weapon_unlocked["bomb"] = true
