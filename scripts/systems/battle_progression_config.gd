@@ -24,15 +24,24 @@ const _DEFAULT_SPAWN := {
 	"boss_spawn_y": -100.0,
 }
 
+const _DEFAULT_COMBAT := {
+	"spell_short_tap_max_ms": 320,
+	"spell_short_tap_max_distance": 56.0,
+	"graze_spell_cooldown_reduce": 0.05,
+	"hit_combo_keep_ratio": 0.7,
+}
+
 var _progression_cfg: Dictionary = {}
 var _scaling_cfg: Dictionary = {}
 var _spawn_cfg: Dictionary = {}
+var _combat_cfg: Dictionary = {}
 
 
 func _init() -> void:
 	_progression_cfg = _DEFAULT_PROGRESSION.duplicate(true)
 	_scaling_cfg = _DEFAULT_SCALING.duplicate(true)
 	_spawn_cfg = _DEFAULT_SPAWN.duplicate(true)
+	_combat_cfg = _DEFAULT_COMBAT.duplicate(true)
 	_load_from_json()
 
 
@@ -47,12 +56,15 @@ func _load_from_json() -> void:
 	var progression_raw: Variant = cfg.get("progression", {})
 	var scaling_raw: Variant = cfg.get("scaling", {})
 	var spawn_raw: Variant = cfg.get("spawn", {})
+	var combat_raw: Variant = cfg.get("combat", {})
 	if typeof(progression_raw) == TYPE_DICTIONARY:
 		_progression_cfg.merge(progression_raw as Dictionary, true)
 	if typeof(scaling_raw) == TYPE_DICTIONARY:
 		_scaling_cfg.merge(scaling_raw as Dictionary, true)
 	if typeof(spawn_raw) == TYPE_DICTIONARY:
 		_spawn_cfg.merge(spawn_raw as Dictionary, true)
+	if typeof(combat_raw) == TYPE_DICTIONARY:
+		_combat_cfg.merge(combat_raw as Dictionary, true)
 
 
 func get_post_continue_upgrade_count() -> int:
@@ -98,3 +110,19 @@ func get_boss_min_hp() -> int:
 
 func get_boss_spawn_y() -> float:
 	return float(_spawn_cfg.get("boss_spawn_y", -100.0))
+
+
+func get_spell_short_tap_max_ms() -> int:
+	return maxi(1, int(_combat_cfg.get("spell_short_tap_max_ms", 320)))
+
+
+func get_spell_short_tap_max_distance() -> float:
+	return maxf(1.0, float(_combat_cfg.get("spell_short_tap_max_distance", 56.0)))
+
+
+func get_graze_spell_cooldown_reduce() -> float:
+	return maxf(0.0, float(_combat_cfg.get("graze_spell_cooldown_reduce", 0.05)))
+
+
+func get_hit_combo_keep_ratio() -> float:
+	return clampf(float(_combat_cfg.get("hit_combo_keep_ratio", 0.7)), 0.0, 1.0)

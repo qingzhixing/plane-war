@@ -33,6 +33,10 @@ var _boss_min_hp: int = 200
 var _boss_spawn_y: float = -100.0
 var _score_multiplier_per_tier: float = 0.08
 var _combo_guard_per_tier: int = 1
+var _spell_short_tap_max_ms: int = 320
+var _spell_short_tap_max_distance: float = 56.0
+var _graze_spell_cooldown_reduce: float = 0.05
+var _hit_combo_keep_ratio: float = 0.7
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -290,9 +294,9 @@ func _try_spell_short_tap(screen_pos: Vector2, key: int) -> void:
 		return
 	var t0: int = int(st["t"])
 	var p0: Vector2 = st["p"]
-	if Time.get_ticks_msec() - t0 > 320:
+	if Time.get_ticks_msec() - t0 > _spell_short_tap_max_ms:
 		return
-	if screen_pos.distance_to(p0) > 56.0:
+	if screen_pos.distance_to(p0) > _spell_short_tap_max_distance:
 		return
 	var hud := get_node_or_null("HUD")
 	if hud != null and hud.has_method("get_spell_screen_rect"):
@@ -346,9 +350,9 @@ func record_graze() -> void:
 	score += gained
 	# 擦弹也提供少量连击奖励：按一次“命中”的连击增量累加
 	_on_successful_hit()
-	# 擦弹额外加速符卡冷却：每次擦弹减少 0.05 秒剩余冷却（若当前已无冷却则无效果）
+	# 擦弹额外加速符卡冷却（若当前已无冷却则无效果）
 	if _spell_cooldown_remaining > 0.0:
-		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - 0.05)
+		_spell_cooldown_remaining = maxf(0.0, _spell_cooldown_remaining - _graze_spell_cooldown_reduce)
 
 
 func record_enemy_killed(_enemy: Node, base_score: int) -> void:
@@ -387,9 +391,9 @@ func on_player_hit() -> void:
 	if _lives_remaining <= 0:
 		get_tree().call_group("game_over_ui", "show_game_over")
 		return
-	# 受击对连击的惩罚：Combo ×0.7 向下取整，小于等于 0 视为连击断档
+	# 受击对连击的惩罚按配置比例计算
 	if combo > 0:
-		var new_combo := int(floor(float(combo) * 0.7))
+		var new_combo := int(floor(float(combo) * _hit_combo_keep_ratio))
 		if new_combo <= 0:
 			combo = 0
 		else:
@@ -696,6 +700,10 @@ func _apply_battle_progression_config() -> void:
 	_boss_spawn_y = _battle_cfg.get_boss_spawn_y()
 	_score_multiplier_per_tier = _battle_cfg.get_score_multiplier_per_tier()
 	_combo_guard_per_tier = _battle_cfg.get_combo_guard_per_tier()
+	_spell_short_tap_max_ms = _battle_cfg.get_spell_short_tap_max_ms()
+	_spell_short_tap_max_distance = _battle_cfg.get_spell_short_tap_max_distance()
+	_graze_spell_cooldown_reduce = _battle_cfg.get_graze_spell_cooldown_reduce()
+	_hit_combo_keep_ratio = _battle_cfg.get_hit_combo_keep_ratio()
 
 
 func _begin_next_extension_block() -> void:

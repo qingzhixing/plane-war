@@ -15,5 +15,11 @@
   },
   "spawn": {
     "boss_spawn_y": -100.0
+  },
+  "combat": {
+    "spell_short_tap_max_ms": 320,
+    "spell_short_tap_max_distance": 56.0,
+    "graze_spell_cooldown_reduce": 0.05,
+    "hit_combo_keep_ratio": 0.7
   }
 }
