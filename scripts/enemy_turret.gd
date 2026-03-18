@@ -1,5 +1,7 @@
 extends Area2D
 
+const _EnemyCombatConfigRef = preload("res://scripts/systems/enemy_combat_config.gd")
+
 @export var move_speed: float = 120.0
 @export var stop_y: float = 320.0
 @export var horizontal_amplitude: float = 80.0
@@ -16,6 +18,7 @@ var _origin_x: float
 var _fire_timer: float = 0.0
 var _is_charging: bool = false
 var _charge_timer: float = 0.0
+var _combat_cfg = _EnemyCombatConfigRef.new()
 
 const _HIT_FLASH_DURATION := 0.12
 var _hit_flash_timer: float = 0.0
@@ -47,7 +50,7 @@ func _process(delta: float) -> void:
 
 	# 超出屏幕下缘时清理
 	var viewport_rect := get_viewport_rect()
-	if global_position.y > viewport_rect.size.y + 100.0:
+	if global_position.y > viewport_rect.size.y + _combat_cfg.get_despawn_y_margin():
 		queue_free()
 
 	# 射击逻辑：先累计冷却，再进入前摇，前摇结束后真正发射
@@ -121,11 +124,7 @@ func _play_enemy_explosion_sfx() -> void:
 
 
 func apply_wave_scaling(wave: int, threat_tier: int = 0) -> void:
-	if wave > 1:
-		var factor := 1.0 + 0.25 * float(wave - 1)
-		max_hp = int(round(float(max_hp) * factor))
-	if threat_tier > 0:
-		max_hp = int(round(float(max_hp) * pow(1.12, float(threat_tier))))
+	max_hp = _combat_cfg.get_scaled_hp(max_hp, wave, threat_tier)
 	if wave > 1 or threat_tier > 0:
 		_hp = max_hp
 

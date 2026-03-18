@@ -25,6 +25,13 @@ const _DEFAULT_SPAWN := {
 }
 
 const _DEFAULT_COMBAT := {
+	"graze_score": 9,
+	"dps_window_seconds": 5.0,
+	"spell_cooldown_seconds": 12.0,
+	"spell_burst_wave_count": 4,
+	"spell_burst_wave_interval": 0.10,
+	"spell_burst_bullet_count": 40,
+	"spell_burst_scene_path": "res://scenes/bullets/PlayerSpellBullet.tscn",
 	"spell_short_tap_max_ms": 320,
 	"spell_short_tap_max_distance": 56.0,
 	"graze_spell_cooldown_reduce": 0.05,
@@ -119,6 +126,34 @@ func get_boss_spawn_y() -> float:
 
 func get_spell_short_tap_max_ms() -> int:
 	return maxi(1, int(_combat_cfg.get("spell_short_tap_max_ms", 320)))
+
+
+func get_graze_score() -> int:
+	return maxi(0, int(_combat_cfg.get("graze_score", 9)))
+
+
+func get_dps_window_seconds() -> float:
+	return maxf(0.1, float(_combat_cfg.get("dps_window_seconds", 5.0)))
+
+
+func get_spell_cooldown_seconds() -> float:
+	return maxf(0.1, float(_combat_cfg.get("spell_cooldown_seconds", 12.0)))
+
+
+func get_spell_burst_wave_count() -> int:
+	return maxi(1, int(_combat_cfg.get("spell_burst_wave_count", 4)))
+
+
+func get_spell_burst_wave_interval() -> float:
+	return maxf(0.01, float(_combat_cfg.get("spell_burst_wave_interval", 0.10)))
+
+
+func get_spell_burst_bullet_count() -> int:
+	return maxi(1, int(_combat_cfg.get("spell_burst_bullet_count", 40)))
+
+
+func get_spell_burst_scene_path() -> String:
+	return str(_combat_cfg.get("spell_burst_scene_path", "res://scenes/bullets/PlayerSpellBullet.tscn"))
 
 
 func get_spell_short_tap_max_distance() -> float:

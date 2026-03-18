@@ -1,5 +1,7 @@
 extends Area2D
 
+const _EnemyCombatConfigRef = preload("res://scripts/systems/enemy_combat_config.gd")
+
 @export var max_hp: int = 300
 @export var fire_interval_phase_a: float = 2.8
 @export var fire_interval_phase_b: float = 5.0
@@ -12,6 +14,7 @@ var _fire_timer: float = 0.0
 var _move_time: float = 0.0
 var _phase_transition_timer: float = 0.0
 var _bullet_speed_mult: float = 1.0
+var _combat_cfg = _EnemyCombatConfigRef.new()
 
 const _HIT_FLASH_DURATION := 0.14
 var _hit_flash_timer: float = 0.0
@@ -21,7 +24,10 @@ var _hit_material: ShaderMaterial
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
 
 func apply_threat_scaling(tier: int) -> void:
-	_bullet_speed_mult = minf(1.38, pow(1.045, float(tier)))
+	_bullet_speed_mult = minf(
+		_combat_cfg.get_boss_float("bullet_speed_cap", 1.38),
+		pow(_combat_cfg.get_boss_float("bullet_speed_base", 1.045), float(tier))
+	)
 
 
 func _ready() -> void:
@@ -42,16 +48,16 @@ func _process(delta: float) -> void:
 	_move_time += delta
 	# 在屏幕上半区域左右缓慢移动，首段从屏幕外缓慢驶入
 	var viewport_rect := get_viewport_rect()
-	var center_y := viewport_rect.size.y * 0.25
+	var center_y := viewport_rect.size.y * _combat_cfg.get_boss_float("center_y_ratio", 0.25)
 	var center_x := viewport_rect.size.x * 0.5
-	var amplitude := viewport_rect.size.x * 0.3
+	var amplitude := viewport_rect.size.x * _combat_cfg.get_boss_float("amplitude_x_ratio", 0.3)
 	var target := Vector2(
-		center_x + sin(_move_time * 0.5) * amplitude,
+		center_x + sin(_move_time * _combat_cfg.get_boss_float("move_frequency", 0.5)) * amplitude,
 		center_y
 	)
 	# 若当前还在屏幕上方，则用插值方式从屏幕外滑入中心位置
 	if global_position.y < center_y:
-		global_position = global_position.lerp(target, min(1.0, delta * 2.5))
+		global_position = global_position.lerp(target, min(1.0, delta * _combat_cfg.get_boss_float("move_lerp_speed", 2.5)))
 	else:
 		global_position = target
 
@@ -74,16 +80,16 @@ func _fire_phase_a() -> void:
 	if bullet_scene == null:
 		return
 	# 子弹更稀疏：减少数量，拉开角度间隔
-	var count: int = 8
+	var count: int = _combat_cfg.get_boss_int("phase_a_count", 8)
 	# 朝下（玩家方向）发射：约 90° 扇形，中心向下
-	var start_angle := PI * 0.25
-	var end_angle := PI * 0.75
+	var start_angle := _combat_cfg.get_boss_float("phase_a_start_angle", PI * 0.25)
+	var end_angle := _combat_cfg.get_boss_float("phase_a_end_angle", PI * 0.75)
 	for i: int in range(count):
 		var t := float(i) / float(max(1, count - 1))
 		var angle: float = lerp(start_angle, end_angle, t)
 		var dir := Vector2(cos(angle), sin(angle))
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position + dir * 40.0
+		bullet.global_position = global_position + dir * _combat_cfg.get_boss_float("phase_a_spawn_radius", 40.0)
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
@@ -102,30 +108,30 @@ func _fire_phase_b() -> void:
 			target_dir = to_player.normalized()
 
 	# 1) 定向扇形压制（更像 Boss 大招，而非玩家符卡）
-	var fan_count := 9
-	var fan_half_angle := 0.55
+	var fan_count := _combat_cfg.get_boss_int("phase_b_fan_count", 9)
+	var fan_half_angle := _combat_cfg.get_boss_float("phase_b_fan_half_angle", 0.55)
 	for i in fan_count:
 		var t := float(i) / float(max(1, fan_count - 1))
 		var angle_offset: float = lerp(-fan_half_angle, fan_half_angle, t)
 		var dir := target_dir.rotated(angle_offset)
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position + dir * 34.0
+		bullet.global_position = global_position + dir * _combat_cfg.get_boss_float("phase_b_fan_spawn_radius", 34.0)
 		if "speed" in bullet:
-			bullet.speed = 380.0 * _bullet_speed_mult
+			bullet.speed = _combat_cfg.get_boss_float("phase_b_fan_speed", 380.0) * _bullet_speed_mult
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
 
 	# 2) 周身旋转环弹（提供持续走位压力）
-	var ring_count := 14
-	var base_angle := _move_time * 1.4
+	var ring_count := _combat_cfg.get_boss_int("phase_b_ring_count", 14)
+	var base_angle := _move_time * _combat_cfg.get_boss_float("phase_b_ring_rotate_speed", 1.4)
 	for i in ring_count:
 		var angle := base_angle + TAU * float(i) / float(ring_count)
 		var dir := Vector2.RIGHT.rotated(angle)
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position + dir * 44.0
+		bullet.global_position = global_position + dir * _combat_cfg.get_boss_float("phase_b_ring_spawn_radius", 44.0)
 		if "speed" in bullet:
-			bullet.speed = 280.0 * _bullet_speed_mult
+			bullet.speed = _combat_cfg.get_boss_float("phase_b_ring_speed", 280.0) * _bullet_speed_mult
 		if bullet.has_method("setup_direction"):
 			bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
@@ -141,7 +147,7 @@ func apply_damage(amount: float) -> void:
 	_trigger_hit_flash()
 
 	# 进入阶段 B：HP 低于 50% 时
-	if not _phase_b and float(_hp) <= float(max_hp) * 0.5:
+	if not _phase_b and float(_hp) <= float(max_hp) * _combat_cfg.get_boss_float("phase_b_hp_ratio", 0.5):
 		_phase_b = true
 		_trigger_phase_transition()
 	_update_boss_hud()
@@ -176,11 +182,14 @@ func _update_boss_hud() -> void:
 
 func _trigger_phase_transition() -> void:
 	# 阶段切换演出：短暂停顿 + 招式名提示（不清除敌方子弹）
-	_phase_transition_timer = 0.3
-	_fire_timer = 0.8
+	_phase_transition_timer = _combat_cfg.get_boss_float("phase_transition_pause", 0.3)
+	_fire_timer = _combat_cfg.get_boss_float("phase_transition_fire_delay", 0.8)
 	var hud := get_tree().get_first_node_in_group("boss_hud")
 	if hud != null and hud.has_method("show_spell_name"):
-		hud.show_spell_name("符：星屑环舞", 1.2)
+		hud.show_spell_name(
+			_combat_cfg.get_boss_string("spell_name", "符：星屑环舞"),
+			_combat_cfg.get_boss_float("spell_name_duration", 1.2)
+		)
 
 
 func _get_audio_manager() -> Node:

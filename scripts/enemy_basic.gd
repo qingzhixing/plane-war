@@ -1,11 +1,14 @@
 extends Area2D
 
+const _EnemyCombatConfigRef = preload("res://scripts/systems/enemy_combat_config.gd")
+
 @export var speed: float = 250.0
 @export var max_hp: int = 4
 @export var exp_value: int = 5
 @export var score_value: int = 10
 
 var _hp: float
+var _combat_cfg = _EnemyCombatConfigRef.new()
 
 const _HIT_FLASH_DURATION := 0.12
 var _hit_flash_timer: float = 0.0
@@ -20,7 +23,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	global_position.y += speed * delta
 	var viewport_rect := get_viewport_rect()
-	if global_position.y > viewport_rect.size.y + 100.0:
+	if global_position.y > viewport_rect.size.y + _combat_cfg.get_despawn_y_margin():
 		queue_free()
 	if _hit_flash_timer > 0.0:
 		_hit_flash_timer = maxf(0.0, _hit_flash_timer - delta)
@@ -66,11 +69,7 @@ func _play_enemy_explosion_sfx() -> void:
 
 
 func apply_wave_scaling(wave: int, threat_tier: int = 0) -> void:
-	if wave > 1:
-		var factor := 1.0 + 0.25 * float(wave - 1)
-		max_hp = int(round(float(max_hp) * factor))
-	if threat_tier > 0:
-		max_hp = int(round(float(max_hp) * pow(1.12, float(threat_tier))))
+	max_hp = _combat_cfg.get_scaled_hp(max_hp, wave, threat_tier)
 	if wave > 1 or threat_tier > 0:
 		_hp = max_hp
 

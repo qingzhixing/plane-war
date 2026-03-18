@@ -17,6 +17,13 @@
     "boss_spawn_y": -100.0
   },
   "combat": {
+    "graze_score": 9,
+    "dps_window_seconds": 5.0,
+    "spell_cooldown_seconds": 12.0,
+    "spell_burst_wave_count": 4,
+    "spell_burst_wave_interval": 0.1,
+    "spell_burst_bullet_count": 40,
+    "spell_burst_scene_path": "res://scenes/bullets/PlayerSpellBullet.tscn",
     "spell_short_tap_max_ms": 320,
     "spell_short_tap_max_distance": 56.0,
     "graze_spell_cooldown_reduce": 0.05,

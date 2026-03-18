@@ -44,6 +44,9 @@ func _apply_combo_guard(main: Node) -> void:
 
 func _apply_spell_cooldown_upgrade(main: Node) -> void:
 	var old_scale: float = main._spell_cooldown_scale
+	var cooldown_base: float = 12.0
+	if main.has_method("get_spell_cooldown_base_seconds"):
+		cooldown_base = float(main.get_spell_cooldown_base_seconds())
 	var new_scale: float = maxf(
 		_effects_cfg.get_main_float("spell_cooldown_min_scale", 0.45),
 		main._spell_cooldown_scale * _effects_cfg.get_main_float("spell_cooldown_mul", 0.85)
@@ -51,7 +54,7 @@ func _apply_spell_cooldown_upgrade(main: Node) -> void:
 	main._spell_cooldown_scale = new_scale
 	if main._spell_cooldown_remaining > 0.0 and old_scale > 0.0:
 		var factor: float = new_scale / old_scale
-		var new_total: float = main._SPELL_COOLDOWN_SECONDS * new_scale
+		var new_total: float = cooldown_base * new_scale
 		main._spell_cooldown_remaining = clampf(main._spell_cooldown_remaining * factor, 0.0, new_total)
 
 
@@ -59,6 +62,9 @@ func _apply_spell_auto_upgrade(main: Node) -> void:
 	if main._spell_auto:
 		return
 	main._spell_auto = true
+	var cooldown_base_auto: float = 12.0
+	if main.has_method("get_spell_cooldown_base_seconds"):
+		cooldown_base_auto = float(main.get_spell_cooldown_base_seconds())
 	var old_scale_auto: float = main._spell_cooldown_scale
 	var new_scale_auto: float = maxf(
 		_effects_cfg.get_main_float("spell_auto_min_scale", 0.2),
@@ -67,7 +73,7 @@ func _apply_spell_auto_upgrade(main: Node) -> void:
 	main._spell_cooldown_scale = new_scale_auto
 	if main._spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
 		var factor_auto: float = new_scale_auto / old_scale_auto
-		var new_total_auto: float = main._SPELL_COOLDOWN_SECONDS * new_scale_auto
+		var new_total_auto: float = cooldown_base_auto * new_scale_auto
 		main._spell_cooldown_remaining = clampf(main._spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
 	if main._spell_cooldown_remaining <= 0.0 and main.has_method("try_use_spell"):
 		main.try_use_spell()

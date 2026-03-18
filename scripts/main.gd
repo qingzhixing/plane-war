@@ -37,6 +37,13 @@ var _spell_short_tap_max_ms: int = 320
 var _spell_short_tap_max_distance: float = 56.0
 var _graze_spell_cooldown_reduce: float = 0.05
 var _hit_combo_keep_ratio: float = 0.7
+var _graze_score: int = 9
+var _dps_window_seconds: float = 5.0
+var _spell_cooldown_seconds: float = 12.0
+var _spell_burst_wave_count: int = 4
+var _spell_burst_wave_interval: float = 0.10
+var _spell_burst_bullet_count: int = 40
+var _spell_burst_scene_path: String = "res://scenes/bullets/PlayerSpellBullet.tscn"
 var _combo_multiplier_thresholds: Array[int] = [10, 25, 50, 100]
 var _combo_multiplier_values: Array[float] = [1.0, 1.2, 1.5, 2.0, 3.0]
 var _combo_buff_thresholds: Array[int] = [10, 25, 50, 100]
@@ -61,9 +68,6 @@ var current_dps: float = 0.0
 var max_dps: float = 0.0
 var best_combo: int = 0
 
-const GRAZE_SCORE: int = 9
-const _DPS_WINDOW_SECONDS: float = 5.0
-
 var _damage_events: Array = [] # 每项为 { "time": float, "amount": float }
 @onready var _spawner: Node = null
 var _waiting_upgrade_choice: bool = false
@@ -76,12 +80,6 @@ var _spell_cooldown_remaining: float = 0.0
 var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
 var _battle_cfg = _BattleProgressionConfigRef.new()
-
-const _SPELL_COOLDOWN_SECONDS: float = 12.0
-const _SPELL_BURST_WAVE_COUNT: int = 4
-const _SPELL_BURST_WAVE_INTERVAL: float = 0.10
-const _SPELL_BURST_BULLET_COUNT: int = 40
-const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerSpellBullet.tscn"
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -258,7 +256,11 @@ func get_best_combo() -> int:
 
 
 func get_spell_cooldown_total() -> float:
-	return _SPELL_COOLDOWN_SECONDS * _spell_cooldown_scale
+	return _spell_cooldown_seconds * _spell_cooldown_scale
+
+
+func get_spell_cooldown_base_seconds() -> float:
+	return _spell_cooldown_seconds
 
 
 func get_spell_cooldown_remaining() -> float:
@@ -351,7 +353,7 @@ func record_player_damage(amount: float, _target: Node) -> void:
 
 
 func record_graze() -> void:
-	var gained := maxi(1, int(round(float(GRAZE_SCORE) * _score_multiplier)))
+	var gained := maxi(1, int(round(float(_graze_score) * _score_multiplier)))
 	score += gained
 	# 擦弹也提供少量连击奖励：按一次“命中”的连击增量累加
 	_on_successful_hit()
@@ -432,7 +434,7 @@ func _update_combo_buffs() -> void:
 
 func _update_dps() -> void:
 	var now: float = float(Time.get_ticks_msec()) / 1000.0
-	var cutoff := now - _DPS_WINDOW_SECONDS
+	var cutoff := now - _dps_window_seconds
 
 	var i := 0
 	while i < _damage_events.size():
@@ -447,7 +449,7 @@ func _update_dps() -> void:
 		if e.has("amount"):
 			total_damage += float(e["amount"])
 
-	current_dps = total_damage / _DPS_WINDOW_SECONDS
+	current_dps = total_damage / maxf(0.1, _dps_window_seconds)
 	if current_dps > max_dps:
 		max_dps = current_dps
 
@@ -476,7 +478,7 @@ func _trigger_spell_effect() -> void:
 		if player.has_method("get_boss_damage_multiplier"):
 			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
 
-	var burst_scene := load(_SPELL_BURST_SCENE_PATH) as PackedScene
+	var burst_scene := load(_spell_burst_scene_path) as PackedScene
 	if burst_scene != null:
 		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
 
@@ -488,11 +490,11 @@ func _trigger_spell_effect() -> void:
 
 
 func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
-	for wave in _SPELL_BURST_WAVE_COUNT:
-		var phase_offset := (TAU / float(_SPELL_BURST_BULLET_COUNT)) * 0.5 * float(wave % 2)
+	for wave in _spell_burst_wave_count:
+		var phase_offset := (TAU / float(_spell_burst_bullet_count)) * 0.5 * float(wave % 2)
 		var radius := 12.0 + 6.0 * float(wave)
-		for i in _SPELL_BURST_BULLET_COUNT:
-			var angle := TAU * float(i) / float(_SPELL_BURST_BULLET_COUNT) + phase_offset
+		for i in _spell_burst_bullet_count:
+			var angle := TAU * float(i) / float(_spell_burst_bullet_count) + phase_offset
 			var dir := Vector2.RIGHT.rotated(angle)
 			var b := bullet_scene.instantiate()
 			b.global_position = origin + dir * radius
@@ -503,8 +505,8 @@ func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_
 			if b.has_method("set_boss_damage_multiplier"):
 				b.set_boss_damage_multiplier(boss_damage_multiplier)
 			get_tree().current_scene.add_child(b)
-		if wave < _SPELL_BURST_WAVE_COUNT - 1:
-			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL).timeout
+		if wave < _spell_burst_wave_count - 1:
+			await get_tree().create_timer(_spell_burst_wave_interval).timeout
 
 
 func _get_combo_multiplier() -> float:
@@ -709,6 +711,13 @@ func _apply_battle_progression_config() -> void:
 	_spell_short_tap_max_distance = _battle_cfg.get_spell_short_tap_max_distance()
 	_graze_spell_cooldown_reduce = _battle_cfg.get_graze_spell_cooldown_reduce()
 	_hit_combo_keep_ratio = _battle_cfg.get_hit_combo_keep_ratio()
+	_graze_score = _battle_cfg.get_graze_score()
+	_dps_window_seconds = _battle_cfg.get_dps_window_seconds()
+	_spell_cooldown_seconds = _battle_cfg.get_spell_cooldown_seconds()
+	_spell_burst_wave_count = _battle_cfg.get_spell_burst_wave_count()
+	_spell_burst_wave_interval = _battle_cfg.get_spell_burst_wave_interval()
+	_spell_burst_bullet_count = _battle_cfg.get_spell_burst_bullet_count()
+	_spell_burst_scene_path = _battle_cfg.get_spell_burst_scene_path()
 	_combo_multiplier_thresholds = _battle_cfg.get_combo_multiplier_thresholds()
 	_combo_multiplier_values = _battle_cfg.get_combo_multiplier_values()
 	_combo_buff_thresholds = _battle_cfg.get_combo_buff_thresholds()
