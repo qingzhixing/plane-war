@@ -5,6 +5,7 @@ signal spell_used
 
 const _BattleProgressionConfigRef = preload("res://scripts/config/battle_progression_config.gd")
 const _BattleStatsSnapshotServiceClass = preload("res://scripts/systems/battle_stats_snapshot_service.gd")
+const _BattlefieldCleanupServiceClass = preload("res://scripts/systems/battlefield_cleanup_service.gd")
 const _SpellEffectServiceClass = preload("res://scripts/systems/spell_effect_service.gd")
 
 @export var player_path: NodePath = NodePath("Player")
@@ -83,6 +84,7 @@ var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
 var _battle_cfg = _BattleProgressionConfigRef.new()
 var _battle_stats_snapshot_service = _BattleStatsSnapshotServiceClass.new()
+var _battlefield_cleanup_service = _BattlefieldCleanupServiceClass.new()
 var _spell_effect_service = _SpellEffectServiceClass.new()
 var _game_stats: Node = null
 
@@ -122,25 +124,17 @@ func _publish_game_stats() -> void:
 
 
 func _clear_enemy_bullets() -> void:
-	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(bullet):
-			bullet.queue_free()
+	_battlefield_cleanup_service.clear_enemy_bullets(get_tree())
 
 
 func _clear_enemies() -> void:
-	for enemy in get_tree().get_nodes_in_group("enemy"):
-		if is_instance_valid(enemy):
-			enemy.queue_free()
+	_battlefield_cleanup_service.clear_enemies(get_tree())
 
 
 func _stop_enemy_spawner_timer() -> void:
 	if _spawner == null:
 		_spawner = get_node_or_null("EnemySpawner")
-	if _spawner == null:
-		return
-	var timer := _spawner.get_node_or_null("Timer")
-	if timer is Timer:
-		(timer as Timer).stop()
+	_battlefield_cleanup_service.stop_spawner_timer(_spawner)
 
 
 func _start_wave() -> void:
