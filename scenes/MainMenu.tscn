@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://mainmenu"]
 
 [ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/main_menu.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://btv236w48os2y" path="res://scenes/Main.tscn" id="2_main"]
 [ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="3_settings"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
 [ext_resource type="Script" uid="uid://dqw5ixwqegv66" path="res://scripts/records_query_ui.gd" id="5_records"]
@@ -16,7 +15,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("4_theme")
 script = ExtResource("1_script")
-game_scene = ExtResource("2_main")
 
 [node name="Background" type="ColorRect" parent="." unique_id=559129640]
 layout_mode = 1

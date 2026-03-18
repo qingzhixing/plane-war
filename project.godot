@@ -22,6 +22,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+ModLoaderStore="*uid://b7olp3lhtuw1x"
+ModLoader="*uid://0jdt6jm8tmax"
 AudioManager="*res://scripts/audio_manager.gd"
 SceneManager="*res://scripts/systems/scene_manager.gd"
 
@@ -35,6 +37,10 @@ window/handheld/orientation=1
 [dotnet]
 
 project/assembly_name="plane-war"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/mod_loader/_export_plugin/plugin.cfg")
 
 [rendering]
 
