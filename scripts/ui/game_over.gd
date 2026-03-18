@@ -121,16 +121,7 @@ func _on_restart_pressed() -> void:
 func _on_main_menu_pressed() -> void:
 	close_panel()
 	get_tree().paused = false
-	if Engine.has_singleton("SceneManager"):
-		var mgr := Engine.get_singleton("SceneManager")
-		if mgr.has_method("goto_main_menu"):
-			mgr.goto_main_menu()
-			return
-	var tree := get_tree()
-	if tree != null:
-		var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
-		if err != OK:
-			tree.reload_current_scene()
+	SceneNavigationService.goto_main_menu(get_tree())
 
 
 func close_panel() -> void:

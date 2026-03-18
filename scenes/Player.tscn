@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://drk5g4eslf2h3"]
 
-[ext_resource type="Script" uid="uid://b3aigm1lpksqa" path="res://scripts/player/player.gd" id="1_p0vlq"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_p0vlq"]
 [ext_resource type="PackedScene" path="res://scenes/bullets/PlayerBullet.tscn" id="2_basic"]
 [ext_resource type="PackedScene" uid="uid://cs67ap8o7es0i" path="res://scenes/bullets/PlayerArrow.tscn" id="3_arrow"]
 [ext_resource type="PackedScene" uid="uid://dyr2asbsbh0sp" path="res://scenes/bullets/PlayerBoomerang.tscn" id="4_boomerang"]
 [ext_resource type="PackedScene" uid="uid://dnccqe6etmx3l" path="res://scenes/bullets/PlayerBomb.tscn" id="5_bomb"]
 [ext_resource type="Texture2D" uid="uid://dgocjs7westlh" path="res://assets/sprites/player/player_ship_base.png" id="5_tex"]
-[ext_resource type="Script" uid="uid://1u2vm5sqjwma" path="res://scripts/effects/hit_judgement_visual.gd" id="6_hit"]
-[ext_resource type="Script" uid="uid://dc24c6fqlvntc" path="res://scripts/player/player_graze_area.gd" id="7_graze"]
+[ext_resource type="Script" path="res://scripts/effects/hit_judgement_visual.gd" id="6_hit"]
+[ext_resource type="Script" path="res://scripts/player/player_graze_area.gd" id="7_graze"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3li8b"]
 radius = 24.0

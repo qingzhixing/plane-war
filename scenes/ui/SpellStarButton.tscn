@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://5hppc0ylcbtl"]
 
-[ext_resource type="Script" uid="uid://bkhph7nvp4cxu" path="res://scripts/ui/spell_star_button.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/spell_star_button.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://ck42tfxkxaff" path="res://assets/ui/star/star0.png" id="2_jg7eg"]
 
 [node name="SpellStarButton" type="TextureButton" unique_id=1293916485]

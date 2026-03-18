@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d4l4ugijajvl"]
 
-[ext_resource type="Script" uid="uid://cpkyocm2p0eis" path="res://scripts/enemies/boss01.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/enemies/boss01.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bqln58s6vxeib" path="res://assets/sprites/enemies/enemy_elite_01.png" id="2_7scm5"]
 
 [node name="Boss01" type="Area2D"]

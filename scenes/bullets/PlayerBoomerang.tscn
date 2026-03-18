@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dyr2asbsbh0sp"]
 
-[ext_resource type="Script" uid="uid://de1gtc7dynp2y" path="res://scripts/bullets/PlayerBoomerang.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/bullets/PlayerBoomerang.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cyw4slfnau0mf" path="res://assets/sprites/bullets/Sickle.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_t2844"]

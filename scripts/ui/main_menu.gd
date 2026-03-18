@@ -7,13 +7,7 @@ extends Control
 
 
 func _on_start_pressed() -> void:
-	if Engine.has_singleton("SceneManager"):
-		var mgr := Engine.get_singleton("SceneManager")
-		if mgr.has_method("goto_game"):
-			mgr.goto_game()
-			return
-	if get_tree() != null:
-		get_tree().change_scene_to_file("res://scenes/Main.tscn")
+	SceneNavigationService.goto_game(get_tree())
 
 
 func _on_records_pressed() -> void:

@@ -119,6 +119,28 @@ func _publish_game_stats() -> void:
 	_game_stats.update_stats(_battle_stats_snapshot_service.build_snapshot(self))
 
 
+func _clear_enemy_bullets() -> void:
+	for bullet in get_tree().get_nodes_in_group("enemy_bullet"):
+		if is_instance_valid(bullet):
+			bullet.queue_free()
+
+
+func _clear_enemies() -> void:
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+
+
+func _stop_enemy_spawner_timer() -> void:
+	if _spawner == null:
+		_spawner = get_node_or_null("EnemySpawner")
+	if _spawner == null:
+		return
+	var timer := _spawner.get_node_or_null("Timer")
+	if timer is Timer:
+		(timer as Timer).stop()
+
+
 func _start_wave() -> void:
 	if _boss_spawned:
 		return
@@ -145,9 +167,7 @@ func get_threat_hp_mult() -> float:
 func on_wave_cleared() -> void:
 	if _waiting_upgrade_choice:
 		return
-	for b in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(b):
-			b.queue_free()
+	_clear_enemy_bullets()
 	# 波次结束：若当前生命未满 2 条，则在进入升级前自动恢复 1 命（不超过 2）
 	if _lives_remaining < 2:
 		_lives_remaining += 1
@@ -575,16 +595,10 @@ func _spawn_boss() -> void:
 	get_tree().paused = false
 
 	# 停止刷普通敌人
-	var spawner := get_node_or_null("EnemySpawner")
-	if spawner != null:
-		var timer := spawner.get_node_or_null("Timer")
-		if timer != null and timer is Timer:
-			(timer as Timer).stop()
+	_stop_enemy_spawner_timer()
 
 	# 清场：移除当前场景中的所有普通敌人
-	for enemy in get_tree().get_nodes_in_group("enemy"):
-		if is_instance_valid(enemy):
-			enemy.queue_free()
+	_clear_enemies()
 
 	# 在屏幕上方中间生成 Boss
 	var boss_scene := load("res://scenes/enemies/Boss01.tscn") as PackedScene
@@ -631,17 +645,9 @@ func debug_set_combo(value: int) -> void:
 func _debug_skip_to_boss() -> void:
 	# 调试：主线 = 假升级跳到第 8 波 Boss；续战 = 直接进续战第 8 波 Boss（同 on_boss_defeated 续战分支）
 	get_tree().paused = false
-	for enemy in get_tree().get_nodes_in_group("enemy"):
-		if is_instance_valid(enemy):
-			enemy.queue_free()
-	for b in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(b):
-			b.queue_free()
-	var sp := get_node_or_null("EnemySpawner")
-	if sp != null:
-		var timer := sp.get_node_or_null("Timer")
-		if timer is Timer:
-			(timer as Timer).stop()
+	_clear_enemies()
+	_clear_enemy_bullets()
+	_stop_enemy_spawner_timer()
 
 	# 续战小怪 1～7 波：直接刷续战 Boss
 	if _extension_wave > 0 and _extension_wave < _extension_block_size:
@@ -749,9 +755,7 @@ func _begin_next_extension_block() -> void:
 	_boss_spawned = false
 	_pending_boss_spawn = false
 	_extension_wave = 0
-	for b in get_tree().get_nodes_in_group("enemy_bullet"):
-		if is_instance_valid(b):
-			b.queue_free()
+	_clear_enemy_bullets()
 	get_tree().paused = false
 	_waiting_upgrade_choice = true
 	_pending_post_boss_upgrade = true

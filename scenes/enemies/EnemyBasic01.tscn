@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://enemybasic01"]
 
-[ext_resource type="Script" uid="uid://d3lm60pm8ir82" path="res://scripts/enemies/enemy_basic.gd" id="1_eb01"]
+[ext_resource type="Script" path="res://scripts/enemies/enemy_basic.gd" id="1_eb01"]
 [ext_resource type="Texture2D" uid="uid://cbbujfsfctoh0" path="res://assets/sprites/enemies/enemy_basic_01.png" id="2_ebtex"]
 
 [node name="EnemyBasic01" type="Area2D"]

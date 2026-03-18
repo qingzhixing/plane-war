@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bm1io1ijyvqyb"]
 
-[ext_resource type="Script" uid="uid://cr33b23e8ov8k" path="res://scripts/bullets/enemy_turret_bullet.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/bullets/enemy_turret_bullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://b13ouvorm5y54" path="res://assets/sprites/bullets/bullet_enemy_basic.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="1"]
