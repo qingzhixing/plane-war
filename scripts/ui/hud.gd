@@ -45,6 +45,8 @@ var _life_slot: Control = null
 
 const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
 const LIFE_ICON: Texture2D = preload("res://assets/ui/heart.svg")
+const EXTENSION_WAVE_MAX: int = 8
+const DEFAULT_SPELL_COOLDOWN_TOTAL: float = 12.0
 
 
 func _ready() -> void:
@@ -103,24 +105,10 @@ func _process(delta: float) -> void:
 
 
 func _read_wave_data() -> Dictionary:
-	var wave_value: int = 1
-	var extension_wave: int = 0
-	var threat_tier: int = 0
-	var is_boss_spawned: bool = false
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		wave_value = int(_game_stats.get_stat("wave", wave_value))
-		extension_wave = int(_game_stats.get_stat("extension_wave", extension_wave))
-		threat_tier = int(_game_stats.get_stat("threat_tier", threat_tier))
-		is_boss_spawned = bool(_game_stats.get_stat("is_boss_spawned", is_boss_spawned))
-	elif is_instance_valid(_main):
-		if _main.has_method("get_wave"):
-			wave_value = int(_main.get_wave())
-		if _main.has_method("get_extension_wave"):
-			extension_wave = int(_main.get_extension_wave())
-		if _main.has_method("get_threat_tier"):
-			threat_tier = int(_main.get_threat_tier())
-		if _main.has_method("is_boss_spawned"):
-			is_boss_spawned = bool(_main.is_boss_spawned())
+	var wave_value := _read_stat_int("wave", 1, &"get_wave")
+	var extension_wave := _read_stat_int("extension_wave", 0, &"get_extension_wave")
+	var threat_tier := _read_stat_int("threat_tier", 0, &"get_threat_tier")
+	var is_boss_spawned := _read_stat_bool("is_boss_spawned", false, &"is_boss_spawned")
 	return {
 		"wave": wave_value,
 		"extension_wave": extension_wave,
@@ -136,10 +124,10 @@ func _build_wave_text(wave_data: Dictionary) -> String:
 	var is_boss_spawned := bool(wave_data.get("is_boss_spawned", false))
 	var wave_text := "第 %d 波" % wave_value
 	if extension_wave > 0:
-		if is_boss_spawned and extension_wave >= 8:
-			wave_text = "续战 8/8 · Boss"
+		if is_boss_spawned and extension_wave >= EXTENSION_WAVE_MAX:
+			wave_text = "续战 %d/%d · Boss" % [EXTENSION_WAVE_MAX, EXTENSION_WAVE_MAX]
 		else:
-			wave_text = "续战 %d/8" % mini(extension_wave, 8)
+			wave_text = "续战 %d/%d" % [mini(extension_wave, EXTENSION_WAVE_MAX), EXTENSION_WAVE_MAX]
 		if threat_tier > 0:
 			wave_text = "%s  威胁%d" % [wave_text, threat_tier]
 		return wave_text
@@ -151,30 +139,40 @@ func _build_wave_text(wave_data: Dictionary) -> String:
 
 
 func _read_combat_data() -> Dictionary:
-	var s: int = 0
-	var c: int = 0
-	var cur: float = 0.0
-	var max_val: float = 0.0
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		s = int(_game_stats.get_stat("score", 0))
-		c = int(_game_stats.get_stat("combo", 0))
-		cur = float(_game_stats.get_stat("current_dps", 0.0))
-		max_val = float(_game_stats.get_stat("max_dps", 0.0))
-	elif is_instance_valid(_main):
-		if _main.has_method("get_score"):
-			s = int(_main.get_score())
-		if _main.has_method("get_combo"):
-			c = int(_main.get_combo())
-		if _main.has_method("get_current_dps"):
-			cur = float(_main.get_current_dps())
-		if _main.has_method("get_max_dps"):
-			max_val = float(_main.get_max_dps())
+	var s := _read_stat_int("score", 0, &"get_score")
+	var c := _read_stat_int("combo", 0, &"get_combo")
+	var cur := _read_stat_float("current_dps", 0.0, &"get_current_dps")
+	var max_val := _read_stat_float("max_dps", 0.0, &"get_max_dps")
 	return {
 		"score": s,
 		"combo": c,
 		"current_dps": cur,
 		"max_dps": max_val,
 	}
+
+
+func _read_stat_int(stat_key: String, default_value: int, main_method: StringName = &"") -> int:
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		return int(_game_stats.get_stat(stat_key, default_value))
+	if is_instance_valid(_main) and main_method != &"" and _main.has_method(main_method):
+		return int(_main.call(main_method))
+	return default_value
+
+
+func _read_stat_float(stat_key: String, default_value: float, main_method: StringName = &"") -> float:
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		return float(_game_stats.get_stat(stat_key, default_value))
+	if is_instance_valid(_main) and main_method != &"" and _main.has_method(main_method):
+		return float(_main.call(main_method))
+	return default_value
+
+
+func _read_stat_bool(stat_key: String, default_value: bool, main_method: StringName = &"") -> bool:
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		return bool(_game_stats.get_stat(stat_key, default_value))
+	if is_instance_valid(_main) and main_method != &"" and _main.has_method(main_method):
+		return bool(_main.call(main_method))
+	return default_value
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -489,20 +487,12 @@ func _update_left_slots() -> void:
 		_main_gun_slot.set_ratio(1.0)
 		_main_gun_slot.set_count(1)
 	# 护盾：外圈 = 有层数时满、无层数时空，x N = 护盾层数
-	var guard_n: int = 0
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		guard_n = int(_game_stats.get_stat("combo_guard_charges", 0))
-	elif is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
-		guard_n = _main.get_combo_guard_charges()
+	var guard_n := _read_stat_int("combo_guard_charges", 0, &"get_combo_guard_charges")
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
 
 	# 生命：外圈 = 有生命时满、无生命时空，x N = 剩余命数
-	var lives: int = 0
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		lives = int(_game_stats.get_stat("lives_remaining", 0))
-	elif is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
-		lives = _main.get_lives_remaining()
+	var lives := _read_stat_int("lives_remaining", 0, &"get_lives_remaining")
 	# 生命不展示冷却环，仅用图标 + xN 表示剩余命数
 	_life_slot.set_ratio(0.0)
 	_life_slot.set_count(maxi(0, lives))
@@ -583,21 +573,9 @@ func _update_side_weapon_cd_slots() -> void:
 func _update_spell_cd_slot() -> void:
 	if _spell_cd_slot == null:
 		return
-	var has_auto: bool = false
-	var cd: float = 0.0
-	var total: float = 12.0
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		has_auto = bool(_game_stats.get_stat("has_spell_auto", false))
-		cd = float(_game_stats.get_stat("spell_cooldown_remaining", 0.0))
-		total = float(_game_stats.get_stat("spell_cooldown_total", 12.0))
-	elif is_instance_valid(_main):
-		has_auto = _main.has_method("has_spell_auto") and _main.has_spell_auto()
-		if _main.has_method("get_spell_cooldown_remaining"):
-			cd = float(_main.get_spell_cooldown_remaining())
-		if _main.has_method("get_spell_cooldown_total"):
-			total = float(_main.get_spell_cooldown_total())
-	else:
-		return
+	var has_auto := _read_stat_bool("has_spell_auto", false, &"has_spell_auto")
+	var cd := _read_stat_float("spell_cooldown_remaining", 0.0, &"get_spell_cooldown_remaining")
+	var total := _read_stat_float("spell_cooldown_total", DEFAULT_SPELL_COOLDOWN_TOTAL, &"get_spell_cooldown_total")
 	# 未自动符卡时不展示右侧符卡槽
 	if not has_auto:
 		_spell_cd_slot.visible = false
@@ -625,22 +603,9 @@ func get_spell_screen_rect() -> Rect2:
 func _update_spell_button() -> void:
 	if _spell_button == null:
 		return
-	var has_auto: bool = false
-	var cd: float = 0.0
-	var total: float = 12.0
-	if _game_stats != null and _game_stats.has_method("get_stat"):
-		has_auto = bool(_game_stats.get_stat("has_spell_auto", false))
-		cd = float(_game_stats.get_stat("spell_cooldown_remaining", 0.0))
-		total = float(_game_stats.get_stat("spell_cooldown_total", 12.0))
-	elif is_instance_valid(_main):
-		if not _main.has_method("get_spell_cooldown_remaining"):
-			return
-		has_auto = _main.has_method("has_spell_auto") and _main.has_spell_auto()
-		cd = float(_main.get_spell_cooldown_remaining())
-		if _main.has_method("get_spell_cooldown_total"):
-			total = float(_main.get_spell_cooldown_total())
-	else:
-		return
+	var has_auto := _read_stat_bool("has_spell_auto", false, &"has_spell_auto")
+	var cd := _read_stat_float("spell_cooldown_remaining", 0.0, &"get_spell_cooldown_remaining")
+	var total := _read_stat_float("spell_cooldown_total", DEFAULT_SPELL_COOLDOWN_TOTAL, &"get_spell_cooldown_total")
 	var progress := 1.0
 	if has_auto:
 		progress = 0.0
