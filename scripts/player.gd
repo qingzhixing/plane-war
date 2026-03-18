@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 const MainWeapon := preload("res://scripts/player/main_weapon.gd")
 const ArrowWeapon := preload("res://scripts/player/arrow_weapon.gd")
+const BombWeapon := preload("res://scripts/player/bomb_weapon.gd")
 
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
@@ -65,6 +66,7 @@ const _ROF_OVERFLOW_DAMAGE_PER_PCT: float = 0.02
 var _rof_overflow_damage: float = 0.0
 var _main_weapon: MainWeapon
 var _arrow_weapon: ArrowWeapon
+var _bomb_weapon: BombWeapon
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -320,10 +322,39 @@ func _update_side_weapons(delta: float) -> void:
 		if _arrow_weapon != null:
 			_arrow_weapon.process(delta)
 	if has_weapon_unlocked("bomb"):
-		_bomb_auto_timer -= delta
-		if _bomb_auto_timer <= 0.0:
-			_bomb_auto_timer += bomb_auto_interval
-			_spawn_bomb_shot()
+		if _bomb_weapon == null and bullet_scene_bomb != null:
+			_bomb_weapon = BombWeapon.new(
+				self,
+				bullet_scene_bomb,
+				func() -> float:
+					return bomb_auto_interval,
+				func() -> int:
+					return _bomb_shot_count,
+				func(
+					scene_res: PackedScene,
+					dir: Vector2,
+					damage_bonus: float,
+					speed_mult: float,
+					penetration: int,
+					visual_type: String,
+					bullet_motion_mode: String,
+					side_offset: Vector2
+				) -> void:
+					_spawn_configured_bullet(
+						scene_res,
+						dir,
+						damage_bonus,
+						speed_mult,
+						penetration,
+						visual_type,
+						bullet_motion_mode,
+						side_offset
+					),
+				func(cd: float) -> void:
+					_bomb_auto_timer = cd
+			)
+		if _bomb_weapon != null:
+			_bomb_weapon.process(delta)
 
 
 @warning_ignore("UNUSED_PARAMETER")
