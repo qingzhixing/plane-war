@@ -287,6 +287,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
+mouse_filter = 2
  bbcode_enabled = true
  text = "[b]plane-war 更新日志（节选）[/b]
 [color=#8af]v0.2.2[/color] - 2026-03-17
