@@ -2,7 +2,7 @@ extends RefCounted
 
 class_name PlayerUpgradeEffectsService
 
-const _UpgradeEffectsConfigRef = preload("res://scripts/systems/upgrade_effects_config.gd")
+const _UpgradeEffectsConfigRef = preload("res://scripts/config/upgrade_effects_config.gd")
 var _effects_cfg = _UpgradeEffectsConfigRef.new()
 
 

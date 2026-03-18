@@ -3,7 +3,7 @@ extends Node2D
 signal level_up
 signal spell_used
 
-const _BattleProgressionConfigRef = preload("res://scripts/systems/battle_progression_config.gd")
+const _BattleProgressionConfigRef = preload("res://scripts/config/battle_progression_config.gd")
 
 @export var player_path: NodePath = NodePath("Player")
 

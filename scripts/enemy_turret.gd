@@ -1,6 +1,6 @@
 extends Area2D
 
-const _EnemyCombatConfigRef = preload("res://scripts/systems/enemy_combat_config.gd")
+const _EnemyCombatConfigRef = preload("res://scripts/config/enemy_combat_config.gd")
 
 @export var move_speed: float = 120.0
 @export var stop_y: float = 320.0

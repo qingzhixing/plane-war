@@ -1,7 +1,5 @@
 extends RefCounted
 
-class_name EnemyCombatConfig
-
 const _CONFIG_JSON_PATH := "res://assets/data/waves/enemy_combat_config.json"
 
 const _DEFAULT_SCALING := {

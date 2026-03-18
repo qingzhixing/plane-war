@@ -1,7 +1,5 @@
 extends RefCounted
 
-class_name EnemySpawnConfig
-
 const _CONFIG_JSON_PATH := "res://assets/data/waves/enemy_spawn_config.json"
 
 const _DEFAULT_NORMAL := {

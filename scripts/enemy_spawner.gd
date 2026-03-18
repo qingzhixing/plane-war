@@ -6,7 +6,7 @@ extends Node
 @export var enemies_per_wave_base: int = 7
 @export var enemies_per_wave_increment: int = 3
 
-const _EnemySpawnConfigRef = preload("res://scripts/systems/enemy_spawn_config.gd")
+const _EnemySpawnConfigRef = preload("res://scripts/config/enemy_spawn_config.gd")
 
 var _remaining_to_spawn: int = 0
 var _timer: Timer

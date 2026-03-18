@@ -1,7 +1,5 @@
 extends RefCounted
 
-class_name BattleProgressionConfig
-
 const _CONFIG_JSON_PATH := "res://assets/data/waves/battle_progression_config.json"
 
 const _DEFAULT_PROGRESSION := {

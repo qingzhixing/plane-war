@@ -1,7 +1,5 @@
 extends RefCounted
 
-class_name UpgradeEffectsConfig
-
 const _CONFIG_JSON_PATH := "res://assets/data/upgrades/upgrade_effects.json"
 
 const _DEFAULT_MAIN := {
