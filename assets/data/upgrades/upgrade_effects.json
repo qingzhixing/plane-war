@@ -1,0 +1,26 @@
+{
+  "main": {
+    "score_up_add": 0.15,
+    "combo_boost_add": 1,
+    "combo_guard_add": 1,
+    "spell_cooldown_mul": 0.85,
+    "spell_cooldown_min_scale": 0.45,
+    "spell_auto_mul": 0.5,
+    "spell_auto_min_scale": 0.2
+  },
+  "player": {
+    "fire_rate_mul": 0.85,
+    "damage_add": 1,
+    "multi_shot_add": 1,
+    "bullet_speed_mul": 1.12,
+    "damage_percent_mul": 1.2,
+    "spread_focus_mul": 0.7,
+    "arrow_cooldown_mul": 0.8,
+    "arrow_cooldown_min": 0.4,
+    "arrow_multi_add": 1,
+    "boomerang_multi_cap": 6,
+    "bomb_multi_add": 1,
+    "bomb_side_cooldown_mul": 0.8,
+    "bomb_side_cooldown_min": 0.85
+  }
+}

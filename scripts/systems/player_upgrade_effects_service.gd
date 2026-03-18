@@ -2,6 +2,9 @@ extends RefCounted
 
 class_name PlayerUpgradeEffectsService
 
+const _UpgradeEffectsConfigRef = preload("res://scripts/systems/upgrade_effects_config.gd")
+var _effects_cfg = _UpgradeEffectsConfigRef.new()
+
 
 func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 	match upgrade_id:
@@ -45,41 +48,50 @@ func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 
 
 func _upgrade_fire_rate(player: Node) -> void:
-	player.fire_interval *= 0.85
+	player.fire_interval *= _effects_cfg.get_player_float("fire_rate_mul", 0.85)
 	if player.has_method("_recompute_rof_overflow_damage"):
 		player._recompute_rof_overflow_damage()
 
 
 func _upgrade_damage(player: Node) -> void:
-	player.bullet_damage += 1
+	player.bullet_damage += _effects_cfg.get_player_int("damage_add", 1)
 
 
 func _upgrade_multi_shot(player: Node) -> void:
-	player._bullet_count = mini(player._bullet_count + 1, player._max_bullet_count)
+	player._bullet_count = mini(
+		player._bullet_count + _effects_cfg.get_player_int("multi_shot_add", 1),
+		player._max_bullet_count
+	)
 
 
 func _upgrade_bullet_speed(player: Node) -> void:
-	player.bullet_speed *= 1.12
+	player.bullet_speed *= _effects_cfg.get_player_float("bullet_speed_mul", 1.12)
 
 
 func _upgrade_damage_percent(player: Node) -> void:
-	player._damage_multiplier *= 1.2
+	player._damage_multiplier *= _effects_cfg.get_player_float("damage_percent_mul", 1.2)
 
 
 func _upgrade_spread_focus(player: Node) -> void:
 	# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
 	if player._bullet_count > 1:
-		player._spread_rad_per_bullet = maxf(player._min_spread_rad_per_bullet, player._spread_rad_per_bullet * 0.7)
+		player._spread_rad_per_bullet = maxf(
+			player._min_spread_rad_per_bullet,
+			player._spread_rad_per_bullet * _effects_cfg.get_player_float("spread_focus_mul", 0.7)
+		)
 
 
 func _upgrade_arrow_cooldown(player: Node) -> void:
-	player.arrow_auto_interval = maxf(0.4, player.arrow_auto_interval * 0.8)
+	player.arrow_auto_interval = maxf(
+		_effects_cfg.get_player_float("arrow_cooldown_min", 0.4),
+		player.arrow_auto_interval * _effects_cfg.get_player_float("arrow_cooldown_mul", 0.8)
+	)
 
 
 func _upgrade_arrow_multi(player: Node) -> void:
 	if not player.has_weapon_unlocked("arrow"):
 		player._weapon_unlocked["arrow"] = true
-	player._arrow_shot_count = max(1, player._arrow_shot_count + 1)
+	player._arrow_shot_count = max(1, player._arrow_shot_count + _effects_cfg.get_player_int("arrow_multi_add", 1))
 
 
 func _upgrade_boomerang_multi(player: Node) -> void:
@@ -87,15 +99,21 @@ func _upgrade_boomerang_multi(player: Node) -> void:
 		player._weapon_unlocked["boomerang"] = true
 		player.call_deferred("_spawn_single_boomerang")
 		return
-	player._boomerang_shot_count = mini(6, player._boomerang_shot_count + 1)
+	player._boomerang_shot_count = mini(
+		_effects_cfg.get_player_int("boomerang_multi_cap", 6),
+		player._boomerang_shot_count + 1
+	)
 	player.call_deferred("_spawn_single_boomerang")
 
 
 func _upgrade_bomb_multi(player: Node) -> void:
 	if not player.has_weapon_unlocked("bomb"):
 		player._weapon_unlocked["bomb"] = true
-	player._bomb_shot_count = max(1, player._bomb_shot_count + 1)
+	player._bomb_shot_count = max(1, player._bomb_shot_count + _effects_cfg.get_player_int("bomb_multi_add", 1))
 
 
 func _upgrade_bomb_side_cooldown(player: Node) -> void:
-	player.bomb_auto_interval = maxf(0.85, player.bomb_auto_interval * 0.8)
+	player.bomb_auto_interval = maxf(
+		_effects_cfg.get_player_float("bomb_side_cooldown_min", 0.85),
+		player.bomb_auto_interval * _effects_cfg.get_player_float("bomb_side_cooldown_mul", 0.8)
+	)
