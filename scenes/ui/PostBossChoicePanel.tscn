@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/post_boss_choice.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/ui/post_boss_choice.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
 
 [node name="PostBossChoice" type="CanvasLayer"]

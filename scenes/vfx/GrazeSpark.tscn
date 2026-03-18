@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bkcxxjvuycivg"]
 
-[ext_resource type="Script" uid="uid://csm4arwk0oix6" path="res://scripts/graze_spark.gd" id="1"]
+[ext_resource type="Script" uid="uid://csm4arwk0oix6" path="res://scripts/effects/graze_spark.gd" id="1"]
 
 [sub_resource type="Gradient" id="Gradient_graze"]
 offsets = PackedFloat32Array(0, 0.18, 0.42, 1)

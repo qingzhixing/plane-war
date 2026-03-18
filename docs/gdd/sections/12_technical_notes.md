@@ -32,7 +32,7 @@
 - 玩家：
   - 场景：`res://scenes/Player.tscn`
   - 节点类型：`CharacterBody2D`
-  - 脚本：`res://scripts/player.gd`
+  - 脚本：`res://scripts/player/player.gd`
 - 子弹：
   - 基类脚本：`res://scripts/bullets/BulletBase.gd`（提供 `damage/speed/direction` 等通用属性与基础移动逻辑）。
   - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBullet.tscn`，脚本 `res://scripts/bullets/PlayerBullet.gd`（直线向上、不穿透）。

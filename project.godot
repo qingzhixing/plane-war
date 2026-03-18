@@ -24,7 +24,7 @@ config/icon="res://icon.svg"
 
 ModLoaderStore="*uid://b7olp3lhtuw1x"
 ModLoader="*uid://0jdt6jm8tmax"
-AudioManager="*res://scripts/audio_manager.gd"
+AudioManager="*res://scripts/core/audio_manager.gd"
 SceneManager="*res://scripts/systems/scene_manager.gd"
 
 [display]

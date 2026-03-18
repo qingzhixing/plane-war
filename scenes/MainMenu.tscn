@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://mainmenu"]
 
-[ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/main_menu.gd" id="1_script"]
-[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="3_settings"]
+[ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/ui/main_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/ui/settings_ui.gd" id="3_settings"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
-[ext_resource type="Script" uid="uid://dqw5ixwqegv66" path="res://scripts/records_query_ui.gd" id="5_records"]
-[ext_resource type="Script" uid="uid://bvv3wiup5utvs" path="res://scripts/about_ui.gd" id="6_about"]
+[ext_resource type="Script" uid="uid://dqw5ixwqegv66" path="res://scripts/ui/records_query_ui.gd" id="5_records"]
+[ext_resource type="Script" uid="uid://bvv3wiup5utvs" path="res://scripts/ui/about_ui.gd" id="6_about"]
 
 [node name="MainMenuRoot" type="Control" unique_id=1522116683]
 layout_mode = 3
