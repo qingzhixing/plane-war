@@ -380,6 +380,8 @@ func _update_side_weapons(delta: float) -> void:
 			)
 		if _bomb_weapon != null:
 			_bomb_weapon.process(delta)
+	if has_weapon_unlocked("boomerang") and _boomerang_weapon != null:
+		_boomerang_weapon.process(delta)
 
 
 @warning_ignore("UNUSED_PARAMETER")
