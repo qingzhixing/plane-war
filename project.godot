@@ -20,6 +20,10 @@ run/main_scene="uid://mainmenu"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://i18n/ui.csv")
+
 [autoload]
 
 AudioManager="*res://scripts/audio_manager.gd"
@@ -34,10 +38,6 @@ window/handheld/orientation=1
 [dotnet]
 
 project/assembly_name="plane-war"
-
-[internationalization]
-
-locale/translations=PackedStringArray("res://i18n/ui.en.translation", "res://i18n/ui.zh_CN.translation")
 
 [rendering]
 
