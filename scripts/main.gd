@@ -3,6 +3,8 @@ extends Node2D
 signal level_up
 signal spell_used
 
+const UpgradeManager := preload("res://scripts/systems/upgrade_manager.gd")
+
 @export var player_path: NodePath = NodePath("Player")
 
 var _exp: int = 0
@@ -57,6 +59,7 @@ var _debug_upgrades_needed: int = 0
 var _spell_cooldown_remaining: float = 0.0
 ## 符卡区短按检测
 var _spell_tap_start: Dictionary = {}
+var _upgrade_manager: UpgradeManager
 
 const _SPELL_COOLDOWN_SECONDS: float = 12.0
 const _SPELL_BURST_WAVE_COUNT: int = 4
@@ -74,6 +77,7 @@ func _ready() -> void:
 	_load_records()
 
 	_spawner = get_node_or_null("EnemySpawner")
+	_upgrade_manager = UpgradeManager.new(self)
 	var pbc := get_node_or_null("PostBossChoice")
 	if pbc != null and pbc.has_method("bind_main"):
 		pbc.bind_main(self)
@@ -190,47 +194,8 @@ func _on_level_up() -> void:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
-	match upgrade_id:
-		"score_up":
-			_score_multiplier += 0.15
-			return
-		"combo_boost":
-			_combo_gain_per_hit += 1
-			return
-		"combo_guard":
-			_combo_guard_charges += 1
-			var p_guard := get_node_or_null(player_path)
-			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
-				p_guard.set_combo_guard_shield_visible(true)
-			return
-		"spell_cooldown", "bomb_cooldown":
-			var old_scale := _spell_cooldown_scale
-			var new_scale := maxf(0.45, _spell_cooldown_scale * 0.85)
-			_spell_cooldown_scale = new_scale
-			# 同步剩余冷却：按相同倍率缩短，保持当前进度不变，且不超过新最大冷却
-			if _spell_cooldown_remaining > 0.0 and old_scale > 0.0:
-				var factor := new_scale / old_scale
-				var new_total := _SPELL_COOLDOWN_SECONDS * new_scale
-				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor, 0.0, new_total)
-			return
-		"spell_auto", "bomb_auto":
-			if _spell_auto:
-				return
-			_spell_auto = true
-			var old_scale_auto := _spell_cooldown_scale
-			var new_scale_auto := maxf(0.2, _spell_cooldown_scale * 0.5)
-			_spell_cooldown_scale = new_scale_auto
-			# 自动符卡同时强力缩短冷却：剩余时间同样按倍率缩短，避免实际等待时间变长
-			if _spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
-				var factor_auto := new_scale_auto / old_scale_auto
-				var new_total_auto := _SPELL_COOLDOWN_SECONDS * new_scale_auto
-				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
-			if _spell_cooldown_remaining <= 0.0:
-				try_use_spell()
-			return
-	var p := get_node_or_null(player_path)
-	if p != null and p.has_method("apply_upgrade"):
-		p.apply_upgrade(upgrade_id)
+	if _upgrade_manager != null:
+		_upgrade_manager.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
 	_exp += amount
