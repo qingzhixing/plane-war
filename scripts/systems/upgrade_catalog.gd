@@ -92,9 +92,9 @@ func _init() -> void:
 
 func _reset_defaults() -> void:
 	_all_upgrades = _DEFAULT_ALL.duplicate(true)
-	_direct_combat_ids = _DEFAULT_DIRECT_COMBAT_IDS.duplicate(true)
-	_main_effect_ids = _DEFAULT_MAIN_EFFECT_IDS.duplicate(true)
-	_player_effect_ids = _DEFAULT_PLAYER_EFFECT_IDS.duplicate(true)
+	_direct_combat_ids = _to_string_array(_DEFAULT_DIRECT_COMBAT_IDS)
+	_main_effect_ids = _to_string_array(_DEFAULT_MAIN_EFFECT_IDS)
+	_player_effect_ids = _to_string_array(_DEFAULT_PLAYER_EFFECT_IDS)
 	_aliases = _DEFAULT_ALIASES.duplicate(true)
 
 
