@@ -1,4 +1,4 @@
-# Plane War Mod API 速查（一期）
+# Plane War Mod API 速查（一期 + 二期）
 
 面向 Mod 作者的快速参考文档。  
 本页聚焦当前项目实际可用的扩展点：事件、注册接口、字段约束与最小模板。
@@ -35,6 +35,8 @@ func _init() -> void:
 - `after_main_shot`
 - `process_mod_weapons`
 - `collect_upgrade_entries`
+- `before_apply_upgrade`
+- `after_apply_upgrade`
 
 注册方式：
 
@@ -158,6 +160,37 @@ func _handler(payload: Dictionary) -> Dictionary:
 
 ---
 
+### 3.7 `before_apply_upgrade`
+
+触发点：玩家升级应用前。  
+输入字段：
+
+- `player: Node`
+- `upgrade_id: String`
+- `cancel: bool`
+
+常用输出字段：
+
+- `upgrade_id`：可改写为另一个升级 ID（升级重定向）。
+- `cancel = true`：取消本次升级应用（不会执行内建效果或 Mod 效果处理器）。
+
+---
+
+### 3.8 `after_apply_upgrade`
+
+触发点：玩家升级处理后。  
+输入字段：
+
+- `player: Node`
+- `original_upgrade_id: String`
+- `resolved_upgrade_id: String`
+- `applied: bool`
+- `cancelled: bool`
+
+用于统计、日志、成就、联动后处理。
+
+---
+
 ## 4. 注册接口速查
 
 ### 4.1 注册敌人
@@ -234,6 +267,31 @@ ModExtensionBridge.register_weapon_entry("my_weapon", {"id": "my_weapon"})
 ```
 
 当前核心战斗流程里尚未直接消费该注册表，可视为预留能力。
+
+---
+
+### 4.6 事件处理器管理（二期）
+
+```gdscript
+ModExtensionBridge.unregister_event_handler("before_main_shot", _before_main_shot)
+ModExtensionBridge.clear_event_handlers("before_main_shot")
+ModExtensionBridge.clear_event_handlers() # 清空所有事件处理器
+var n := ModExtensionBridge.get_event_handler_count("before_main_shot")
+```
+
+适合热更新、切换模式、临时订阅后回收。
+
+---
+
+### 4.7 升级效果处理器管理（二期）
+
+```gdscript
+ModExtensionBridge.unregister_upgrade_effect_handler(_apply_upgrade)
+ModExtensionBridge.clear_upgrade_effect_handlers()
+var n := ModExtensionBridge.get_upgrade_effect_handler_count()
+```
+
+用于动态卸载或重新装配升级效果逻辑。
 
 ---
 

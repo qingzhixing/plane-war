@@ -8,6 +8,47 @@ var _effects_cfg = _UpgradeEffectsConfigRef.new()
 
 
 func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
+	var before_payload := {
+		"player": player,
+		"upgrade_id": upgrade_id,
+		"cancel": false,
+	}
+	before_payload = ModExtensionBridge.dispatch_event("before_apply_upgrade", before_payload)
+	if bool(before_payload.get("cancel", false)):
+		ModExtensionBridge.dispatch_event(
+			"after_apply_upgrade",
+			{
+				"player": player,
+				"original_upgrade_id": upgrade_id,
+				"resolved_upgrade_id": upgrade_id,
+				"applied": false,
+				"cancelled": true,
+			}
+		)
+		return false
+
+	var resolved_upgrade_id := str(before_payload.get("upgrade_id", upgrade_id)).strip_edges()
+	if resolved_upgrade_id.is_empty():
+		resolved_upgrade_id = upgrade_id
+
+	var applied := _apply_builtin_upgrade(player, resolved_upgrade_id)
+	if not applied:
+		applied = ModExtensionBridge.try_apply_upgrade_effect(player, resolved_upgrade_id)
+
+	ModExtensionBridge.dispatch_event(
+		"after_apply_upgrade",
+		{
+			"player": player,
+			"original_upgrade_id": upgrade_id,
+			"resolved_upgrade_id": resolved_upgrade_id,
+			"applied": applied,
+			"cancelled": false,
+		}
+	)
+	return applied
+
+
+func _apply_builtin_upgrade(player: Node, upgrade_id: String) -> bool:
 	match upgrade_id:
 		"fire_rate":
 			_upgrade_fire_rate(player)
@@ -45,7 +86,7 @@ func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 			_upgrade_bomb_side_cooldown(player)
 			return true
 		_:
-			return ModExtensionBridge.try_apply_upgrade_effect(player, upgrade_id)
+			return false
 
 
 func _upgrade_fire_rate(player: Node) -> void:

@@ -11,6 +11,8 @@ const _SUPPORTED_EVENTS := {
 	"after_main_shot": true,
 	"process_mod_weapons": true,
 	"collect_upgrade_entries": true,
+	"before_apply_upgrade": true,
+	"after_apply_upgrade": true,
 }
 
 static var _event_handlers: Dictionary = {}
@@ -30,9 +32,56 @@ static func register_event_handler(event_name: String, handler: Callable) -> boo
 		_LogBridgeRef.warn("ModExtensionBridge reject invalid event handler for: %s" % event_name)
 		return false
 	var handlers: Array = _event_handlers.get(event_name, [])
+	for existing_variant in handlers:
+		var existing := existing_variant as Callable
+		if existing != null and existing == handler:
+			_LogBridgeRef.warn("ModExtensionBridge reject duplicate event handler for: %s" % event_name)
+			return false
 	handlers.append(handler)
 	_event_handlers[event_name] = handlers
 	return true
+
+
+static func unregister_event_handler(event_name: String, handler: Callable) -> bool:
+	if not _SUPPORTED_EVENTS.has(event_name):
+		return false
+	if not _event_handlers.has(event_name):
+		return false
+	var handlers: Array = _event_handlers.get(event_name, [])
+	if handlers.is_empty():
+		return false
+	for i in range(handlers.size() - 1, -1, -1):
+		var existing := handlers[i] as Callable
+		if existing != null and existing == handler:
+			handlers.remove_at(i)
+			_event_handlers[event_name] = handlers
+			return true
+	return false
+
+
+static func clear_event_handlers(event_name: String = "") -> int:
+	if event_name.is_empty():
+		var total := 0
+		for handlers_variant in _event_handlers.values():
+			if typeof(handlers_variant) == TYPE_ARRAY:
+				total += (handlers_variant as Array).size()
+		_event_handlers.clear()
+		return total
+	if not _event_handlers.has(event_name):
+		return 0
+	var handlers: Array = _event_handlers.get(event_name, [])
+	var removed := handlers.size()
+	_event_handlers.erase(event_name)
+	return removed
+
+
+static func get_event_handler_count(event_name: String) -> int:
+	if not _event_handlers.has(event_name):
+		return 0
+	var handlers: Variant = _event_handlers[event_name]
+	if typeof(handlers) != TYPE_ARRAY:
+		return 0
+	return (handlers as Array).size()
 
 
 static func dispatch_event(event_name: String, payload: Dictionary) -> Dictionary:
@@ -198,8 +247,30 @@ static func register_upgrade_effect_handler(handler: Callable) -> bool:
 	if not handler.is_valid():
 		_LogBridgeRef.warn("ModExtensionBridge reject invalid upgrade effect handler.")
 		return false
+	for existing in _upgrade_effect_handlers:
+		if existing == handler:
+			_LogBridgeRef.warn("ModExtensionBridge reject duplicate upgrade effect handler.")
+			return false
 	_upgrade_effect_handlers.append(handler)
 	return true
+
+
+static func unregister_upgrade_effect_handler(handler: Callable) -> bool:
+	for i in range(_upgrade_effect_handlers.size() - 1, -1, -1):
+		if _upgrade_effect_handlers[i] == handler:
+			_upgrade_effect_handlers.remove_at(i)
+			return true
+	return false
+
+
+static func clear_upgrade_effect_handlers() -> int:
+	var removed := _upgrade_effect_handlers.size()
+	_upgrade_effect_handlers.clear()
+	return removed
+
+
+static func get_upgrade_effect_handler_count() -> int:
+	return _upgrade_effect_handlers.size()
 
 
 static func try_apply_upgrade_effect(player: Node, upgrade_id: String) -> bool:

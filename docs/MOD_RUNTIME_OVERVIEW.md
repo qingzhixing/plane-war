@@ -57,6 +57,8 @@
 - `after_main_shot`
 - `process_mod_weapons`
 - `collect_upgrade_entries`
+- `before_apply_upgrade`
+- `after_apply_upgrade`
 
 事件通过 payload 字典传递；handler 可返回字典覆盖字段。
 
@@ -67,6 +69,9 @@
 - `register_weapon_entry(weapon_id, entry)`
 - `register_upgrade_effect_handler(handler)`
 - `register_upgrade_alias(alias_id, target_id)`
+- `unregister_event_handler(event_name, handler)`
+- `clear_event_handlers(event_name = "")`
+- `get_event_handler_count(event_name)`
 
 ---
 
@@ -75,7 +80,7 @@
 - **敌人生成**：`EnemySpawner` 在选敌前后派发事件，并可抽取 mod 敌人条目。
 - **主武器发射**：`Player` 在发射前后派发事件，支持取消默认发射与追加自定义发射请求。
 - **升级池合并**：`UpgradeCatalog` 合并 Mod 注册升级。
-- **升级效果执行**：`PlayerUpgradeEffectsService` 未命中内建升级时交给 Mod handler。
+- **升级效果执行**：`PlayerUpgradeEffectsService` 在应用前后派发升级生命周期事件，并在未命中内建升级时交给 Mod handler。
 
 ---
 
