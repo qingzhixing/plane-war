@@ -1,6 +1,11 @@
 extends Control
 ## 唯一名称：%StartButton %RecordsButton %SettingsButton %AboutButton %QuitButton %SettingsUI %RecordsQueryUI %AboutUI
 
+@onready var _settings_ui: CanvasLayer = %SettingsUI
+@onready var _records_query_ui: RecordsQueryPanel = %RecordsQueryUI
+@onready var _about_ui: AboutPanel = %AboutUI
+
+
 func _on_start_pressed() -> void:
 	if Engine.has_singleton("SceneManager"):
 		var mgr := Engine.get_singleton("SceneManager")
@@ -12,15 +17,18 @@ func _on_start_pressed() -> void:
 
 
 func _on_records_pressed() -> void:
-	(%RecordsQueryUI as CanvasLayer).show_panel()
+	if _records_query_ui != null:
+		_records_query_ui.show_panel()
 
 
 func _on_settings_pressed() -> void:
-	(%SettingsUI as CanvasLayer).show_settings_from_menu()
+	if _settings_ui != null and _settings_ui.has_method("show_settings_from_menu"):
+		_settings_ui.show_settings_from_menu()
 
 
 func _on_about_pressed() -> void:
-	(%AboutUI as CanvasLayer).show_panel()
+	if _about_ui != null:
+		_about_ui.show_panel()
 
 
 func _on_quit_pressed() -> void:

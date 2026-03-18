@@ -1,26 +1,32 @@
-extends CanvasLayer
+extends ModalPanel
+
+class_name AboutPanel
 
 const GITHUB_URL := "https://github.com/qingzhixing/plane-war"
 
+@onready var _dimmer: Control = $AboutDimmer
 @onready var _about_scroll: ScrollContainer = $AboutCenter/AboutPanel/AboutMargin/AboutVBox/AboutScroll
 
 var _dragging_about := false
 
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	super._ready()
 	set_process_input(true)
-	layer = 118
-	visible = false
+	if _dimmer != null and not _dimmer.gui_input.is_connected(_on_about_dimmer_gui_input):
+		_dimmer.gui_input.connect(_on_about_dimmer_gui_input)
+
+
+func get_panel_layer() -> int:
+	return 118
 
 
 func show_panel() -> void:
-	visible = true
+	open_panel()
 
 
 func _on_close_pressed() -> void:
-	visible = false
-	_dragging_about = false
+	close_panel()
 
 
 func _on_github_pressed() -> void:
@@ -63,3 +69,19 @@ func _scroll_by_delta(delta_y: float) -> void:
 	var max_value := vbar.max_value
 	var new_value := _about_scroll.scroll_vertical - int(delta_y)
 	_about_scroll.scroll_vertical = clamp(new_value, 0, int(max_value))
+
+
+func close_panel() -> void:
+	_dragging_about = false
+	super.close_panel()
+
+
+func _on_about_dimmer_gui_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		close_panel()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenTouch and event.pressed:
+		close_panel()
+		get_viewport().set_input_as_handled()

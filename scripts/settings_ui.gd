@@ -1,8 +1,11 @@
-extends CanvasLayer
+extends ModalPanel
+
+class_name SettingsPanel
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 var _root: Control
+var _dimmer: ColorRect
 var _panel: Panel
 var _bgm_slider: HSlider
 var _sfx_slider: HSlider
@@ -22,8 +25,8 @@ var _syncing_audio_ui: bool = false
 
 
 func _ready() -> void:
+	super._ready()
 	add_to_group("settings_menu")
-	visible = false
 
 	_root = Control.new()
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -38,6 +41,9 @@ func _ready() -> void:
 	_root.add_child(dimmer)
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dimmer.set_offsets_preset(Control.PRESET_FULL_RECT)
+	_dimmer = dimmer
+	if _dimmer != null and not _dimmer.gui_input.is_connected(_on_settings_dimmer_gui_input):
+		_dimmer.gui_input.connect(_on_settings_dimmer_gui_input)
 
 	var center := CenterContainer.new()
 	center.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -206,14 +212,14 @@ func show_settings() -> void:
 	get_tree().paused = true
 	_apply_run_only_buttons_visibility(true)
 	_sync_audio_controls_from_manager()
-	visible = true
+	open_panel()
 
 
 func show_settings_from_menu() -> void:
 	_is_from_menu = true
 	_apply_run_only_buttons_visibility(false)
 	_sync_audio_controls_from_manager()
-	visible = true
+	open_panel()
 
 
 func _sync_audio_controls_from_manager() -> void:
@@ -263,18 +269,14 @@ func _apply_run_only_buttons_visibility(in_run: bool) -> void:
 
 
 func _on_close_pressed() -> void:
-	if _is_from_menu:
-		visible = false
-	else:
-		visible = false
-		get_tree().paused = _was_paused_before
+	close_panel()
 
 
 func _on_end_run_pressed() -> void:
 	# 从设置面板触发与 HUD “提前结算” 一致的行为
 	var game_over := get_tree().get_first_node_in_group("game_over_ui")
 	if game_over != null and game_over.has_method("show_game_over"):
-		visible = false
+		close_panel()
 		game_over.show_game_over()
 
 
@@ -282,7 +284,7 @@ func _on_skip_to_boss_pressed() -> void:
 	# 从设置面板触发跳关到 Boss（仅调试使用）
 	var main := get_tree().current_scene
 	if main != null and main.has_method("_debug_skip_to_boss"):
-		visible = false
+		close_panel()
 		get_tree().paused = false
 		main._debug_skip_to_boss()
 
@@ -305,7 +307,7 @@ func _on_debug_upgrades_pressed() -> void:
 		return
 	var picker := main.get_node_or_null("DebugUpgradePicker")
 	if picker != null and picker.has_method("_open_panel"):
-		visible = false
+		close_panel()
 		get_tree().paused = false
 		picker._open_panel()
 
@@ -394,3 +396,23 @@ func _apply_scale_percent(scale_percent: int) -> void:
 	var root_window := get_tree().root
 	if root_window is Window:
 		(root_window as Window).content_scale_factor = float(p) / 100.0
+
+
+func close_panel() -> void:
+	var was_visible := visible
+	super.close_panel()
+	if not was_visible:
+		return
+	if not _is_from_menu:
+		get_tree().paused = _was_paused_before
+
+
+func _on_settings_dimmer_gui_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		close_panel()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenTouch and event.pressed:
+		close_panel()
+		get_viewport().set_input_as_handled()
