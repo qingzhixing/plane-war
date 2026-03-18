@@ -4,6 +4,7 @@ signal level_up
 signal spell_used
 
 const _BattleProgressionConfigRef = preload("res://scripts/config/battle_progression_config.gd")
+const _BattleStatsSnapshotServiceClass = preload("res://scripts/systems/battle_stats_snapshot_service.gd")
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -80,6 +81,7 @@ var _spell_cooldown_remaining: float = 0.0
 var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
 var _battle_cfg = _BattleProgressionConfigRef.new()
+var _battle_stats_snapshot_service = _BattleStatsSnapshotServiceClass.new()
 var _game_stats: Node = null
 
 func _ready() -> void:
@@ -114,21 +116,7 @@ func _publish_game_stats() -> void:
 		return
 	if not _game_stats.has_method("update_stats"):
 		return
-	_game_stats.update_stats({
-		"score": score,
-		"combo": combo,
-		"current_dps": current_dps,
-		"max_dps": max_dps,
-		"wave": _wave,
-		"extension_wave": _extension_wave,
-		"threat_tier": threat_tier,
-		"is_boss_spawned": _boss_spawned,
-		"lives_remaining": _lives_remaining,
-		"combo_guard_charges": _combo_guard_charges,
-		"spell_cooldown_remaining": _spell_cooldown_remaining,
-		"spell_cooldown_total": get_spell_cooldown_total(),
-		"has_spell_auto": _spell_auto,
-	})
+	_game_stats.update_stats(_battle_stats_snapshot_service.build_snapshot(self))
 
 
 func _start_wave() -> void:
