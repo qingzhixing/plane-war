@@ -10,6 +10,7 @@ var _last_drag_pos := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	set_process_input(true)
 	layer = 118
 	visible = false
 
