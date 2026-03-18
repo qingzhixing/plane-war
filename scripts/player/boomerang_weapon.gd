@@ -10,7 +10,7 @@ var choose_direction: Callable
 var _airborne_count: int = 0
 var _pending_spawns: int = 0
 var _cooldown: float = 0.0
-var _spawn_interval: float = 0.18
+var _spawn_interval: float = 0.06
 
 
 func _init(
