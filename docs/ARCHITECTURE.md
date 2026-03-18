@@ -39,4 +39,3 @@
 - `AudioManager`（`scripts/audio_manager.gd`）通过 autoload 提供全局音频播放服务。
 - `project.godot` 中配置窗口拉伸（`viewport` + `keep`）、基准分辨率 `720×1280`，主场景为 `MainMenu.tscn`。
 - 本地成绩存储在 `user://records.cfg`，由 `scripts/main.gd` 负责读写。
-

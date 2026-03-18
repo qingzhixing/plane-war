@@ -56,4 +56,3 @@ func _spawn_arrow_volley() -> void:
 			"straight",
 			side_offset
 		)
-

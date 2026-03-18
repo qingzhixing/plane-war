@@ -79,4 +79,3 @@ func _spawn_one(dir: Vector2, params: Dictionary) -> void:
 	if bullet.has_method("set_boss_damage_multiplier"):
 		bullet.set_boss_damage_multiplier(float(params.get("boss_damage_multiplier", 1.0)))
 	tree.current_scene.add_child(bullet)
-
