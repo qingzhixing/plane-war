@@ -3,8 +3,6 @@ extends Node2D
 signal level_up
 signal spell_used
 
-const RecordsService := preload("res://scripts/systems/records_service.gd")
-
 @export var player_path: NodePath = NodePath("Player")
 
 var _exp: int = 0

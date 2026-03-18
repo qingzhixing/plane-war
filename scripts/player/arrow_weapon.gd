@@ -12,20 +12,20 @@ var _timer: float = 0.0
 
 
 func _init(
-	owner: Node2D,
-	bullet_scene_arrow: PackedScene,
-	get_interval: Callable,
-	get_shot_count: Callable,
-	spawn_bullet: Callable,
-	update_cooldown: Callable
+	owner_node: Node2D,
+	bullet_scene_arrow_res: PackedScene,
+	get_interval_fn: Callable,
+	get_shot_count_fn: Callable,
+	spawn_bullet_fn: Callable,
+	update_cooldown_fn: Callable
 ) -> void:
-	self.owner = owner
-	self.bullet_scene_arrow = bullet_scene_arrow
-	self.get_interval = get_interval
-	self.get_shot_count = get_shot_count
-	self.spawn_bullet = spawn_bullet
-	self.update_cooldown = update_cooldown
-	_timer = float(get_interval.call())
+	self.owner = owner_node
+	self.bullet_scene_arrow = bullet_scene_arrow_res
+	self.get_interval = get_interval_fn
+	self.get_shot_count = get_shot_count_fn
+	self.spawn_bullet = spawn_bullet_fn
+	self.update_cooldown = update_cooldown_fn
+	_timer = float(get_interval_fn.call())
 
 
 func process(delta: float) -> void:

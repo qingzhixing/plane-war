@@ -3,28 +3,10 @@ extends CanvasLayer
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
-# 与 UpgradeUI + Main.apply_upgrade 对齐；含仅 Main 处理的词条
-const _ALL: Array[Dictionary] = [
-	{"id": "fire_rate", "name": "速射机炮", "desc": "间隔×0.85；溢出攻速%转伤"},
-	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
-	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
-	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
-	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
-	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
-	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "弓箭齐射 +1 / 解锁"},
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖 / 齐射 +1"},
-	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
-	{"id": "combo_guard", "name": "稳态护盾", "desc": "连击保护 +1 层"},
-	{"id": "spell_cooldown", "name": "符卡充能", "desc": "符卡冷却 -15%"},
-	{"id": "spell_auto", "name": "自动符卡", "desc": "一次性 冷却-50% 自动放"},
-	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器 / 齐射 +1"},
-	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
-	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
-]
-
 var _main: Node
 var _root: Control
 var _open: bool = false
+var _upgrade_catalog: UpgradeCatalog = UpgradeCatalog.new()
 
 
 func _ready() -> void:
@@ -110,7 +92,7 @@ func _build_ui() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 
-	for u in _ALL:
+	for u in _upgrade_catalog.get_all_upgrades():
 		var id: String = u["id"]
 		var b := Button.new()
 		b.text = "%s — %s" % [u["name"], u["desc"]]

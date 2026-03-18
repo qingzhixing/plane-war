@@ -2,7 +2,6 @@ extends ModalPanel
 
 class_name SettingsPanel
 
-const SettingsService := preload("res://scripts/systems/settings_service.gd")
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 var _root: Control

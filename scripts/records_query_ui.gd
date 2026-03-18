@@ -4,7 +4,6 @@ class_name RecordsQueryPanel
 
 ## 只读展示 user://records.cfg（与 Main._load_records / _save_records 键一致）
 
-const RecordsService := preload("res://scripts/systems/records_service.gd")
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 @onready var _dimmer: Control = $Dimmer
