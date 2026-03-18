@@ -15,14 +15,19 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="plane-war"
-config/version="0.2.2"
+config/version="0.2.3"
 run/main_scene="uid://mainmenu"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
 
-AudioManager="*res://scripts/audio_manager.gd"
+ModLoaderStore="*uid://b7olp3lhtuw1x"
+ModLoader="*uid://0jdt6jm8tmax"
+AudioManager="*res://scripts/core/audio_manager.gd"
+SceneManager="*res://scripts/systems/scene_manager.gd"
+GameStats="*res://scripts/systems/game_stats.gd"
+LogService="*res://scripts/systems/log_service.gd"
 
 [display]
 
@@ -35,9 +40,9 @@ window/handheld/orientation=1
 
 project/assembly_name="plane-war"
 
-[internationalization]
+[editor_plugins]
 
-locale/translations=PackedStringArray("res://i18n/ui.en.translation", "res://i18n/ui.zh_CN.translation")
+enabled=PackedStringArray("res://addons/mod_loader/_export_plugin/plugin.cfg")
 
 [rendering]
 

@@ -131,3 +131,12 @@
 - **主线 Boss**：第 8 波；**续战块**内第 8 波再打 Boss（同场景，**血量显著高于主线**，避免「还不如小怪」）。
 - **Boss HP（实现）**：基数约 **300**；威胁乘区 **1.2^tier**；**续战 Boss** 再乘 **(3.2 + tier)**（tier≥1 时极明显）；弹幕 **speed** 仍 **min(1.35, 1.04^tier)**。小怪仍用 **1.12^tier**。
 
+## Mod 扩展约定（一期）
+
+- 敌人生成仍保留内建 `basic/turret/elite` 选择逻辑作为 fallback。
+- 在生成流程中新增两个可扩展阶段：
+  - `before_enemy_select`：Mod 可根据波次与威胁信息建议敌人；
+  - `after_enemy_select`：Mod 可替换主流程已选敌人，或取消本次生成。
+- 支持 Mod 注册“候选敌人”条目（`enemy_id + scene + weight + wave_min + extension_only`），由生成器合并抽选。
+- 兼容性目标：未安装 Mod 时，敌人出现概率与节奏不变；Mod 异常时本次忽略并记录日志，不中断对局。
+

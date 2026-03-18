@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d3vxe0r241fci"]
 
-[ext_resource type="Script" uid="uid://dnounpqp244ow" path="res://scripts/bullets/PlayerSpellBullet.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/bullets/PlayerSpellBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bcf54jkmqsmnk" path="res://assets/sprites/bullets/spell_bullet.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_unp5v"]
