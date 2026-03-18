@@ -121,3 +121,34 @@
   - 可注入至少 1 个升级词条并在三选一出现且可生效；
   - 可通过武器事件在不改原分支的情况下附加 1 次发射行为。
 
+### 二期扩展（Bridge 管理与升级生命周期）
+
+- 在一期能力基础上，补充 Bridge 级别的“可管理性”与“升级生命周期事件”：
+  - 事件处理器管理：支持按事件移除单个 handler、清空指定事件 handler、统计事件 handler 数量。
+  - 升级生命周期事件：
+    - `before_apply_upgrade`：在升级效果应用前触发，可改写 `upgrade_id` 或取消本次应用；
+    - `after_apply_upgrade`：在升级处理结束后触发，用于统计、日志、附加后处理。
+
+#### 二期事件约定
+
+- `before_apply_upgrade` 输入字段：
+  - `player`
+  - `upgrade_id`
+  - `cancel`（默认 `false`）
+- `before_apply_upgrade` 可写字段：
+  - `upgrade_id`：允许重定向到其他升级 ID
+  - `cancel`：置 `true` 直接取消本次升级应用
+- `after_apply_upgrade` 输入字段：
+  - `player`
+  - `original_upgrade_id`
+  - `resolved_upgrade_id`
+  - `applied`（是否成功应用）
+  - `cancelled`（是否在 before 阶段被取消）
+
+#### 二期验收标准
+
+- 能通过 API 对指定事件完成 handler 注册、移除、清空，并返回可预期结果。
+- Mod 可在 `before_apply_upgrade` 中改写升级 ID，且主流程按改写结果执行。
+- Mod 可在 `before_apply_upgrade` 中取消升级，且不会触发内建或 Mod 升级效果。
+- `after_apply_upgrade` 在“成功应用 / 未命中 / 被取消”三种场景都能收到准确状态字段。
+
