@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const _PlayerUpgradeEffectsServiceClass = preload("res://scripts/systems/player_upgrade_effects_service.gd")
+
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
@@ -64,7 +66,7 @@ var _main_weapon: MainWeapon
 var _arrow_weapon: ArrowWeapon
 var _bomb_weapon: BombWeapon
 var _boomerang_weapon: BoomerangWeapon
-var _upgrade_handlers: Dictionary = {}
+var _player_upgrade_effects = _PlayerUpgradeEffectsServiceClass.new()
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -90,7 +92,6 @@ func _ready() -> void:
 	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
 		call_deferred("_spawn_boomerang_volley")
 	_recompute_rof_overflow_damage()
-	_init_upgrade_handlers()
 
 	_main_weapon = MainWeapon.new(
 		self,
@@ -113,25 +114,6 @@ func _ready() -> void:
 		func() -> void:
 			_play_shoot_sfx()
 	)
-
-
-func _init_upgrade_handlers() -> void:
-	_upgrade_handlers = {
-		"fire_rate": Callable(self, "_upgrade_fire_rate"),
-		"damage": Callable(self, "_upgrade_damage"),
-		"multi_shot": Callable(self, "_upgrade_multi_shot"),
-		"bullet_speed": Callable(self, "_upgrade_bullet_speed"),
-		"damage_percent": Callable(self, "_upgrade_damage_percent"),
-		"spread_focus": Callable(self, "_upgrade_spread_focus"),
-		"arrow_cooldown": Callable(self, "_upgrade_arrow_cooldown"),
-		"arrow_multi": Callable(self, "_upgrade_arrow_multi"),
-		"boomerang_speed": Callable(self, "_upgrade_noop"),
-		"boomerang_cooldown": Callable(self, "_upgrade_noop"),
-		"boomerang_multi": Callable(self, "_upgrade_boomerang_multi"),
-		"bomb_multi": Callable(self, "_upgrade_bomb_multi"),
-		"bomb_weapon": Callable(self, "_upgrade_bomb_multi"),
-		"bomb_side_cooldown": Callable(self, "_upgrade_bomb_side_cooldown"),
-	}
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -557,71 +539,7 @@ func release_pointer() -> void:
 	_has_pointer = false
 
 func apply_upgrade(upgrade_id: String) -> void:
-	if not _upgrade_handlers.has(upgrade_id):
-		return
-	var handler := _upgrade_handlers[upgrade_id] as Callable
-	if handler != null:
-		handler.call()
-
-
-func _upgrade_fire_rate() -> void:
-	fire_interval *= 0.85
-	_recompute_rof_overflow_damage()
-
-
-func _upgrade_damage() -> void:
-	bullet_damage += 1
-
-
-func _upgrade_multi_shot() -> void:
-	_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
-
-
-func _upgrade_bullet_speed() -> void:
-	bullet_speed *= 1.12
-
-
-func _upgrade_damage_percent() -> void:
-	_damage_multiplier *= 1.2
-
-
-func _upgrade_spread_focus() -> void:
-	# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
-	if _bullet_count > 1:
-		_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
-
-
-func _upgrade_arrow_cooldown() -> void:
-	arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
-
-
-func _upgrade_arrow_multi() -> void:
-	if not has_weapon_unlocked("arrow"):
-		_weapon_unlocked["arrow"] = true
-	_arrow_shot_count = max(1, _arrow_shot_count + 1)
-
-
-func _upgrade_boomerang_multi() -> void:
-	if not has_weapon_unlocked("boomerang"):
-		_weapon_unlocked["boomerang"] = true
-		call_deferred("_spawn_single_boomerang")
-		return
-	_boomerang_shot_count = mini(6, _boomerang_shot_count + 1)
-	call_deferred("_spawn_single_boomerang")
-
-
-func _upgrade_bomb_multi() -> void:
-	if not has_weapon_unlocked("bomb"):
-		_weapon_unlocked["bomb"] = true
-	_bomb_shot_count = max(1, _bomb_shot_count + 1)
-
-
-func _upgrade_bomb_side_cooldown() -> void:
-	bomb_auto_interval = maxf(0.85, bomb_auto_interval * 0.8)
-
-
-func _upgrade_noop() -> void:
-	pass
+	_player_upgrade_effects.apply_player_upgrade(self, upgrade_id)
 
 
 func set_shield_active(active: bool) -> void:
