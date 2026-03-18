@@ -126,13 +126,11 @@ vertical_alignment = 2
 [node name="SettingsUI" type="CanvasLayer" parent="." unique_id=2015724451]
 unique_name_in_owner = true
 process_mode = 3
-visible = false
 script = ExtResource("3_settings")
 
 [node name="RecordsQueryUI" type="CanvasLayer" parent="." unique_id=1684068955]
 unique_name_in_owner = true
 process_mode = 4
-visible = false
 script = ExtResource("5_records")
 
 [node name="Dimmer" type="ColorRect" parent="RecordsQueryUI" unique_id=269771730]
@@ -241,7 +239,6 @@ text = "返回"
 [node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
 unique_name_in_owner = true
 process_mode = 4
-visible = false
 script = ExtResource("6_about")
 
 [node name="AboutDimmer" type="ColorRect" parent="AboutUI" unique_id=1439742973]
@@ -290,8 +287,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
-bbcode_enabled = true
-text = "[b]plane-war 更新日志（节选）[/b]
+ bbcode_enabled = true
+ text = "[b]plane-war 更新日志（节选）[/b]
 [color=#8af]v0.2.2[/color] - 2026-03-17
 - 引入 2 条命离散生命值系统，生命归零当次立刻结算本局。
 - 每波结束若生命未满 2 条，会自动恢复 1 命。
