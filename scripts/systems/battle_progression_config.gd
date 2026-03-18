@@ -29,6 +29,11 @@ const _DEFAULT_COMBAT := {
 	"spell_short_tap_max_distance": 56.0,
 	"graze_spell_cooldown_reduce": 0.05,
 	"hit_combo_keep_ratio": 0.7,
+	"combo_multiplier_thresholds": [10, 25, 50, 100],
+	"combo_multiplier_values": [1.0, 1.2, 1.5, 2.0, 3.0],
+	"combo_buff_thresholds": [10, 25, 50, 100],
+	"combo_buff_high_start_tier": 4,
+	"combo_buff_high_step_combo": 100,
 }
 
 var _progression_cfg: Dictionary = {}
@@ -126,3 +131,50 @@ func get_graze_spell_cooldown_reduce() -> float:
 
 func get_hit_combo_keep_ratio() -> float:
 	return clampf(float(_combat_cfg.get("hit_combo_keep_ratio", 0.7)), 0.0, 1.0)
+
+
+func get_combo_multiplier_thresholds() -> Array[int]:
+	var out := _to_int_array(_combat_cfg.get("combo_multiplier_thresholds", []))
+	if out.is_empty():
+		return [10, 25, 50, 100]
+	return out
+
+
+func get_combo_multiplier_values() -> Array[float]:
+	var out := _to_float_array(_combat_cfg.get("combo_multiplier_values", []))
+	if out.size() < 2:
+		return [1.0, 1.2, 1.5, 2.0, 3.0]
+	return out
+
+
+func get_combo_buff_thresholds() -> Array[int]:
+	var out := _to_int_array(_combat_cfg.get("combo_buff_thresholds", []))
+	if out.is_empty():
+		return [10, 25, 50, 100]
+	return out
+
+
+func get_combo_buff_high_start_tier() -> int:
+	return maxi(1, int(_combat_cfg.get("combo_buff_high_start_tier", 4)))
+
+
+func get_combo_buff_high_step_combo() -> int:
+	return maxi(1, int(_combat_cfg.get("combo_buff_high_step_combo", 100)))
+
+
+func _to_int_array(raw: Variant) -> Array[int]:
+	var out: Array[int] = []
+	if typeof(raw) != TYPE_ARRAY:
+		return out
+	for item in raw:
+		out.append(int(item))
+	return out
+
+
+func _to_float_array(raw: Variant) -> Array[float]:
+	var out: Array[float] = []
+	if typeof(raw) != TYPE_ARRAY:
+		return out
+	for item in raw:
+		out.append(float(item))
+	return out

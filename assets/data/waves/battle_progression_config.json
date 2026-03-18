@@ -20,6 +20,11 @@
     "spell_short_tap_max_ms": 320,
     "spell_short_tap_max_distance": 56.0,
     "graze_spell_cooldown_reduce": 0.05,
-    "hit_combo_keep_ratio": 0.7
+    "hit_combo_keep_ratio": 0.7,
+    "combo_multiplier_thresholds": [10, 25, 50, 100],
+    "combo_multiplier_values": [1.0, 1.2, 1.5, 2.0, 3.0],
+    "combo_buff_thresholds": [10, 25, 50, 100],
+    "combo_buff_high_start_tier": 4,
+    "combo_buff_high_step_combo": 100
   }
 }

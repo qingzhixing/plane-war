@@ -37,6 +37,11 @@ var _spell_short_tap_max_ms: int = 320
 var _spell_short_tap_max_distance: float = 56.0
 var _graze_spell_cooldown_reduce: float = 0.05
 var _hit_combo_keep_ratio: float = 0.7
+var _combo_multiplier_thresholds: Array[int] = [10, 25, 50, 100]
+var _combo_multiplier_values: Array[float] = [1.0, 1.2, 1.5, 2.0, 3.0]
+var _combo_buff_thresholds: Array[int] = [10, 25, 50, 100]
+var _combo_buff_high_start_tier: int = 4
+var _combo_buff_high_step_combo: int = 100
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -503,29 +508,29 @@ func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_
 
 
 func _get_combo_multiplier() -> float:
-	if combo < 10:
+	if _combo_multiplier_values.is_empty():
 		return 1.0
-	elif combo < 25:
-		return 1.2
-	elif combo < 50:
-		return 1.5
-	elif combo < 100:
-		return 2.0
-	else:
-		return 3.0
+	var thresholds_count := _combo_multiplier_thresholds.size()
+	var value_count := _combo_multiplier_values.size()
+	var limit := mini(thresholds_count, value_count - 1)
+	for i in limit:
+		if combo < _combo_multiplier_thresholds[i]:
+			return _combo_multiplier_values[i]
+	return _combo_multiplier_values[value_count - 1]
 
 
 func _get_combo_buff_tier(current_combo: int) -> int:
-	if current_combo < 10:
+	if _combo_buff_thresholds.is_empty():
 		return 0
-	if current_combo < 25:
-		return 1
-	if current_combo < 50:
-		return 2
-	if current_combo < 100:
-		return 3
-	# 100 连以上：每 100 连提升一档，从 4 开始递增
-	return 4 + int(floor((current_combo - 100) / 100.0))
+	var thresholds_count := _combo_buff_thresholds.size()
+	for i in thresholds_count:
+		if current_combo < _combo_buff_thresholds[i]:
+			return i
+	var last_threshold := _combo_buff_thresholds[thresholds_count - 1]
+	var step_combo := maxi(1, _combo_buff_high_step_combo)
+	return _combo_buff_high_start_tier + int(
+		floor(float(current_combo - last_threshold) / float(step_combo))
+	)
 
 
 func _load_records() -> void:
@@ -704,6 +709,11 @@ func _apply_battle_progression_config() -> void:
 	_spell_short_tap_max_distance = _battle_cfg.get_spell_short_tap_max_distance()
 	_graze_spell_cooldown_reduce = _battle_cfg.get_graze_spell_cooldown_reduce()
 	_hit_combo_keep_ratio = _battle_cfg.get_hit_combo_keep_ratio()
+	_combo_multiplier_thresholds = _battle_cfg.get_combo_multiplier_thresholds()
+	_combo_multiplier_values = _battle_cfg.get_combo_multiplier_values()
+	_combo_buff_thresholds = _battle_cfg.get_combo_buff_thresholds()
+	_combo_buff_high_start_tier = _battle_cfg.get_combo_buff_high_start_tier()
+	_combo_buff_high_step_combo = _battle_cfg.get_combo_buff_high_step_combo()
 
 
 func _begin_next_extension_block() -> void:
