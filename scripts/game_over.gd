@@ -110,10 +110,13 @@ func _on_restart_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
+	if Engine.has_singleton("SceneManager"):
+		var mgr := Engine.get_singleton("SceneManager")
+		if mgr.has_method("goto_main_menu"):
+			mgr.goto_main_menu()
+			return
 	var tree := get_tree()
-	if tree == null:
-		return
-	var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
-	if err != OK:
-		# 如果主菜单场景路径不同，保底行为为重新加载当前场景
-		tree.reload_current_scene()
+	if tree != null:
+		var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
+		if err != OK:
+			tree.reload_current_scene()

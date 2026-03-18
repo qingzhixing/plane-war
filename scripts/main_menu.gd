@@ -1,18 +1,14 @@
 extends Control
 ## 唯一名称：%StartButton %RecordsButton %SettingsButton %AboutButton %QuitButton %SettingsUI %RecordsQueryUI %AboutUI
 
-@export var game_scene: PackedScene
-
-
-func _ready() -> void:
-	if game_scene == null:
-		game_scene = load("res://scenes/Main.tscn") as PackedScene
-
-
 func _on_start_pressed() -> void:
-	if game_scene == null:
-		return
-	get_tree().change_scene_to_packed(game_scene)
+	if Engine.has_singleton("SceneManager"):
+		var mgr := Engine.get_singleton("SceneManager")
+		if mgr.has_method("goto_game"):
+			mgr.goto_game()
+			return
+	if get_tree() != null:
+		get_tree().change_scene_to_file("res://scenes/Main.tscn")
 
 
 func _on_records_pressed() -> void:
