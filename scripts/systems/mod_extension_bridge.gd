@@ -13,6 +13,8 @@ const _SUPPORTED_EVENTS := {
 	"collect_upgrade_entries": true,
 	"before_apply_upgrade": true,
 	"after_apply_upgrade": true,
+	"before_apply_main_upgrade": true,
+	"after_apply_main_upgrade": true,
 }
 
 static var _event_handlers: Dictionary = {}
@@ -20,8 +22,39 @@ static var _enemy_registry: Dictionary = {}
 static var _upgrade_registry: Dictionary = {}
 static var _upgrade_aliases: Dictionary = {}
 static var _direct_combat_upgrade_ids: Dictionary = {}
+static var _main_effect_upgrade_ids: Dictionary = {}
+static var _player_effect_upgrade_ids: Dictionary = {}
 static var _upgrade_effect_handlers: Array[Callable] = []
+static var _main_upgrade_effect_handlers: Array[Callable] = []
 static var _weapon_registry: Dictionary = {}
+
+
+static func reset_all_registries() -> void:
+	clear_event_handlers()
+	_enemy_registry.clear()
+	_upgrade_registry.clear()
+	_upgrade_aliases.clear()
+	_direct_combat_upgrade_ids.clear()
+	_main_effect_upgrade_ids.clear()
+	_player_effect_upgrade_ids.clear()
+	_weapon_registry.clear()
+	clear_upgrade_effect_handlers()
+	clear_main_upgrade_effect_handlers()
+
+
+static func get_registry_stats() -> Dictionary:
+	return {
+		"events": _event_handlers.size(),
+		"enemy_entries": _enemy_registry.size(),
+		"upgrade_entries": _upgrade_registry.size(),
+		"upgrade_aliases": _upgrade_aliases.size(),
+		"direct_combat_marks": _direct_combat_upgrade_ids.size(),
+		"main_effect_marks": _main_effect_upgrade_ids.size(),
+		"player_effect_marks": _player_effect_upgrade_ids.size(),
+		"upgrade_effect_handlers": _upgrade_effect_handlers.size(),
+		"main_upgrade_effect_handlers": _main_upgrade_effect_handlers.size(),
+		"weapon_entries": _weapon_registry.size(),
+	}
 
 
 static func register_event_handler(event_name: String, handler: Callable) -> bool:
@@ -84,6 +117,13 @@ static func get_event_handler_count(event_name: String) -> int:
 	return (handlers as Array).size()
 
 
+static func get_registered_event_names() -> Array[String]:
+	var names: Array[String] = []
+	for key in _event_handlers.keys():
+		names.append(str(key))
+	return names
+
+
 static func dispatch_event(event_name: String, payload: Dictionary) -> Dictionary:
 	if not _SUPPORTED_EVENTS.has(event_name):
 		return payload
@@ -101,12 +141,12 @@ static func dispatch_event(event_name: String, payload: Dictionary) -> Dictionar
 	return safe_payload
 
 
-static func register_enemy_entry(enemy_id: String, entry: Dictionary) -> bool:
+static func register_enemy_entry(enemy_id: String, entry: Dictionary, replace_existing: bool = false) -> bool:
 	var id := enemy_id.strip_edges()
 	if id.is_empty():
 		_LogBridgeRef.warn("ModExtensionBridge reject enemy entry with empty id.")
 		return false
-	if _enemy_registry.has(id):
+	if _enemy_registry.has(id) and not replace_existing:
 		_LogBridgeRef.warn("ModExtensionBridge reject duplicate enemy id: %s" % id)
 		return false
 	if not entry.has("scene") or not (entry["scene"] is PackedScene):
@@ -119,6 +159,42 @@ static func register_enemy_entry(enemy_id: String, entry: Dictionary) -> bool:
 	normalized["extension_only"] = bool(normalized.get("extension_only", false))
 	_enemy_registry[id] = normalized
 	return true
+
+
+static func unregister_enemy_entry(enemy_id: String) -> bool:
+	var id := enemy_id.strip_edges()
+	if id.is_empty() or not _enemy_registry.has(id):
+		return false
+	_enemy_registry.erase(id)
+	return true
+
+
+static func clear_enemy_registry() -> int:
+	var removed := _enemy_registry.size()
+	_enemy_registry.clear()
+	return removed
+
+
+static func get_registered_enemy_entries() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for entry_variant in _enemy_registry.values():
+		if typeof(entry_variant) != TYPE_DICTIONARY:
+			continue
+		out.append((entry_variant as Dictionary).duplicate(true))
+	return out
+
+
+static func has_enemy_entry(enemy_id: String) -> bool:
+	return _enemy_registry.has(enemy_id)
+
+
+static func get_enemy_entry(enemy_id: String) -> Dictionary:
+	if not _enemy_registry.has(enemy_id):
+		return {}
+	var entry: Variant = _enemy_registry[enemy_id]
+	if typeof(entry) != TYPE_DICTIONARY:
+		return {}
+	return (entry as Dictionary).duplicate(true)
 
 
 static func get_enemy_entries_for_context(wave: int, extension_index: int) -> Array[Dictionary]:
@@ -137,18 +213,50 @@ static func get_enemy_entries_for_context(wave: int, extension_index: int) -> Ar
 	return out
 
 
-static func register_upgrade_entry(upgrade: Dictionary, direct_combat: bool = false) -> bool:
+static func register_upgrade_entry(upgrade: Dictionary, direct_combat: bool = false, replace_existing: bool = false) -> bool:
 	if not _is_valid_upgrade_entry(upgrade):
 		_LogBridgeRef.warn("ModExtensionBridge reject invalid upgrade entry.")
 		return false
 	var id := str(upgrade["id"])
-	if _upgrade_registry.has(id):
+	if _upgrade_registry.has(id) and not replace_existing:
 		_LogBridgeRef.warn("ModExtensionBridge reject duplicate upgrade id: %s" % id)
 		return false
 	_upgrade_registry[id] = upgrade.duplicate(true)
 	if direct_combat:
 		_direct_combat_upgrade_ids[id] = true
+	else:
+		_direct_combat_upgrade_ids.erase(id)
+	var has_main_effect := bool(upgrade.get("main_effect", false))
+	if has_main_effect:
+		_main_effect_upgrade_ids[id] = true
+	else:
+		_main_effect_upgrade_ids.erase(id)
+	var has_player_effect := bool(upgrade.get("player_effect", true))
+	if has_player_effect:
+		_player_effect_upgrade_ids[id] = true
+	else:
+		_player_effect_upgrade_ids.erase(id)
 	return true
+
+
+static func unregister_upgrade_entry(upgrade_id: String) -> bool:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty() or not _upgrade_registry.has(id):
+		return false
+	_upgrade_registry.erase(id)
+	_direct_combat_upgrade_ids.erase(id)
+	_main_effect_upgrade_ids.erase(id)
+	_player_effect_upgrade_ids.erase(id)
+	return true
+
+
+static func clear_upgrade_registry() -> int:
+	var removed := _upgrade_registry.size()
+	_upgrade_registry.clear()
+	_direct_combat_upgrade_ids.clear()
+	_main_effect_upgrade_ids.clear()
+	_player_effect_upgrade_ids.clear()
+	return removed
 
 
 static func get_registered_upgrades() -> Array[Dictionary]:
@@ -182,18 +290,32 @@ static func has_upgrade_entry(upgrade_id: String) -> bool:
 	return _upgrade_registry.has(upgrade_id)
 
 
-static func register_weapon_entry(weapon_id: String, entry: Dictionary) -> bool:
+static func register_weapon_entry(weapon_id: String, entry: Dictionary, replace_existing: bool = false) -> bool:
 	var id := weapon_id.strip_edges()
 	if id.is_empty():
 		_LogBridgeRef.warn("ModExtensionBridge reject weapon entry with empty id.")
 		return false
-	if _weapon_registry.has(id):
+	if _weapon_registry.has(id) and not replace_existing:
 		_LogBridgeRef.warn("ModExtensionBridge reject duplicate weapon id: %s" % id)
 		return false
 	var normalized := entry.duplicate(true)
 	normalized["id"] = id
 	_weapon_registry[id] = normalized
 	return true
+
+
+static func unregister_weapon_entry(weapon_id: String) -> bool:
+	var id := weapon_id.strip_edges()
+	if id.is_empty() or not _weapon_registry.has(id):
+		return false
+	_weapon_registry.erase(id)
+	return true
+
+
+static func clear_weapon_registry() -> int:
+	var removed := _weapon_registry.size()
+	_weapon_registry.clear()
+	return removed
 
 
 static func has_weapon_entry(weapon_id: String) -> bool:
@@ -226,6 +348,20 @@ static func register_upgrade_alias(alias_id: String, target_id: String) -> void:
 	_upgrade_aliases[alias_key] = target_key
 
 
+static func unregister_upgrade_alias(alias_id: String) -> bool:
+	var alias_key := alias_id.strip_edges()
+	if alias_key.is_empty() or not _upgrade_aliases.has(alias_key):
+		return false
+	_upgrade_aliases.erase(alias_key)
+	return true
+
+
+static func clear_upgrade_aliases() -> int:
+	var removed := _upgrade_aliases.size()
+	_upgrade_aliases.clear()
+	return removed
+
+
 static func resolve_upgrade_alias(upgrade_id: String) -> String:
 	if _upgrade_aliases.has(upgrade_id):
 		return str(_upgrade_aliases[upgrade_id])
@@ -239,8 +375,75 @@ static func mark_direct_combat_upgrade(upgrade_id: String) -> void:
 	_direct_combat_upgrade_ids[id] = true
 
 
+static func unmark_direct_combat_upgrade(upgrade_id: String) -> bool:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty() or not _direct_combat_upgrade_ids.has(id):
+		return false
+	_direct_combat_upgrade_ids.erase(id)
+	return true
+
+
+static func get_direct_combat_upgrade_ids() -> Array[String]:
+	var out: Array[String] = []
+	for key in _direct_combat_upgrade_ids.keys():
+		out.append(str(key))
+	return out
+
+
 static func is_direct_combat_upgrade(upgrade_id: String) -> bool:
 	return _direct_combat_upgrade_ids.has(upgrade_id)
+
+
+static func mark_main_effect_upgrade(upgrade_id: String) -> void:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty():
+		return
+	_main_effect_upgrade_ids[id] = true
+
+
+static func unmark_main_effect_upgrade(upgrade_id: String) -> bool:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty() or not _main_effect_upgrade_ids.has(id):
+		return false
+	_main_effect_upgrade_ids.erase(id)
+	return true
+
+
+static func get_main_effect_upgrade_ids() -> Array[String]:
+	var out: Array[String] = []
+	for key in _main_effect_upgrade_ids.keys():
+		out.append(str(key))
+	return out
+
+
+static func is_main_effect_upgrade(upgrade_id: String) -> bool:
+	return _main_effect_upgrade_ids.has(upgrade_id)
+
+
+static func mark_player_effect_upgrade(upgrade_id: String) -> void:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty():
+		return
+	_player_effect_upgrade_ids[id] = true
+
+
+static func unmark_player_effect_upgrade(upgrade_id: String) -> bool:
+	var id := upgrade_id.strip_edges()
+	if id.is_empty() or not _player_effect_upgrade_ids.has(id):
+		return false
+	_player_effect_upgrade_ids.erase(id)
+	return true
+
+
+static func get_player_effect_upgrade_ids() -> Array[String]:
+	var out: Array[String] = []
+	for key in _player_effect_upgrade_ids.keys():
+		out.append(str(key))
+	return out
+
+
+static func is_player_effect_upgrade(upgrade_id: String) -> bool:
+	return _player_effect_upgrade_ids.has(upgrade_id)
 
 
 static func register_upgrade_effect_handler(handler: Callable) -> bool:
@@ -273,11 +476,51 @@ static func get_upgrade_effect_handler_count() -> int:
 	return _upgrade_effect_handlers.size()
 
 
+static func register_main_upgrade_effect_handler(handler: Callable) -> bool:
+	if not handler.is_valid():
+		_LogBridgeRef.warn("ModExtensionBridge reject invalid main upgrade effect handler.")
+		return false
+	for existing in _main_upgrade_effect_handlers:
+		if existing == handler:
+			_LogBridgeRef.warn("ModExtensionBridge reject duplicate main upgrade effect handler.")
+			return false
+	_main_upgrade_effect_handlers.append(handler)
+	return true
+
+
+static func unregister_main_upgrade_effect_handler(handler: Callable) -> bool:
+	for i in range(_main_upgrade_effect_handlers.size() - 1, -1, -1):
+		if _main_upgrade_effect_handlers[i] == handler:
+			_main_upgrade_effect_handlers.remove_at(i)
+			return true
+	return false
+
+
+static func clear_main_upgrade_effect_handlers() -> int:
+	var removed := _main_upgrade_effect_handlers.size()
+	_main_upgrade_effect_handlers.clear()
+	return removed
+
+
+static func get_main_upgrade_effect_handler_count() -> int:
+	return _main_upgrade_effect_handlers.size()
+
+
 static func try_apply_upgrade_effect(player: Node, upgrade_id: String) -> bool:
 	for handler in _upgrade_effect_handlers:
 		if not handler.is_valid():
 			continue
 		var result: Variant = handler.call(player, upgrade_id)
+		if typeof(result) == TYPE_BOOL and bool(result):
+			return true
+	return false
+
+
+static func try_apply_main_upgrade_effect(main: Node, upgrade_id: String) -> bool:
+	for handler in _main_upgrade_effect_handlers:
+		if not handler.is_valid():
+			continue
+		var result: Variant = handler.call(main, upgrade_id)
 		if typeof(result) == TYPE_BOOL and bool(result):
 			return true
 	return false

@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 const _PlayerUpgradeEffectsServiceClass = preload("res://scripts/systems/player_upgrade_effects_service.gd")
-const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
+const _ModExtensionBridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
 
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
@@ -221,10 +221,10 @@ func _spawn_weapon_shot() -> void:
 		"weapon_mode": _weapon_mode,
 		"cancel_default": false,
 	}
-	before_payload = ModExtensionBridge.dispatch_event("before_main_shot", before_payload)
+	before_payload = _ModExtensionBridgeRef.dispatch_event("before_main_shot", before_payload)
 	if bool(before_payload.get("cancel_default", false)):
 		_apply_mod_spawn_requests(before_payload.get("spawn_requests", []))
-		ModExtensionBridge.dispatch_event(
+		_ModExtensionBridgeRef.dispatch_event(
 			"after_main_shot",
 			{
 				"player": self,
@@ -234,13 +234,14 @@ func _spawn_weapon_shot() -> void:
 		)
 		return
 	var resolved_mode := str(before_payload.get("weapon_mode", _weapon_mode))
-	match resolved_mode:
-		"arrow":
-			_spawn_arrow_shot()
-		_:
-			_spawn_default_shot()
+	if not _spawn_weapon_entry_shot(resolved_mode):
+		match resolved_mode:
+			"arrow":
+				_spawn_arrow_shot()
+			_:
+				_spawn_default_shot()
 	_apply_mod_spawn_requests(before_payload.get("spawn_requests", []))
-	ModExtensionBridge.dispatch_event(
+	_ModExtensionBridgeRef.dispatch_event(
 		"after_main_shot",
 		{
 			"player": self,
@@ -248,6 +249,56 @@ func _spawn_weapon_shot() -> void:
 			"used_default": true,
 		}
 	)
+
+
+func _spawn_weapon_entry_shot(weapon_id: String) -> bool:
+	if not _ModExtensionBridgeRef.has_weapon_entry(weapon_id):
+		return false
+	var entry := _ModExtensionBridgeRef.get_weapon_entry(weapon_id)
+	if entry.is_empty():
+		return false
+	var requests: Array = []
+	_append_weapon_entry_requests(entry, requests)
+	if requests.is_empty():
+		return false
+	_apply_mod_spawn_requests(requests)
+	return true
+
+
+func _append_weapon_entry_requests(entry: Dictionary, requests: Array) -> void:
+	var scene_res := entry.get("scene", null) as PackedScene
+	if scene_res == null:
+		return
+	var count := maxi(1, int(entry.get("count", 1)))
+	var count_prop := str(entry.get("count_from_property", ""))
+	if not count_prop.is_empty() and count_prop in self:
+		count = maxi(1, int(self.get(count_prop)))
+	var spread := float(entry.get("spread", 0.0))
+	var spread_prop := str(entry.get("spread_from_property", ""))
+	if not spread_prop.is_empty() and spread_prop in self:
+		spread = float(self.get(spread_prop))
+	var damage_bonus := float(entry.get("damage_bonus", 0.0))
+	var speed_mult := float(entry.get("speed_mult", 1.0))
+	var penetration := int(entry.get("penetration", 0))
+	var visual_type := str(entry.get("visual_type", "bullet"))
+	var bullet_motion_mode := str(entry.get("motion_mode", "straight"))
+	var side_offset_step := float(entry.get("side_offset_step", 0.0))
+	for i in count:
+		var angle: float = (i - (count - 1) * 0.5) * spread
+		var dir := Vector2(sin(angle), -cos(angle))
+		var side_offset := Vector2(-dir.y, dir.x) * side_offset_step * (i - (count - 1) * 0.5)
+		requests.append(
+			{
+				"scene": scene_res,
+				"dir": dir,
+				"damage_bonus": damage_bonus,
+				"speed_mult": speed_mult,
+				"penetration": penetration,
+				"visual_type": visual_type,
+				"motion_mode": bullet_motion_mode,
+				"side_offset": side_offset,
+			}
+		)
 
 
 func _spawn_default_shot() -> void:
@@ -408,7 +459,7 @@ func _update_side_weapons(delta: float) -> void:
 			_bomb_weapon.process(delta)
 	if has_weapon_unlocked("boomerang") and _boomerang_weapon != null:
 		_boomerang_weapon.process(delta)
-	ModExtensionBridge.process_mod_weapons(self, delta)
+	_ModExtensionBridgeRef.process_mod_weapons(self, delta)
 
 
 func _apply_mod_spawn_requests(raw_requests: Variant) -> void:

@@ -20,15 +20,15 @@ func apply_upgrade(upgrade_id: String) -> void:
 		return
 	var resolved_id := _upgrade_catalog.resolve_upgrade_id(upgrade_id)
 	if _upgrade_catalog.has_main_effect(resolved_id):
-		_main_upgrade_effects.apply_main_upgrade(main, resolved_id)
-		return
+		if _main_upgrade_effects.apply_main_upgrade(main, resolved_id):
+			return
 	var player := main.get_node_or_null(main.player_path)
 	if player == null:
 		_warn_unknown_upgrade_id(resolved_id)
 		return
 	if _upgrade_catalog.has_player_effect(resolved_id):
-		_player_upgrade_effects.apply_player_upgrade(player, resolved_id)
-		return
+		if _player_upgrade_effects.apply_player_upgrade(player, resolved_id):
+			return
 	_warn_unknown_upgrade_id(resolved_id)
 
 

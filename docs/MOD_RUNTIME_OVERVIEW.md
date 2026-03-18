@@ -6,6 +6,7 @@
 
 - **加载层（Godot Mod Loader）**：负责发现、校验、依赖排序、实例化 `mod_main.gd`。
 - **扩展层（ModExtensionBridge）**：负责将 Mod 回调接入战斗流程（敌人、武器、升级）。
+- **内置核心包（builtin core mod）**：当前基线武器/敌人/升级已迁移到 `mods-unpacked/planewar-core_mod`，主工程仅保留流程壳。
 
 ---
 
@@ -59,6 +60,8 @@
 - `collect_upgrade_entries`
 - `before_apply_upgrade`
 - `after_apply_upgrade`
+- `before_apply_main_upgrade`
+- `after_apply_main_upgrade`
 
 事件通过 payload 字典传递；handler 可返回字典覆盖字段。
 
@@ -68,30 +71,40 @@
 - `register_upgrade_entry(upgrade, direct_combat=false)`
 - `register_weapon_entry(weapon_id, entry)`
 - `register_upgrade_effect_handler(handler)`
+- `register_main_upgrade_effect_handler(handler)`
 - `register_upgrade_alias(alias_id, target_id)`
+- `register_enemy_entry(..., replace_existing=true/false)`
+- `register_weapon_entry(..., replace_existing=true/false)`
+- `register_upgrade_entry(..., replace_existing=true/false)`
+- `unregister_enemy_entry(enemy_id)`
+- `unregister_weapon_entry(weapon_id)`
+- `unregister_upgrade_entry(upgrade_id)`
+- `clear_enemy_registry() / clear_weapon_registry() / clear_upgrade_registry()`
+- `get_registered_enemy_entries() / get_weapon_entries() / get_registered_upgrades()`
+- `mark_main_effect_upgrade(upgrade_id) / mark_player_effect_upgrade(upgrade_id)`
 - `unregister_event_handler(event_name, handler)`
 - `clear_event_handlers(event_name = "")`
 - `get_event_handler_count(event_name)`
+- `get_registry_stats()`
 
 ---
 
 ## 6. 游戏内接入点
 
-- **敌人生成**：`EnemySpawner` 在选敌前后派发事件，并可抽取 mod 敌人条目。
-- **主武器发射**：`Player` 在发射前后派发事件，支持取消默认发射与追加自定义发射请求。
-- **升级池合并**：`UpgradeCatalog` 合并 Mod 注册升级。
-- **升级效果执行**：`PlayerUpgradeEffectsService` 在应用前后派发升级生命周期事件，并在未命中内建升级时交给 Mod handler。
+- **敌人生成**：`EnemySpawner` 已移除内建敌人硬编码，默认从 Bridge 注册表与事件结果决定最终敌人。
+- **主武器发射**：`Player` 在发射前后派发事件，并优先尝试按 Bridge `weapon entry` 生成发射请求。
+- **升级池合并**：`UpgradeCatalog` 直接消费 Bridge 已注册升级（无本地默认升级常量）。
+- **升级效果执行**：`PlayerUpgradeEffectsService` / `MainUpgradeEffectsService` 仅通过 Bridge handler 执行效果（支持前后生命周期事件）。
 
 ---
 
-## 7. 示例 Mod（demo_mod-mod_api_demo）
+## 7. 内置核心 Mod 与示例
 
-示例包含：
-
-- 注入敌人条目（`EnemyElite01`）
-- 注入升级条目（`mod_api_demo_damage`）
-- 注入升级生效逻辑（玩家子弹伤害 +2）
-- 监听主武器事件并追加额外发射请求
+- 内置核心内容包：`mods-unpacked/planewar-core_mod`
+  - 注册基线敌人、武器条目、升级条目、别名、主/玩家升级效果处理器。
+  - 作为“无外部 Mod”时的默认内容来源。
+- 示例扩展包：`mods-unpacked/demo_mod-mod_api_demo`
+  - 展示第三方 Mod 如何注入额外敌人、升级与武器事件。
 
 ---
 
