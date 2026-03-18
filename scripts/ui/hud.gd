@@ -4,6 +4,7 @@ extends CanvasLayer
 
 var _player: Node = null
 var _main: Node = null
+var _game_stats: Node = null
 var _is_paused: bool = false
 var _combo_base_color: Color = Color.WHITE
 var _combo_base_scale: Vector2 = Vector2.ONE
@@ -50,6 +51,7 @@ func _ready() -> void:
 	if player_path != NodePath(""):
 		_player = get_node(player_path)
 	_main = get_parent()
+	_game_stats = get_node_or_null("/root/GameStats")
 	if is_instance_valid(_main) and _main.has_signal("spell_used"):
 		_main.spell_used.connect(_on_spell_used)
 	
@@ -83,49 +85,96 @@ func _ready() -> void:
 	_ensure_left_slots_panel()
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_main) and _main.has_method("get_wave"):
-		var wave_text := "第 %d 波" % _main.get_wave()
-		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
-			var ex: int = int(_main.get_extension_wave())
-			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned() and ex >= 8:
-				wave_text = "续战 8/8 · Boss"
-			else:
-				wave_text = "续战 %d/8" % mini(ex, 8)
-			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
-				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
-		else:
-			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
-				wave_text = "%s - Boss" % wave_text
-			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
-				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
-		_wave_label.text = wave_text
-	# 分数 / 连击 / DPS HUD
-	if is_instance_valid(_main):
-		var s: int = 0
-		var c: int = 0
-		var cur: float = 0.0
-		var max_val: float = 0.0
+	var wave_data := _read_wave_data()
+	_wave_label.text = _build_wave_text(wave_data)
 
-		if _main.has_method("get_score"):
-			s = _main.get_score()
-		if _main.has_method("get_combo"):
-			c = _main.get_combo()
-		if _main.has_method("get_current_dps"):
-			cur = _main.get_current_dps()
-		if _main.has_method("get_max_dps"):
-			max_val = _main.get_max_dps()
-
-		if _score_label != null:
-			_score_label.text = "Score: %d" % s
-		if _combo_label != null:
-			_update_combo_visual(c)
-			_update_combo_feedback(c, delta)
-		_update_combo_screen_vfx(c)
-		if _dps_label != null:
-			_dps_label.text = "DPS: %.0f  Max: %.0f" % [cur, max_val]
-		_update_spell_button()
+	var combat_data := _read_combat_data()
+	if _score_label != null:
+		_score_label.text = "Score: %d" % combat_data.score
+	if _combo_label != null:
+		_update_combo_visual(combat_data.combo)
+		_update_combo_feedback(combat_data.combo, delta)
+	_update_combo_screen_vfx(combat_data.combo)
+	if _dps_label != null:
+		_dps_label.text = "DPS: %.0f  Max: %.0f" % [combat_data.current_dps, combat_data.max_dps]
+	_update_spell_button()
 	_update_left_slots()
 	_update_side_weapon_cd_slots()
+
+
+func _read_wave_data() -> Dictionary:
+	var wave_value: int = 1
+	var extension_wave: int = 0
+	var threat_tier: int = 0
+	var is_boss_spawned: bool = false
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		wave_value = int(_game_stats.get_stat("wave", wave_value))
+		extension_wave = int(_game_stats.get_stat("extension_wave", extension_wave))
+		threat_tier = int(_game_stats.get_stat("threat_tier", threat_tier))
+		is_boss_spawned = bool(_game_stats.get_stat("is_boss_spawned", is_boss_spawned))
+	elif is_instance_valid(_main):
+		if _main.has_method("get_wave"):
+			wave_value = int(_main.get_wave())
+		if _main.has_method("get_extension_wave"):
+			extension_wave = int(_main.get_extension_wave())
+		if _main.has_method("get_threat_tier"):
+			threat_tier = int(_main.get_threat_tier())
+		if _main.has_method("is_boss_spawned"):
+			is_boss_spawned = bool(_main.is_boss_spawned())
+	return {
+		"wave": wave_value,
+		"extension_wave": extension_wave,
+		"threat_tier": threat_tier,
+		"is_boss_spawned": is_boss_spawned,
+	}
+
+
+func _build_wave_text(wave_data: Dictionary) -> String:
+	var wave_value := int(wave_data.get("wave", 1))
+	var extension_wave := int(wave_data.get("extension_wave", 0))
+	var threat_tier := int(wave_data.get("threat_tier", 0))
+	var is_boss_spawned := bool(wave_data.get("is_boss_spawned", false))
+	var wave_text := "第 %d 波" % wave_value
+	if extension_wave > 0:
+		if is_boss_spawned and extension_wave >= 8:
+			wave_text = "续战 8/8 · Boss"
+		else:
+			wave_text = "续战 %d/8" % mini(extension_wave, 8)
+		if threat_tier > 0:
+			wave_text = "%s  威胁%d" % [wave_text, threat_tier]
+		return wave_text
+	if is_boss_spawned:
+		wave_text = "%s - Boss" % wave_text
+	if threat_tier > 0:
+		wave_text = "%s  威胁%d" % [wave_text, threat_tier]
+	return wave_text
+
+
+func _read_combat_data() -> Dictionary:
+	var s: int = 0
+	var c: int = 0
+	var cur: float = 0.0
+	var max_val: float = 0.0
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		s = int(_game_stats.get_stat("score", 0))
+		c = int(_game_stats.get_stat("combo", 0))
+		cur = float(_game_stats.get_stat("current_dps", 0.0))
+		max_val = float(_game_stats.get_stat("max_dps", 0.0))
+	elif is_instance_valid(_main):
+		if _main.has_method("get_score"):
+			s = int(_main.get_score())
+		if _main.has_method("get_combo"):
+			c = int(_main.get_combo())
+		if _main.has_method("get_current_dps"):
+			cur = float(_main.get_current_dps())
+		if _main.has_method("get_max_dps"):
+			max_val = float(_main.get_max_dps())
+	return {
+		"score": s,
+		"combo": c,
+		"current_dps": cur,
+		"max_dps": max_val,
+	}
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -441,14 +490,18 @@ func _update_left_slots() -> void:
 		_main_gun_slot.set_count(1)
 	# 护盾：外圈 = 有层数时满、无层数时空，x N = 护盾层数
 	var guard_n: int = 0
-	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		guard_n = int(_game_stats.get_stat("combo_guard_charges", 0))
+	elif is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
 		guard_n = _main.get_combo_guard_charges()
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
 
 	# 生命：外圈 = 有生命时满、无生命时空，x N = 剩余命数
 	var lives: int = 0
-	if is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		lives = int(_game_stats.get_stat("lives_remaining", 0))
+	elif is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
 		lives = _main.get_lives_remaining()
 	# 生命不展示冷却环，仅用图标 + xN 表示剩余命数
 	_life_slot.set_ratio(0.0)
@@ -528,9 +581,23 @@ func _update_side_weapon_cd_slots() -> void:
 
 
 func _update_spell_cd_slot() -> void:
-	if _spell_cd_slot == null or not is_instance_valid(_main):
+	if _spell_cd_slot == null:
 		return
-	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+	var has_auto: bool = false
+	var cd: float = 0.0
+	var total: float = 12.0
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		has_auto = bool(_game_stats.get_stat("has_spell_auto", false))
+		cd = float(_game_stats.get_stat("spell_cooldown_remaining", 0.0))
+		total = float(_game_stats.get_stat("spell_cooldown_total", 12.0))
+	elif is_instance_valid(_main):
+		has_auto = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+		if _main.has_method("get_spell_cooldown_remaining"):
+			cd = float(_main.get_spell_cooldown_remaining())
+		if _main.has_method("get_spell_cooldown_total"):
+			total = float(_main.get_spell_cooldown_total())
+	else:
+		return
 	# 未自动符卡时不展示右侧符卡槽
 	if not has_auto:
 		_spell_cd_slot.visible = false
@@ -538,14 +605,6 @@ func _update_spell_cd_slot() -> void:
 		_spell_cd_slot.set_count(0)
 		return
 	_spell_cd_slot.visible = true
-	if not _main.has_method("get_spell_cooldown_remaining"):
-		_spell_cd_slot.set_ratio(0.0)
-		_spell_cd_slot.set_count(0)
-		return
-	var cd := float(_main.get_spell_cooldown_remaining())
-	var total := 12.0
-	if _main.has_method("get_spell_cooldown_total"):
-		total = float(_main.get_spell_cooldown_total())
 	var r: float = 0.0
 	if total > 0.0:
 		r = clampf(cd / total, 0.0, 1.0)
@@ -564,15 +623,24 @@ func get_spell_screen_rect() -> Rect2:
 
 
 func _update_spell_button() -> void:
-	if _spell_button == null or not is_instance_valid(_main):
+	if _spell_button == null:
 		return
-	if not _main.has_method("get_spell_cooldown_remaining"):
+	var has_auto: bool = false
+	var cd: float = 0.0
+	var total: float = 12.0
+	if _game_stats != null and _game_stats.has_method("get_stat"):
+		has_auto = bool(_game_stats.get_stat("has_spell_auto", false))
+		cd = float(_game_stats.get_stat("spell_cooldown_remaining", 0.0))
+		total = float(_game_stats.get_stat("spell_cooldown_total", 12.0))
+	elif is_instance_valid(_main):
+		if not _main.has_method("get_spell_cooldown_remaining"):
+			return
+		has_auto = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+		cd = float(_main.get_spell_cooldown_remaining())
+		if _main.has_method("get_spell_cooldown_total"):
+			total = float(_main.get_spell_cooldown_total())
+	else:
 		return
-	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
-	var cd := float(_main.get_spell_cooldown_remaining())
-	var total := 12.0
-	if _main.has_method("get_spell_cooldown_total"):
-		total = float(_main.get_spell_cooldown_total())
 	var progress := 1.0
 	if has_auto:
 		progress = 0.0

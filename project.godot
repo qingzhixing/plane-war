@@ -26,6 +26,7 @@ ModLoaderStore="*uid://b7olp3lhtuw1x"
 ModLoader="*uid://0jdt6jm8tmax"
 AudioManager="*res://scripts/core/audio_manager.gd"
 SceneManager="*res://scripts/systems/scene_manager.gd"
+GameStats="*res://scripts/systems/game_stats.gd"
 
 [display]
 

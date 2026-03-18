@@ -80,6 +80,7 @@ var _spell_cooldown_remaining: float = 0.0
 var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
 var _battle_cfg = _BattleProgressionConfigRef.new()
+var _game_stats: Node = null
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -93,6 +94,7 @@ func _ready() -> void:
 
 	_spawner = get_node_or_null("EnemySpawner")
 	_upgrade_manager = UpgradeManager.new(self)
+	_game_stats = get_node_or_null("/root/GameStats")
 	var pbc := get_node_or_null("PostBossChoice")
 	if pbc != null and pbc.has_method("bind_main"):
 		pbc.bind_main(self)
@@ -104,6 +106,29 @@ func _process(delta: float) -> void:
 	_update_combo_buffs()
 	_update_dps()
 	_update_spell(delta)
+	_publish_game_stats()
+
+
+func _publish_game_stats() -> void:
+	if _game_stats == null:
+		return
+	if not _game_stats.has_method("update_stats"):
+		return
+	_game_stats.update_stats({
+		"score": score,
+		"combo": combo,
+		"current_dps": current_dps,
+		"max_dps": max_dps,
+		"wave": _wave,
+		"extension_wave": _extension_wave,
+		"threat_tier": threat_tier,
+		"is_boss_spawned": _boss_spawned,
+		"lives_remaining": _lives_remaining,
+		"combo_guard_charges": _combo_guard_charges,
+		"spell_cooldown_remaining": _spell_cooldown_remaining,
+		"spell_cooldown_total": get_spell_cooldown_total(),
+		"has_spell_auto": _spell_auto,
+	})
 
 
 func _start_wave() -> void:
