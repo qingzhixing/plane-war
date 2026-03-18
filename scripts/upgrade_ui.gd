@@ -67,7 +67,7 @@ func _build_ui() -> void:
 	center.add_child(vbox)
 
 	_title = Label.new()
-	_title.text = tr("升级！选一个强化")
+	_title.text = "升级！选一个强化"
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title.add_theme_font_size_override("font_size", 36)
 	vbox.add_child(_title)

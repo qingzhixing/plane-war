@@ -80,7 +80,7 @@ func _build_ui() -> void:
 	margin.add_child(vbox)
 
 	var title := Label.new()
-	title.text = tr("调试：自选升级（点关闭返回）")
+	title.text = "调试：自选升级（点关闭返回）"
 	title.add_theme_font_size_override("font_size", 28)
 	vbox.add_child(title)
 
@@ -89,13 +89,13 @@ func _build_ui() -> void:
 	vbox.add_child(row)
 
 	var close_btn := Button.new()
-	close_btn.text = tr("关闭")
+	close_btn.text = "关闭"
 	close_btn.custom_minimum_size = Vector2(120, 48)
 	close_btn.pressed.connect(_close)
 	row.add_child(close_btn)
 
 	var hint := Label.new()
-	hint.text = tr("点击条目立即生效，可重复叠加")
+	hint.text = "点击条目立即生效，可重复叠加"
 	hint.add_theme_font_size_override("font_size", 18)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(hint)
