@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
+const _UpgradePickServiceClass = preload("res://scripts/systems/upgrade_pick_service.gd")
 
 var _root: Control
 var _panel: ColorRect
@@ -8,6 +9,7 @@ var _title: Label
 var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
 var _main: Node
 var _upgrade_catalog: UpgradeCatalog = UpgradeCatalog.new()
+var _pick_service = _UpgradePickServiceClass.new(_upgrade_catalog)
 
 const CARD_WIDTH: float = 280.0
 const CARD_HEIGHT: float = 140.0
@@ -116,50 +118,9 @@ func _update_card_sizes() -> void:
 
 func show_pick() -> void:
 	_update_card_sizes()
-	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
-	var at_max_bullets: bool = false
-	var bullet_count: int = 1
-	var arrow_unlocked: bool = false
-	var bomb_unlocked: bool = false
-	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
-		bullet_count = player.get_bullet_count()
-		at_max_bullets = bullet_count >= player.get_max_bullet_count()
-	if player != null and player.has_method("has_weapon_unlocked"):
-		arrow_unlocked = player.has_weapon_unlocked("arrow")
-	if player != null and player.has_method("has_weapon_unlocked"):
-		bomb_unlocked = player.has_weapon_unlocked("bomb")
-	for u in _upgrade_catalog.get_all_upgrades():
-		if u["id"] == "spell_auto" and _main.has_method("has_spell_auto") and _main.has_spell_auto():
-			continue
-		if u["id"] == "multi_shot" and at_max_bullets:
-			continue
-		if u["id"] == "spread_focus" and bullet_count <= 1:
-			continue
-		if u["id"] == "arrow_cooldown" and not arrow_unlocked:
-			continue
-		if u["id"] == "bomb_side_cooldown" and not bomb_unlocked:
-			continue
-		pool.append(u)
-	pool.shuffle()
-	var pick_count: int = min(3, pool.size())
-	var chosen: Array[Dictionary] = []
-	for i in pick_count:
-		chosen.append(pool[i])
-	# 保证至少出现 1 张直接战斗收益词条，避免鸡肋三选
-	var has_combat_card := false
-	for c in chosen:
-		if _is_direct_combat_upgrade(c["id"]):
-			has_combat_card = true
-			break
-	if not has_combat_card:
-		for c in pool:
-			if _is_direct_combat_upgrade(c["id"]):
-				if chosen.is_empty():
-					chosen.append(c)
-				else:
-					chosen[0] = c
-				break
+	var pool: Array[Dictionary] = _pick_service.build_pick_candidates(_main, player)
+	var chosen: Array[Dictionary] = _pick_service.choose_upgrades(pool, 3)
 	for i in chosen.size():
 		var u: Dictionary = chosen[i]
 		var card: Dictionary = _cards[i]
@@ -200,7 +161,3 @@ func _on_card_pressed(card_index: int) -> void:
 	get_tree().paused = false
 	if _main.has_method("on_upgrade_selected"):
 		_main.on_upgrade_selected()
-
-
-func _is_direct_combat_upgrade(upgrade_id: String) -> bool:
-	return _upgrade_catalog.is_direct_combat_upgrade(upgrade_id)
