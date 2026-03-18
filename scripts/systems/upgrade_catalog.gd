@@ -2,7 +2,9 @@ extends RefCounted
 
 class_name UpgradeCatalog
 
-const ALL: Array[Dictionary] = [
+const _CATALOG_JSON_PATH := "res://assets/data/upgrades/upgrade_catalog.json"
+
+const _DEFAULT_ALL: Array[Dictionary] = [
 	# 主武器：基础子弹
 	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器间隔 -15%；超 75发/秒 的攻速按%转攻击力"},
 	{"id": "damage_percent", "name": "高爆弹头", "desc": "主武器伤害 +20%"},
@@ -29,7 +31,7 @@ const ALL: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-const DIRECT_COMBAT_IDS = [
+const _DEFAULT_DIRECT_COMBAT_IDS = [
 	"fire_rate",
 	"damage_percent",
 	"multi_shot",
@@ -46,7 +48,7 @@ const DIRECT_COMBAT_IDS = [
 	"bomb_side_cooldown",
 ]
 
-const MAIN_EFFECT_IDS = [
+const _DEFAULT_MAIN_EFFECT_IDS = [
 	"score_up",
 	"combo_boost",
 	"combo_guard",
@@ -54,7 +56,7 @@ const MAIN_EFFECT_IDS = [
 	"spell_auto",
 ]
 
-const PLAYER_EFFECT_IDS = [
+const _DEFAULT_PLAYER_EFFECT_IDS = [
 	"fire_rate",
 	"damage",
 	"multi_shot",
@@ -70,30 +72,103 @@ const PLAYER_EFFECT_IDS = [
 	"bomb_side_cooldown",
 ]
 
-const ALIASES = {
+const _DEFAULT_ALIASES = {
 	"bomb_cooldown": "spell_cooldown",
 	"bomb_auto": "spell_auto",
 	"bomb_weapon": "bomb_multi",
 }
 
+var _all_upgrades: Array[Dictionary] = []
+var _direct_combat_ids: Array[String] = []
+var _main_effect_ids: Array[String] = []
+var _player_effect_ids: Array[String] = []
+var _aliases: Dictionary = {}
+
+
+func _init() -> void:
+	_reset_defaults()
+	_load_from_json()
+
+
+func _reset_defaults() -> void:
+	_all_upgrades = _DEFAULT_ALL.duplicate(true)
+	_direct_combat_ids = _DEFAULT_DIRECT_COMBAT_IDS.duplicate(true)
+	_main_effect_ids = _DEFAULT_MAIN_EFFECT_IDS.duplicate(true)
+	_player_effect_ids = _DEFAULT_PLAYER_EFFECT_IDS.duplicate(true)
+	_aliases = _DEFAULT_ALIASES.duplicate(true)
+
+
+func _load_from_json() -> void:
+	var file := FileAccess.open(_CATALOG_JSON_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var cfg := parsed as Dictionary
+	var all_raw: Variant = cfg.get("all", [])
+	var direct_raw: Variant = cfg.get("direct_combat_ids", [])
+	var main_raw: Variant = cfg.get("main_effect_ids", [])
+	var player_raw: Variant = cfg.get("player_effect_ids", [])
+	var aliases_raw: Variant = cfg.get("aliases", {})
+
+	var all_converted := _to_upgrade_dict_array(all_raw)
+	var direct_converted := _to_string_array(direct_raw)
+	var main_converted := _to_string_array(main_raw)
+	var player_converted := _to_string_array(player_raw)
+	if not all_converted.is_empty():
+		_all_upgrades = all_converted
+	if not direct_converted.is_empty():
+		_direct_combat_ids = direct_converted
+	if not main_converted.is_empty():
+		_main_effect_ids = main_converted
+	if not player_converted.is_empty():
+		_player_effect_ids = player_converted
+	if typeof(aliases_raw) == TYPE_DICTIONARY:
+		_aliases = (aliases_raw as Dictionary).duplicate(true)
+
+
+func _to_upgrade_dict_array(raw: Variant) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if typeof(raw) != TYPE_ARRAY:
+		return out
+	for item in raw:
+		if typeof(item) != TYPE_DICTIONARY:
+			continue
+		var d := item as Dictionary
+		if not d.has("id"):
+			continue
+		out.append(d.duplicate(true))
+	return out
+
+
+func _to_string_array(raw: Variant) -> Array[String]:
+	var out: Array[String] = []
+	if typeof(raw) != TYPE_ARRAY:
+		return out
+	for item in raw:
+		if typeof(item) == TYPE_STRING:
+			out.append(String(item))
+	return out
+
 
 func get_all_upgrades() -> Array[Dictionary]:
-	return ALL.duplicate(true)
+	return _all_upgrades.duplicate(true)
 
 
 func is_direct_combat_upgrade(upgrade_id: String) -> bool:
-	return upgrade_id in DIRECT_COMBAT_IDS
+	return upgrade_id in _direct_combat_ids
 
 
 func resolve_upgrade_id(upgrade_id: String) -> String:
-	if ALIASES.has(upgrade_id):
-		return str(ALIASES[upgrade_id])
+	if _aliases.has(upgrade_id):
+		return str(_aliases[upgrade_id])
 	return upgrade_id
 
 
 func has_main_effect(upgrade_id: String) -> bool:
-	return resolve_upgrade_id(upgrade_id) in MAIN_EFFECT_IDS
+	return resolve_upgrade_id(upgrade_id) in _main_effect_ids
 
 
 func has_player_effect(upgrade_id: String) -> bool:
-	return resolve_upgrade_id(upgrade_id) in PLAYER_EFFECT_IDS
+	return resolve_upgrade_id(upgrade_id) in _player_effect_ids
