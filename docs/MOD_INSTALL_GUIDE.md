@@ -5,17 +5,16 @@
 ## 前提条件
 
 - 你使用的是包含 Godot Mod Loader 的游戏版本。
-- 已至少启动过一次游戏（用于自动创建用户目录）。
 
 ## 一、找到 Mod 目录
 
-导出版默认从 `user://mods` 读取 Mod。  
-在 Windows 上通常对应到 `AppData/Roaming/Godot/app_userdata/<你的游戏目录>/mods`。
+导出版默认从**游戏安装目录**下的 `mods` 文件夹读取 Mod。
 
 如果你不确定具体位置，可以：
 
-1. 先运行一次游戏并退出。
-2. 在资源管理器中搜索包含 `mods` 的 `app_userdata` 目录。
+1. 打开游戏可执行文件所在目录（例如 `PlaneWar.exe` 所在目录）。
+2. 在同级创建 `mods` 文件夹（如果还没有）。
+3. 最终结构应类似：`<游戏安装目录>/mods/`
 
 ## 二、准备 Mod 文件
 
@@ -34,13 +33,13 @@
 
 ## 三、安装方式
 
-支持以下两种方式（都放到 `mods` 目录里）：
+导出版默认从安装目录下的 `mods` 读取 **zip 包**，推荐方式如下：
 
-- **方式 A：解压目录（开发调试推荐）**
-  - `mods/<namespace>-<mod_name>/manifest.json`
-  - `mods/<namespace>-<mod_name>/mod_main.gd`
-- **方式 B：zip 压缩包（发布推荐）**
-  - 直接将 Mod zip 放入 `mods` 目录
+- **方式 A：zip 压缩包（发布推荐）**
+  - 直接将 Mod zip 放入 `mods` 目录（如 `mods/your_mod.zip`）
+
+> 说明：当前导出版本地 `mods` 来源按 zip 扫描，不会读取该目录下的解压子目录。
+> 若你是开发者并在编辑器调试，可使用项目内 `res://mods-unpacked/` 目录进行解包调试。
 
 安装后重启游戏即可生效。
 
