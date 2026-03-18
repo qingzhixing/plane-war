@@ -1,6 +1,6 @@
 extends RefCounted
 
-const LogBridge = preload("res://scripts/systems/log_bridge.gd")
+const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
 const _CONFIG_JSON_PATH := "res://assets/data/waves/enemy_combat_config.json"
 
 const _DEFAULT_SCALING := {
@@ -63,11 +63,11 @@ func _init() -> void:
 func _load_from_json() -> void:
 	var file := FileAccess.open(_CONFIG_JSON_PATH, FileAccess.READ)
 	if file == null:
-		LogBridge.warn("EnemyCombatConfig missing file: %s" % _CONFIG_JSON_PATH)
+		_LogBridgeRef.warn("EnemyCombatConfig missing file: %s" % _CONFIG_JSON_PATH)
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
-		LogBridge.error("EnemyCombatConfig parse failed: root is not dictionary")
+		_LogBridgeRef.error("EnemyCombatConfig parse failed: root is not dictionary")
 		return
 	var cfg: Dictionary = parsed as Dictionary
 	var scaling_raw: Variant = cfg.get("scaling", {})

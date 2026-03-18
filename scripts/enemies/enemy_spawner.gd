@@ -1,6 +1,7 @@
 extends Node
 
-const LogBridge = preload("res://scripts/systems/log_bridge.gd")
+const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
+const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
 @export var enemy_scene: PackedScene
 @export var enemy_scene_turret: PackedScene
 @export var enemy_scene_elite: PackedScene
@@ -21,15 +22,15 @@ func _ready() -> void:
 	if enemy_scene == null:
 		enemy_scene = preload("res://scenes/enemies/EnemyBasic01.tscn")
 		if enemy_scene == null:
-			LogBridge.error("EnemySpawner failed to preload EnemyBasic01.tscn")
+			_LogBridgeRef.error("EnemySpawner failed to preload EnemyBasic01.tscn")
 	if enemy_scene_turret == null:
 		enemy_scene_turret = preload("res://scenes/enemies/EnemyBasic02_Turret.tscn")
 		if enemy_scene_turret == null:
-			LogBridge.error("EnemySpawner failed to preload EnemyBasic02_Turret.tscn")
+			_LogBridgeRef.error("EnemySpawner failed to preload EnemyBasic02_Turret.tscn")
 	if enemy_scene_elite == null:
 		enemy_scene_elite = preload("res://scenes/enemies/EnemyElite01.tscn")
 		if enemy_scene_elite == null:
-			LogBridge.error("EnemySpawner failed to preload EnemyElite01.tscn")
+			_LogBridgeRef.error("EnemySpawner failed to preload EnemyElite01.tscn")
 	_timer = get_node_or_null("Timer") as Timer
 	if _timer != null:
 		_default_timer_wait = _timer.wait_time
@@ -39,7 +40,7 @@ func _ready() -> void:
 func start_wave(wave: int) -> void:
 	_extension_index = 0
 	if _timer == null:
-		LogBridge.error("EnemySpawner timer node missing in scene tree.")
+		_LogBridgeRef.error("EnemySpawner timer node missing in scene tree.")
 		return
 	_timer.wait_time = _spawn_cfg.get_normal_interval(_default_timer_wait)
 	_remaining_to_spawn = _spawn_cfg.get_normal_enemy_count(wave)
@@ -50,7 +51,7 @@ func start_wave(wave: int) -> void:
 func start_extension_wave(ext: int, threat_tier: int) -> void:
 	_extension_index = clampi(ext, 1, _spawn_cfg.get_extension_wave_max())
 	if _timer == null:
-		LogBridge.error("EnemySpawner timer node missing in extension wave start.")
+		_LogBridgeRef.error("EnemySpawner timer node missing in extension wave start.")
 		return
 	_remaining_to_spawn = _spawn_cfg.get_extension_enemy_count(_extension_index, threat_tier)
 	_timer.wait_time = _spawn_cfg.get_extension_interval(_extension_index, _default_timer_wait)
@@ -76,6 +77,7 @@ func _on_spawn_timeout() -> void:
 		return
 
 	var scene_to_use: PackedScene = enemy_scene
+	var enemy_id := "builtin.basic"
 	var tier := 0
 	if main != null and main.has_method("get_threat_tier"):
 		tier = main.get_threat_tier()
@@ -87,21 +89,67 @@ func _on_spawn_timeout() -> void:
 		var elite_chance := _spawn_cfg.get_extension_elite_chance(_extension_index)
 		if enemy_scene_elite != null and randf() < elite_chance:
 			scene_to_use = enemy_scene_elite
+			enemy_id = "builtin.elite"
 		else:
 			var use_turret := randf() < _spawn_cfg.get_extension_turret_chance() and enemy_scene_turret != null
 			scene_to_use = enemy_scene_turret if use_turret else enemy_scene
+			enemy_id = "builtin.turret" if use_turret else "builtin.basic"
 	else:
 		if wave >= _spawn_cfg.get_normal_elite_wave_min() and enemy_scene_elite != null and randf() < _spawn_cfg.get_normal_elite_chance():
 			scene_to_use = enemy_scene_elite
+			enemy_id = "builtin.elite"
 		elif wave == 1:
 			scene_to_use = enemy_scene
+			enemy_id = "builtin.basic"
 		else:
 			var turret_chance := _spawn_cfg.get_normal_turret_chance(wave)
 			var use_turret := randf() < turret_chance and enemy_scene_turret != null
 			scene_to_use = enemy_scene if not use_turret else enemy_scene_turret
+			enemy_id = "builtin.turret" if use_turret else "builtin.basic"
+
+	var before_payload := {
+		"wave": wave,
+		"effective_wave": effective_wave,
+		"threat_tier": tier,
+		"extension_index": _extension_index,
+		"enemy_id": enemy_id,
+		"scene": scene_to_use,
+		"cancel_spawn": false,
+	}
+	before_payload = ModExtensionBridge.dispatch_event("before_enemy_select", before_payload)
+	scene_to_use = before_payload.get("scene", scene_to_use)
+	enemy_id = str(before_payload.get("enemy_id", enemy_id))
+	if bool(before_payload.get("cancel_spawn", false)):
+		_remaining_to_spawn -= 1
+		return
+
+	var mod_enemy_pick := _pick_mod_enemy_entry(wave)
+	if not mod_enemy_pick.is_empty():
+		var mod_weight := float(mod_enemy_pick.get("weight", 0.0))
+		var roll := randf_range(0.0, 1.0 + mod_weight)
+		if roll > 1.0 and mod_enemy_pick.has("scene"):
+			scene_to_use = mod_enemy_pick["scene"]
+			enemy_id = str(mod_enemy_pick.get("id", "mod.enemy"))
+
+	var after_payload := {
+		"wave": wave,
+		"effective_wave": effective_wave,
+		"threat_tier": tier,
+		"extension_index": _extension_index,
+		"enemy_id": enemy_id,
+		"scene": scene_to_use,
+		"cancel_spawn": false,
+	}
+	after_payload = ModExtensionBridge.dispatch_event("after_enemy_select", after_payload)
+	scene_to_use = after_payload.get("scene", scene_to_use)
+	if after_payload.has("enemy_id"):
+		enemy_id = str(after_payload["enemy_id"])
+	if bool(after_payload.get("cancel_spawn", false)):
+		_remaining_to_spawn -= 1
+		return
 
 	if scene_to_use == null:
-		LogBridge.warn("EnemySpawner resolved null enemy scene, skip this spawn tick.")
+		_LogBridgeRef.warn("EnemySpawner resolved null enemy scene, skip this spawn tick.")
 		return
 
 	var enemy := scene_to_use.instantiate()
@@ -112,3 +160,21 @@ func _on_spawn_timeout() -> void:
 	enemy.global_position = Vector2(x, -50.0)
 	get_tree().current_scene.add_child(enemy)
 	_remaining_to_spawn -= 1
+
+
+func _pick_mod_enemy_entry(wave: int) -> Dictionary:
+	var mod_entries := ModExtensionBridge.get_enemy_entries_for_context(wave, _extension_index)
+	if mod_entries.is_empty():
+		return {}
+	var total_weight := 0.0
+	for e in mod_entries:
+		total_weight += maxf(0.0, float(e.get("weight", 1.0)))
+	if total_weight <= 0.0:
+		return {}
+	var roll := randf() * total_weight
+	var acc := 0.0
+	for e in mod_entries:
+		acc += maxf(0.0, float(e.get("weight", 1.0)))
+		if roll <= acc:
+			return e
+	return mod_entries[mod_entries.size() - 1]

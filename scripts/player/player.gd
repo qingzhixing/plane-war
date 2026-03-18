@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const _PlayerUpgradeEffectsServiceClass = preload("res://scripts/systems/player_upgrade_effects_service.gd")
+const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
 
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
@@ -215,11 +216,38 @@ func _update_shooting(delta: float) -> void:
 		_play_shoot_sfx()
 
 func _spawn_weapon_shot() -> void:
-	match _weapon_mode:
+	var before_payload := {
+		"player": self,
+		"weapon_mode": _weapon_mode,
+		"cancel_default": false,
+	}
+	before_payload = ModExtensionBridge.dispatch_event("before_main_shot", before_payload)
+	if bool(before_payload.get("cancel_default", false)):
+		_apply_mod_spawn_requests(before_payload.get("spawn_requests", []))
+		ModExtensionBridge.dispatch_event(
+			"after_main_shot",
+			{
+				"player": self,
+				"weapon_mode": str(before_payload.get("weapon_mode", _weapon_mode)),
+				"used_default": false,
+			}
+		)
+		return
+	var resolved_mode := str(before_payload.get("weapon_mode", _weapon_mode))
+	match resolved_mode:
 		"arrow":
 			_spawn_arrow_shot()
 		_:
 			_spawn_default_shot()
+	_apply_mod_spawn_requests(before_payload.get("spawn_requests", []))
+	ModExtensionBridge.dispatch_event(
+		"after_main_shot",
+		{
+			"player": self,
+			"weapon_mode": resolved_mode,
+			"used_default": true,
+		}
+	)
 
 
 func _spawn_default_shot() -> void:
@@ -380,6 +408,33 @@ func _update_side_weapons(delta: float) -> void:
 			_bomb_weapon.process(delta)
 	if has_weapon_unlocked("boomerang") and _boomerang_weapon != null:
 		_boomerang_weapon.process(delta)
+	ModExtensionBridge.process_mod_weapons(self, delta)
+
+
+func _apply_mod_spawn_requests(raw_requests: Variant) -> void:
+	if typeof(raw_requests) != TYPE_ARRAY:
+		return
+	for request_variant in raw_requests:
+		if typeof(request_variant) != TYPE_DICTIONARY:
+			continue
+		var request := request_variant as Dictionary
+		var scene_res := request.get("scene", null) as PackedScene
+		if scene_res == null:
+			continue
+		var dir_raw: Variant = request.get("dir", Vector2.UP)
+		var dir := dir_raw as Vector2 if typeof(dir_raw) == TYPE_VECTOR2 else Vector2.UP
+		var side_offset_raw: Variant = request.get("side_offset", Vector2.ZERO)
+		var side_offset := side_offset_raw as Vector2 if typeof(side_offset_raw) == TYPE_VECTOR2 else Vector2.ZERO
+		_spawn_configured_bullet(
+			scene_res,
+			(dir as Vector2).normalized(),
+			float(request.get("damage_bonus", 0.0)),
+			float(request.get("speed_mult", 1.0)),
+			int(request.get("penetration", 0)),
+			str(request.get("visual_type", "bullet")),
+			str(request.get("motion_mode", "straight")),
+			side_offset as Vector2
+		)
 
 
 @warning_ignore("UNUSED_PARAMETER")
@@ -440,6 +495,17 @@ func get_boss_damage_multiplier() -> float:
 
 func has_weapon_unlocked(weapon_id: String) -> bool:
 	return _weapon_unlocked.has(weapon_id) and bool(_weapon_unlocked[weapon_id])
+
+
+func set_weapon_unlocked(weapon_id: String, unlocked: bool = true) -> void:
+	var id := weapon_id.strip_edges()
+	if id.is_empty():
+		return
+	_weapon_unlocked[id] = unlocked
+
+
+func unlock_weapon(weapon_id: String) -> void:
+	set_weapon_unlocked(weapon_id, true)
 
 
 func get_weapon_mode() -> String:

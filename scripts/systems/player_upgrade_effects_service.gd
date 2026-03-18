@@ -3,6 +3,7 @@ extends RefCounted
 class_name PlayerUpgradeEffectsService
 
 const _UpgradeEffectsConfigRef = preload("res://scripts/config/upgrade_effects_config.gd")
+const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
 var _effects_cfg = _UpgradeEffectsConfigRef.new()
 
 
@@ -44,7 +45,7 @@ func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 			_upgrade_bomb_side_cooldown(player)
 			return true
 		_:
-			return false
+			return ModExtensionBridge.try_apply_upgrade_effect(player, upgrade_id)
 
 
 func _upgrade_fire_rate(player: Node) -> void:
@@ -90,13 +91,19 @@ func _upgrade_arrow_cooldown(player: Node) -> void:
 
 func _upgrade_arrow_multi(player: Node) -> void:
 	if not player.has_weapon_unlocked("arrow"):
-		player._weapon_unlocked["arrow"] = true
+		if player.has_method("set_weapon_unlocked"):
+			player.set_weapon_unlocked("arrow", true)
+		else:
+			player._weapon_unlocked["arrow"] = true
 	player._arrow_shot_count = max(1, player._arrow_shot_count + _effects_cfg.get_player_int("arrow_multi_add", 1))
 
 
 func _upgrade_boomerang_multi(player: Node) -> void:
 	if not player.has_weapon_unlocked("boomerang"):
-		player._weapon_unlocked["boomerang"] = true
+		if player.has_method("set_weapon_unlocked"):
+			player.set_weapon_unlocked("boomerang", true)
+		else:
+			player._weapon_unlocked["boomerang"] = true
 		player.call_deferred("_spawn_single_boomerang")
 		return
 	player._boomerang_shot_count = mini(
@@ -108,7 +115,10 @@ func _upgrade_boomerang_multi(player: Node) -> void:
 
 func _upgrade_bomb_multi(player: Node) -> void:
 	if not player.has_weapon_unlocked("bomb"):
-		player._weapon_unlocked["bomb"] = true
+		if player.has_method("set_weapon_unlocked"):
+			player.set_weapon_unlocked("bomb", true)
+		else:
+			player._weapon_unlocked["bomb"] = true
 	player._bomb_shot_count = max(1, player._bomb_shot_count + _effects_cfg.get_player_int("bomb_multi_add", 1))
 
 

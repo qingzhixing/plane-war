@@ -1,0 +1,28 @@
+{
+  "name": "mod_api_demo",
+  "namespace": "demo_mod",
+  "version_number": "0.1.0",
+  "website_url": "https://example.com",
+  "description": "Demo mod for Hook-first mod API phase 1.",
+  "dependencies": [],
+  "extra": {
+	"godot": {
+	  "authors": [
+        "plane-war"
+	  ],
+	  "compatible_mod_loader_version": [
+        "999.999.999"
+	  ],
+	  "compatible_game_version": [
+        "999.999.999"
+	  ],
+	  "optional_dependencies": [],
+	  "incompatibilities": [],
+	  "load_before": [],
+	  "tags": [
+		"demo",
+        "mod_api"
+	  ]
+	}
+  }
+}

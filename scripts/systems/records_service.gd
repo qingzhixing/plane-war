@@ -1,7 +1,7 @@
 extends RefCounted
 
 class_name RecordsService
-const LogBridge = preload("res://scripts/systems/log_bridge.gd")
+const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
 
 const _RECORDS_FILE_PATH: String = "user://records.cfg"
 
@@ -10,7 +10,7 @@ static func load_best_records() -> Dictionary:
 	var cfg := ConfigFile.new()
 	var err := cfg.load(_RECORDS_FILE_PATH)
 	if err != OK:
-		LogBridge.warn("RecordsService load failed (%d), fallback defaults." % err)
+		_LogBridgeRef.warn("RecordsService load failed (%d), fallback defaults." % err)
 		return {
 			"best_score": 0,
 			"best_dps": 0.0,
@@ -30,7 +30,7 @@ static func save_best_records(best_score: int, best_dps: float, best_combo: int)
 	cfg.set_value("records", "best_combo", best_combo)
 	var err := cfg.save(_RECORDS_FILE_PATH)
 	if err != OK:
-		LogBridge.error("RecordsService save failed (%d)." % err)
+		_LogBridgeRef.error("RecordsService save failed (%d)." % err)
 
 
 static func finalize_best_records(best_records: Dictionary, run_stats: Dictionary) -> Dictionary:

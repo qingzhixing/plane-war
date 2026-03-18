@@ -3,6 +3,7 @@ extends RefCounted
 class_name UpgradeCatalog
 
 const _CATALOG_JSON_PATH := "res://assets/data/upgrades/upgrade_catalog.json"
+const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
 
 const _DEFAULT_ALL: Array[Dictionary] = [
 	# 主武器：基础子弹
@@ -153,17 +154,30 @@ func _to_string_array(raw: Variant) -> Array[String]:
 
 
 func get_all_upgrades() -> Array[Dictionary]:
-	return _all_upgrades.duplicate(true)
+	var out := _all_upgrades.duplicate(true)
+	var seen: Dictionary = {}
+	for item in out:
+		if item.has("id"):
+			seen[str(item["id"])] = true
+	for item in ModExtensionBridge.get_registered_upgrades():
+		if not item.has("id"):
+			continue
+		var id := str(item["id"])
+		if seen.has(id):
+			continue
+		out.append(item.duplicate(true))
+		seen[id] = true
+	return out
 
 
 func is_direct_combat_upgrade(upgrade_id: String) -> bool:
-	return upgrade_id in _direct_combat_ids
+	return upgrade_id in _direct_combat_ids or ModExtensionBridge.is_direct_combat_upgrade(upgrade_id)
 
 
 func resolve_upgrade_id(upgrade_id: String) -> String:
 	if _aliases.has(upgrade_id):
 		return str(_aliases[upgrade_id])
-	return upgrade_id
+	return ModExtensionBridge.resolve_upgrade_alias(upgrade_id)
 
 
 func has_main_effect(upgrade_id: String) -> bool:
@@ -171,4 +185,5 @@ func has_main_effect(upgrade_id: String) -> bool:
 
 
 func has_player_effect(upgrade_id: String) -> bool:
-	return resolve_upgrade_id(upgrade_id) in _player_effect_ids
+	var resolved := resolve_upgrade_id(upgrade_id)
+	return resolved in _player_effect_ids or ModExtensionBridge.has_upgrade_entry(resolved)
