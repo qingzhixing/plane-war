@@ -27,7 +27,4 @@ func apply_upgrade(upgrade_id: String) -> void:
 		return
 	if _upgrade_catalog.has_player_effect(resolved_id):
 		_player_upgrade_effects.apply_player_upgrade(player, resolved_id)
-		return
-	# 兼容：若后续仍有 Player 自身处理的特殊升级，可保留此后备路径。
-	if player.has_method("apply_upgrade"):
-		player.apply_upgrade(resolved_id)
+	return
