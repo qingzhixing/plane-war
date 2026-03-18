@@ -1,8 +1,6 @@
 extends Node
 
 const _BridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
-const _UpgradeEffectsConfigRef = preload("res://scripts/config/upgrade_effects_config.gd")
-const _EnemySpawnConfigRef = preload("res://scripts/config/enemy_spawn_config.gd")
 
 const _UPGRADES: Array[Dictionary] = [
 	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器间隔 -15%；超 75发/秒 的攻速按%转攻击力", "direct_combat": true, "player_effect": true},
@@ -26,11 +24,58 @@ const _ENEMY_BASIC_ID := "builtin.basic"
 const _ENEMY_TURRET_ID := "builtin.turret"
 const _ENEMY_ELITE_ID := "builtin.elite"
 
-var _effects_cfg = _UpgradeEffectsConfigRef.new()
-var _spawn_cfg = _EnemySpawnConfigRef.new()
+const _UPGRADE_EFFECTS_CONFIG_PATH := "res://mods-unpacked/planewar-core_mod/config/upgrade_effects.json"
+const _ENEMY_SPAWN_CONFIG_PATH := "res://mods-unpacked/planewar-core_mod/config/enemy_spawn_config.json"
+
+const _DEFAULT_MAIN_EFFECTS := {
+	"score_up_add": 0.15,
+	"combo_boost_add": 1,
+	"combo_guard_add": 1,
+	"spell_cooldown_mul": 0.85,
+	"spell_cooldown_min_scale": 0.45,
+	"spell_auto_mul": 0.5,
+	"spell_auto_min_scale": 0.2,
+}
+
+const _DEFAULT_PLAYER_EFFECTS := {
+	"fire_rate_mul": 0.85,
+	"damage_add": 1,
+	"multi_shot_add": 1,
+	"bullet_speed_mul": 1.12,
+	"damage_percent_mul": 1.2,
+	"spread_focus_mul": 0.7,
+	"arrow_cooldown_mul": 0.8,
+	"arrow_cooldown_min": 0.4,
+	"arrow_multi_add": 1,
+	"boomerang_multi_cap": 6,
+	"bomb_multi_add": 1,
+	"bomb_side_cooldown_mul": 0.8,
+	"bomb_side_cooldown_min": 0.85,
+}
+
+const _DEFAULT_ENEMY_NORMAL := {
+	"elite_wave_min": 4,
+	"elite_chance": 0.18,
+	"turret_chance": {
+		"2": 0.18,
+		"default": 0.35,
+	},
+}
+
+const _DEFAULT_ENEMY_EXTENSION := {
+	"elite_base_chance": 0.22,
+	"elite_step_per_wave": 0.10,
+	"turret_chance": 0.55,
+}
+
+var _main_effects_cfg: Dictionary = {}
+var _player_effects_cfg: Dictionary = {}
+var _enemy_normal_cfg: Dictionary = {}
+var _enemy_extension_cfg: Dictionary = {}
 
 
 func _init() -> void:
+	_load_local_configs()
 	_register_enemy_entries()
 	_register_weapon_entries()
 	_register_upgrade_entries()
@@ -128,17 +173,17 @@ func _before_enemy_select(payload: Dictionary) -> Dictionary:
 	var extension_index := int(out.get("extension_index", 0))
 	var selected_id := _ENEMY_BASIC_ID
 	if extension_index > 0:
-		var elite_chance := _spawn_cfg.get_extension_elite_chance(extension_index)
+		var elite_chance := _get_extension_elite_chance(extension_index)
 		if randf() < elite_chance:
 			selected_id = _ENEMY_ELITE_ID
 		else:
-			var use_turret := randf() < _spawn_cfg.get_extension_turret_chance()
+			var use_turret := randf() < _get_extension_turret_chance()
 			selected_id = _ENEMY_TURRET_ID if use_turret else _ENEMY_BASIC_ID
 	else:
-		if wave >= _spawn_cfg.get_normal_elite_wave_min() and randf() < _spawn_cfg.get_normal_elite_chance():
+		if wave >= _get_normal_elite_wave_min() and randf() < _get_normal_elite_chance():
 			selected_id = _ENEMY_ELITE_ID
 		elif wave > 1:
-			var use_turret_wave := randf() < _spawn_cfg.get_normal_turret_chance(wave)
+			var use_turret_wave := randf() < _get_normal_turret_chance(wave)
 			selected_id = _ENEMY_TURRET_ID if use_turret_wave else _ENEMY_BASIC_ID
 	var selected_entry := _BridgeRef.get_enemy_entry(selected_id)
 	if selected_entry.has("scene"):
@@ -150,13 +195,13 @@ func _before_enemy_select(payload: Dictionary) -> Dictionary:
 func _apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
 	match upgrade_id:
 		"score_up":
-			main._score_multiplier += _effects_cfg.get_main_float("score_up_add", 0.15)
+			main._score_multiplier += _get_main_effect_float("score_up_add", 0.15)
 			return true
 		"combo_boost":
-			main._combo_gain_per_hit += _effects_cfg.get_main_int("combo_boost_add", 1)
+			main._combo_gain_per_hit += _get_main_effect_int("combo_boost_add", 1)
 			return true
 		"combo_guard":
-			main._combo_guard_charges += _effects_cfg.get_main_int("combo_guard_add", 1)
+			main._combo_guard_charges += _get_main_effect_int("combo_guard_add", 1)
 			var player := main.get_node_or_null(main.player_path)
 			if player != null and player.has_method("set_combo_guard_shield_visible"):
 				player.set_combo_guard_shield_visible(true)
@@ -167,8 +212,8 @@ func _apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
 			if main.has_method("get_spell_cooldown_base_seconds"):
 				cooldown_base = float(main.get_spell_cooldown_base_seconds())
 			var new_scale: float = maxf(
-				_effects_cfg.get_main_float("spell_cooldown_min_scale", 0.45),
-				main._spell_cooldown_scale * _effects_cfg.get_main_float("spell_cooldown_mul", 0.85)
+				_get_main_effect_float("spell_cooldown_min_scale", 0.45),
+				main._spell_cooldown_scale * _get_main_effect_float("spell_cooldown_mul", 0.85)
 			)
 			main._spell_cooldown_scale = new_scale
 			if main._spell_cooldown_remaining > 0.0 and old_scale > 0.0:
@@ -185,8 +230,8 @@ func _apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
 				cooldown_base_auto = float(main.get_spell_cooldown_base_seconds())
 			var old_scale_auto: float = main._spell_cooldown_scale
 			var new_scale_auto: float = maxf(
-				_effects_cfg.get_main_float("spell_auto_min_scale", 0.2),
-				main._spell_cooldown_scale * _effects_cfg.get_main_float("spell_auto_mul", 0.5)
+				_get_main_effect_float("spell_auto_min_scale", 0.2),
+				main._spell_cooldown_scale * _get_main_effect_float("spell_auto_mul", 0.5)
 			)
 			main._spell_cooldown_scale = new_scale_auto
 			if main._spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
@@ -203,42 +248,42 @@ func _apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
 func _apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 	match upgrade_id:
 		"fire_rate":
-			player.fire_interval *= _effects_cfg.get_player_float("fire_rate_mul", 0.85)
+			player.fire_interval *= _get_player_effect_float("fire_rate_mul", 0.85)
 			if player.has_method("_recompute_rof_overflow_damage"):
 				player._recompute_rof_overflow_damage()
 			return true
 		"damage":
-			player.bullet_damage += _effects_cfg.get_player_int("damage_add", 1)
+			player.bullet_damage += _get_player_effect_int("damage_add", 1)
 			return true
 		"multi_shot":
 			player._bullet_count = mini(
-				player._bullet_count + _effects_cfg.get_player_int("multi_shot_add", 1),
+				player._bullet_count + _get_player_effect_int("multi_shot_add", 1),
 				player._max_bullet_count
 			)
 			return true
 		"bullet_speed":
-			player.bullet_speed *= _effects_cfg.get_player_float("bullet_speed_mul", 1.12)
+			player.bullet_speed *= _get_player_effect_float("bullet_speed_mul", 1.12)
 			return true
 		"damage_percent":
-			player._damage_multiplier *= _effects_cfg.get_player_float("damage_percent_mul", 1.2)
+			player._damage_multiplier *= _get_player_effect_float("damage_percent_mul", 1.2)
 			return true
 		"spread_focus":
 			if player._bullet_count > 1:
 				player._spread_rad_per_bullet = maxf(
 					player._min_spread_rad_per_bullet,
-					player._spread_rad_per_bullet * _effects_cfg.get_player_float("spread_focus_mul", 0.7)
+					player._spread_rad_per_bullet * _get_player_effect_float("spread_focus_mul", 0.7)
 				)
 			return true
 		"arrow_cooldown":
 			player.arrow_auto_interval = maxf(
-				_effects_cfg.get_player_float("arrow_cooldown_min", 0.4),
-				player.arrow_auto_interval * _effects_cfg.get_player_float("arrow_cooldown_mul", 0.8)
+				_get_player_effect_float("arrow_cooldown_min", 0.4),
+				player.arrow_auto_interval * _get_player_effect_float("arrow_cooldown_mul", 0.8)
 			)
 			return true
 		"arrow_multi":
 			if not player.has_weapon_unlocked("arrow"):
 				player.set_weapon_unlocked("arrow", true)
-			player._arrow_shot_count = max(1, player._arrow_shot_count + _effects_cfg.get_player_int("arrow_multi_add", 1))
+			player._arrow_shot_count = max(1, player._arrow_shot_count + _get_player_effect_int("arrow_multi_add", 1))
 			return true
 		"boomerang_speed", "boomerang_cooldown":
 			return true
@@ -248,7 +293,7 @@ func _apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 				player.call_deferred("_spawn_single_boomerang")
 				return true
 			player._boomerang_shot_count = mini(
-				_effects_cfg.get_player_int("boomerang_multi_cap", 6),
+				_get_player_effect_int("boomerang_multi_cap", 6),
 				player._boomerang_shot_count + 1
 			)
 			player.call_deferred("_spawn_single_boomerang")
@@ -256,13 +301,100 @@ func _apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 		"bomb_multi", "bomb_weapon":
 			if not player.has_weapon_unlocked("bomb"):
 				player.set_weapon_unlocked("bomb", true)
-			player._bomb_shot_count = max(1, player._bomb_shot_count + _effects_cfg.get_player_int("bomb_multi_add", 1))
+			player._bomb_shot_count = max(1, player._bomb_shot_count + _get_player_effect_int("bomb_multi_add", 1))
 			return true
 		"bomb_side_cooldown":
 			player.bomb_auto_interval = maxf(
-				_effects_cfg.get_player_float("bomb_side_cooldown_min", 0.85),
-				player.bomb_auto_interval * _effects_cfg.get_player_float("bomb_side_cooldown_mul", 0.8)
+				_get_player_effect_float("bomb_side_cooldown_min", 0.85),
+				player.bomb_auto_interval * _get_player_effect_float("bomb_side_cooldown_mul", 0.8)
 			)
 			return true
 		_:
 			return false
+
+
+func _load_local_configs() -> void:
+	_main_effects_cfg = _DEFAULT_MAIN_EFFECTS.duplicate(true)
+	_player_effects_cfg = _DEFAULT_PLAYER_EFFECTS.duplicate(true)
+	_enemy_normal_cfg = _DEFAULT_ENEMY_NORMAL.duplicate(true)
+	_enemy_extension_cfg = _DEFAULT_ENEMY_EXTENSION.duplicate(true)
+	_load_upgrade_effects_json()
+	_load_enemy_spawn_json()
+
+
+func _load_upgrade_effects_json() -> void:
+	var file := FileAccess.open(_UPGRADE_EFFECTS_CONFIG_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var cfg := parsed as Dictionary
+	var main_raw: Variant = cfg.get("main", {})
+	if typeof(main_raw) == TYPE_DICTIONARY:
+		_main_effects_cfg.merge(main_raw as Dictionary, true)
+	var player_raw: Variant = cfg.get("player", {})
+	if typeof(player_raw) == TYPE_DICTIONARY:
+		_player_effects_cfg.merge(player_raw as Dictionary, true)
+
+
+func _load_enemy_spawn_json() -> void:
+	var file := FileAccess.open(_ENEMY_SPAWN_CONFIG_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var cfg := parsed as Dictionary
+	var normal_raw: Variant = cfg.get("normal", {})
+	if typeof(normal_raw) == TYPE_DICTIONARY:
+		_enemy_normal_cfg.merge(normal_raw as Dictionary, true)
+	var extension_raw: Variant = cfg.get("extension", {})
+	if typeof(extension_raw) == TYPE_DICTIONARY:
+		_enemy_extension_cfg.merge(extension_raw as Dictionary, true)
+
+
+func _get_main_effect_float(key: String, default_value: float) -> float:
+	return float(_main_effects_cfg.get(key, default_value))
+
+
+func _get_main_effect_int(key: String, default_value: int) -> int:
+	return int(_main_effects_cfg.get(key, default_value))
+
+
+func _get_player_effect_float(key: String, default_value: float) -> float:
+	return float(_player_effects_cfg.get(key, default_value))
+
+
+func _get_player_effect_int(key: String, default_value: int) -> int:
+	return int(_player_effects_cfg.get(key, default_value))
+
+
+func _get_extension_elite_chance(ext: int) -> float:
+	var base_chance := float(_enemy_extension_cfg.get("elite_base_chance", 0.22))
+	var step := float(_enemy_extension_cfg.get("elite_step_per_wave", 0.10))
+	var index := maxi(ext - 1, 0)
+	return base_chance + step * float(index)
+
+
+func _get_extension_turret_chance() -> float:
+	return float(_enemy_extension_cfg.get("turret_chance", 0.55))
+
+
+func _get_normal_elite_wave_min() -> int:
+	return int(_enemy_normal_cfg.get("elite_wave_min", 4))
+
+
+func _get_normal_elite_chance() -> float:
+	return float(_enemy_normal_cfg.get("elite_chance", 0.18))
+
+
+func _get_normal_turret_chance(wave: int) -> float:
+	var turret_raw: Variant = _enemy_normal_cfg.get("turret_chance", {})
+	if typeof(turret_raw) != TYPE_DICTIONARY:
+		return 0.35
+	var turret_cfg := turret_raw as Dictionary
+	var wave_key := str(wave)
+	if turret_cfg.has(wave_key):
+		return float(turret_cfg.get(wave_key, 0.35))
+	return float(turret_cfg.get("default", 0.35))

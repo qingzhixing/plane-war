@@ -94,7 +94,7 @@
 - **敌人生成**：`EnemySpawner` 已移除内建敌人硬编码，默认从 Bridge 注册表与事件结果决定最终敌人。
 - **主武器发射**：`Player` 在发射前后派发事件，并优先尝试按 Bridge `weapon entry` 生成发射请求。
 - **升级池合并**：`UpgradeCatalog` 直接消费 Bridge 已注册升级（无本地默认升级常量）。
-- **升级效果执行**：`PlayerUpgradeEffectsService` / `MainUpgradeEffectsService` 仅通过 Bridge handler 执行效果（支持前后生命周期事件）。
+- **升级效果执行**：主流程通过 `ModExtensionBridge` 统一升级入口分发（支持 player/main 的前后生命周期事件）。
 
 ---
 
@@ -102,6 +102,7 @@
 
 - 内置核心内容包：`mods-unpacked/planewar-core_mod`
   - 注册基线敌人、武器条目、升级条目、别名、主/玩家升级效果处理器。
+  - 使用自身配置文件（`config/upgrade_effects.json`、`config/enemy_spawn_config.json`），不依赖 `scripts/config`。
   - 作为“无外部 Mod”时的默认内容来源。
 - 示例扩展包：`mods-unpacked/demo_mod-mod_api_demo`
   - 展示第三方 Mod 如何注入额外敌人、升级与武器事件。

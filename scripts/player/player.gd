@@ -1,6 +1,5 @@
 extends CharacterBody2D
 
-const _PlayerUpgradeEffectsServiceClass = preload("res://scripts/systems/player_upgrade_effects_service.gd")
 const _ModExtensionBridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
 
 @export var move_speed: float = 600.0
@@ -67,7 +66,6 @@ var _main_weapon: MainWeapon
 var _arrow_weapon: ArrowWeapon
 var _bomb_weapon: BombWeapon
 var _boomerang_weapon: BoomerangWeapon
-var _player_upgrade_effects = _PlayerUpgradeEffectsServiceClass.new()
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -656,7 +654,7 @@ func release_pointer() -> void:
 	_has_pointer = false
 
 func apply_upgrade(upgrade_id: String) -> void:
-	_player_upgrade_effects.apply_player_upgrade(self, upgrade_id)
+	_ModExtensionBridgeRef.apply_player_upgrade(self, upgrade_id)
 
 
 func set_shield_active(active: bool) -> void:

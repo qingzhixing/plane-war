@@ -506,6 +506,94 @@ static func get_main_upgrade_effect_handler_count() -> int:
 	return _main_upgrade_effect_handlers.size()
 
 
+static func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
+	var before_payload := {
+		"player": player,
+		"upgrade_id": upgrade_id,
+		"cancel": false,
+	}
+	before_payload = dispatch_event("before_apply_upgrade", before_payload)
+	if bool(before_payload.get("cancel", false)):
+		dispatch_event(
+			"after_apply_upgrade",
+			{
+				"player": player,
+				"original_upgrade_id": upgrade_id,
+				"resolved_upgrade_id": upgrade_id,
+				"applied": false,
+				"cancelled": true,
+			}
+		)
+		return false
+
+	var resolved_upgrade_id := str(before_payload.get("upgrade_id", upgrade_id)).strip_edges()
+	if resolved_upgrade_id.is_empty():
+		resolved_upgrade_id = upgrade_id
+	resolved_upgrade_id = resolve_upgrade_alias(resolved_upgrade_id)
+	var applied := try_apply_upgrade_effect(player, resolved_upgrade_id)
+
+	dispatch_event(
+		"after_apply_upgrade",
+		{
+			"player": player,
+			"original_upgrade_id": upgrade_id,
+			"resolved_upgrade_id": resolved_upgrade_id,
+			"applied": applied,
+			"cancelled": false,
+		}
+	)
+	return applied
+
+
+static func apply_main_upgrade(main: Node, upgrade_id: String) -> bool:
+	var before_payload := {
+		"main": main,
+		"upgrade_id": upgrade_id,
+		"cancel": false,
+	}
+	before_payload = dispatch_event("before_apply_main_upgrade", before_payload)
+	if bool(before_payload.get("cancel", false)):
+		dispatch_event(
+			"after_apply_main_upgrade",
+			{
+				"main": main,
+				"original_upgrade_id": upgrade_id,
+				"resolved_upgrade_id": upgrade_id,
+				"applied": false,
+				"cancelled": true,
+			}
+		)
+		return false
+
+	var resolved_upgrade_id := str(before_payload.get("upgrade_id", upgrade_id)).strip_edges()
+	if resolved_upgrade_id.is_empty():
+		resolved_upgrade_id = upgrade_id
+	resolved_upgrade_id = resolve_upgrade_alias(resolved_upgrade_id)
+	var applied := try_apply_main_upgrade_effect(main, resolved_upgrade_id)
+	dispatch_event(
+		"after_apply_main_upgrade",
+		{
+			"main": main,
+			"original_upgrade_id": upgrade_id,
+			"resolved_upgrade_id": resolved_upgrade_id,
+			"applied": applied,
+			"cancelled": false,
+		}
+	)
+	return applied
+
+
+static func apply_upgrade(main: Node, player: Node, upgrade_id: String) -> bool:
+	var resolved_upgrade_id := resolve_upgrade_alias(upgrade_id)
+	if is_main_effect_upgrade(resolved_upgrade_id):
+		if apply_main_upgrade(main, resolved_upgrade_id):
+			return true
+	if player != null and is_player_effect_upgrade(resolved_upgrade_id):
+		if apply_player_upgrade(player, resolved_upgrade_id):
+			return true
+	return false
+
+
 static func try_apply_upgrade_effect(player: Node, upgrade_id: String) -> bool:
 	for handler in _upgrade_effect_handlers:
 		if not handler.is_valid():

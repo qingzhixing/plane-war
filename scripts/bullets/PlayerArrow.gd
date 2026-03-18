@@ -47,4 +47,3 @@ func _find_target() -> Node2D:
 				closest_dist = d
 				closest = e
 	return closest
-
