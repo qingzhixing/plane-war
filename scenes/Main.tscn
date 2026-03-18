@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/BossHud.tscn" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
-[ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PostBossChoicePanel.tscn" id="13_post_boss"]
 [ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
@@ -137,9 +137,7 @@ text = "DPS: 0  Max: 0"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
-process_mode = 3
-script = ExtResource("13_post_boss")
+[node name="PostBossChoice" parent="." unique_id=1999888771 instance=ExtResource("13_post_boss")]
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
