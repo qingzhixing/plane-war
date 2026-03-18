@@ -5,6 +5,7 @@ signal spell_used
 
 const _BattleProgressionConfigRef = preload("res://scripts/config/battle_progression_config.gd")
 const _BattleStatsSnapshotServiceClass = preload("res://scripts/systems/battle_stats_snapshot_service.gd")
+const _SpellEffectServiceClass = preload("res://scripts/systems/spell_effect_service.gd")
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -82,6 +83,7 @@ var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
 var _battle_cfg = _BattleProgressionConfigRef.new()
 var _battle_stats_snapshot_service = _BattleStatsSnapshotServiceClass.new()
+var _spell_effect_service = _SpellEffectServiceClass.new()
 var _game_stats: Node = null
 
 func _ready() -> void:
@@ -500,46 +502,14 @@ func has_spell_auto() -> bool:
 
 func _trigger_spell_effect() -> void:
 	# 符卡效果：周身 360° 弹幕；敌弹靠符卡弹碰撞逐发消除（不全屏清弹）
-	var player := get_node_or_null(player_path)
-	var origin := get_viewport().get_visible_rect().size * 0.5
-	var player_damage := 1.0
-	var boss_damage_multiplier := 1.0
-	if player != null:
-		origin = player.global_position
-		if player.has_method("get_bullet_damage"):
-			player_damage = int(player.get_bullet_damage())
-		if player.has_method("get_boss_damage_multiplier"):
-			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
-
-	var burst_scene := load(_spell_burst_scene_path) as PackedScene
-	if burst_scene != null:
-		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
-
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_enemy_explosion"):
-		audio.play_enemy_explosion()
-	if audio != null and audio.has_method("play_power_up"):
-		audio.play_power_up()
-
-
-func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:
-	for wave in _spell_burst_wave_count:
-		var phase_offset := (TAU / float(_spell_burst_bullet_count)) * 0.5 * float(wave % 2)
-		var radius := 12.0 + 6.0 * float(wave)
-		for i in _spell_burst_bullet_count:
-			var angle := TAU * float(i) / float(_spell_burst_bullet_count) + phase_offset
-			var dir := Vector2.RIGHT.rotated(angle)
-			var b := bullet_scene.instantiate()
-			b.global_position = origin + dir * radius
-			if "damage" in b:
-				b.damage = player_damage
-			if b.has_method("set_direction"):
-				b.set_direction(dir)
-			if b.has_method("set_boss_damage_multiplier"):
-				b.set_boss_damage_multiplier(boss_damage_multiplier)
-			get_tree().current_scene.add_child(b)
-		if wave < _spell_burst_wave_count - 1:
-			await get_tree().create_timer(_spell_burst_wave_interval).timeout
+	_spell_effect_service.trigger_spell(
+		self,
+		player_path,
+		_spell_burst_scene_path,
+		_spell_burst_wave_count,
+		_spell_burst_wave_interval,
+		_spell_burst_bullet_count
+	)
 
 
 func _get_combo_multiplier() -> float:
