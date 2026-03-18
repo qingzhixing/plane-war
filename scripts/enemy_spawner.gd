@@ -6,11 +6,14 @@ extends Node
 @export var enemies_per_wave_base: int = 7
 @export var enemies_per_wave_increment: int = 3
 
+const _EnemySpawnConfigRef = preload("res://scripts/systems/enemy_spawn_config.gd")
+
 var _remaining_to_spawn: int = 0
 var _timer: Timer
 ## 0 = 普通波次；1～7 = 续战小怪第 n 波
 var _extension_index: int = 0
 var _default_timer_wait: float = 1.0
+var _spawn_cfg = _EnemySpawnConfigRef.new()
 
 
 func _ready() -> void:
@@ -30,21 +33,18 @@ func start_wave(wave: int) -> void:
 	_extension_index = 0
 	if _timer == null:
 		return
-	_timer.wait_time = _default_timer_wait
-	_remaining_to_spawn = enemies_per_wave_base + enemies_per_wave_increment * max(wave - 1, 0)
+	_timer.wait_time = _spawn_cfg.get_normal_interval(_default_timer_wait)
+	_remaining_to_spawn = _spawn_cfg.get_normal_enemy_count(wave)
 	_timer.start()
 
 
 ## 续战小怪：ext 1～7，数量/间隔/精英率递增
 func start_extension_wave(ext: int, threat_tier: int) -> void:
-	_extension_index = clampi(ext, 1, 7)
+	_extension_index = clampi(ext, 1, _spawn_cfg.get_extension_wave_max())
 	if _timer == null:
 		return
-	var counts := [8, 11, 13, 15, 17, 19, 22]
-	var intervals := [0.88, 0.72, 0.64, 0.56, 0.50, 0.46, 0.42]
-	var tier_bonus := threat_tier * 2 if ext < 6 else threat_tier * 3
-	_remaining_to_spawn = counts[_extension_index - 1] + tier_bonus
-	_timer.wait_time = intervals[_extension_index - 1]
+	_remaining_to_spawn = _spawn_cfg.get_extension_enemy_count(_extension_index, threat_tier)
+	_timer.wait_time = _spawn_cfg.get_extension_interval(_extension_index, _default_timer_wait)
 	_timer.start()
 
 
@@ -75,19 +75,19 @@ func _on_spawn_timeout() -> void:
 	if _extension_index > 0:
 		# 续战：始终可炮台/精英，精英率随波升
 		effective_wave = 7 + _extension_index
-		var elite_chance := 0.22 + float(_extension_index - 1) * 0.10
+		var elite_chance := _spawn_cfg.get_extension_elite_chance(_extension_index)
 		if enemy_scene_elite != null and randf() < elite_chance:
 			scene_to_use = enemy_scene_elite
 		else:
-			var use_turret := randf() < 0.55 and enemy_scene_turret != null
+			var use_turret := randf() < _spawn_cfg.get_extension_turret_chance() and enemy_scene_turret != null
 			scene_to_use = enemy_scene_turret if use_turret else enemy_scene
 	else:
-		if wave >= 4 and enemy_scene_elite != null and randf() < 0.18:
+		if wave >= _spawn_cfg.get_normal_elite_wave_min() and enemy_scene_elite != null and randf() < _spawn_cfg.get_normal_elite_chance():
 			scene_to_use = enemy_scene_elite
 		elif wave == 1:
 			scene_to_use = enemy_scene
 		else:
-			var turret_chance := 0.18 if wave == 2 else 0.35
+			var turret_chance := _spawn_cfg.get_normal_turret_chance(wave)
 			var use_turret := randf() < turret_chance and enemy_scene_turret != null
 			scene_to_use = enemy_scene if not use_turret else enemy_scene_turret
 
