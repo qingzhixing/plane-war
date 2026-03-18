@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const MainWeapon := preload("res://scripts/player/main_weapon.gd")
+
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
 @export var fire_interval: float = 0.2
@@ -60,6 +62,7 @@ const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
 ## 相对 75/s 每溢出 1% → 主炮 +0.02 伤害（进乘区前）
 const _ROF_OVERFLOW_DAMAGE_PER_PCT: float = 0.02
 var _rof_overflow_damage: float = 0.0
+var _main_weapon: MainWeapon
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -85,6 +88,28 @@ func _ready() -> void:
 	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
 		call_deferred("_spawn_boomerang_volley")
 	_recompute_rof_overflow_damage()
+
+	_main_weapon = MainWeapon.new(
+		self,
+		bullet_scene_basic,
+		_max_bullet_count,
+		func() -> float:
+			return _effective_shot_interval(),
+		func() -> Dictionary:
+			return {
+				"bullet_count": _bullet_count,
+				"spread_rad_per_bullet": _spread_rad_per_bullet,
+				"damage": float(bullet_damage),
+				"speed": bullet_speed,
+				"bullet_speed_mult": _combo_bullet_speed_mult,
+				"damage_multiplier": _damage_multiplier,
+				"combo_damage_bonus": float(_combo_damage_bonus),
+				"rof_overflow_damage": _rof_overflow_damage,
+				"boss_damage_multiplier": _boss_damage_multiplier,
+			},
+		func() -> void:
+			_play_shoot_sfx()
+	)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -169,6 +194,11 @@ func _effective_shot_interval() -> float:
 
 
 func _update_shooting(delta: float) -> void:
+	if _main_weapon != null:
+		_main_weapon.process(delta)
+		return
+
+	# 兜底：旧逻辑（理论上不会走到）
 	var effective_interval := _effective_shot_interval()
 	if _fire_timer > effective_interval:
 		_fire_timer = effective_interval
