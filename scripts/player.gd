@@ -3,6 +3,7 @@ extends CharacterBody2D
 const MainWeapon := preload("res://scripts/player/main_weapon.gd")
 const ArrowWeapon := preload("res://scripts/player/arrow_weapon.gd")
 const BombWeapon := preload("res://scripts/player/bomb_weapon.gd")
+const BoomerangWeapon := preload("res://scripts/player/boomerang_weapon.gd")
 
 @export var move_speed: float = 600.0
 @export var keyboard_speed_multiplier: float = 1.5
@@ -67,6 +68,7 @@ var _rof_overflow_damage: float = 0.0
 var _main_weapon: MainWeapon
 var _arrow_weapon: ArrowWeapon
 var _bomb_weapon: BombWeapon
+var _boomerang_weapon: BoomerangWeapon
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -253,18 +255,39 @@ func _spawn_bomb_shot() -> void:
 
 
 func _spawn_single_boomerang() -> void:
-	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
+	if not has_weapon_unlocked("boomerang"):
 		return
-	if _boomerang_airborne >= _boomerang_shot_count:
-		return
-	var dir := _boomerang_aim_dir()
-	if dir == Vector2.ZERO:
-		dir = Vector2(0, -1)
-	if dir.y > 0.0:
-		dir.y = -dir.y
-	var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0
-	_boomerang_airborne = maxi(0, _boomerang_airborne + 1)
-	_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
+	if _boomerang_weapon == null and bullet_scene_boomerang != null:
+		_boomerang_weapon = BoomerangWeapon.new(
+			self,
+			bullet_scene_boomerang,
+			func() -> int:
+				return _boomerang_shot_count,
+			func(
+				scene_res: PackedScene,
+				dir: Vector2,
+				damage_bonus: float,
+				speed_mult: float,
+				penetration: int,
+				visual_type: String,
+				bullet_motion_mode: String,
+				side_offset: Vector2
+			) -> void:
+				_spawn_configured_bullet(
+					scene_res,
+					dir,
+					damage_bonus,
+					speed_mult,
+					penetration,
+					visual_type,
+					bullet_motion_mode,
+					side_offset
+				),
+			func() -> Vector2:
+				return _boomerang_aim_dir()
+		)
+	if _boomerang_weapon != null:
+		_boomerang_weapon.try_spawn()
 
 
 func _boomerang_aim_dir() -> Vector2:
@@ -282,6 +305,8 @@ func _boomerang_aim_dir() -> Vector2:
 
 func on_boomerang_returned() -> void:
 	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
+	if _boomerang_weapon != null:
+		_boomerang_weapon.notify_returned()
 	if has_weapon_unlocked("boomerang"):
 		call_deferred("_spawn_single_boomerang")
 
