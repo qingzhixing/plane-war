@@ -4,7 +4,7 @@ class_name RecordsQueryPanel
 
 ## 只读展示 user://records.cfg（与 Main._load_records / _save_records 键一致）
 
-const _RECORDS_PATH := "user://records.cfg"
+const RecordsService := preload("res://scripts/systems/records_service.gd")
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 @onready var _dimmer: Control = $Dimmer
@@ -20,14 +20,10 @@ func _ready() -> void:
 
 
 func show_panel() -> void:
-	var cfg := ConfigFile.new()
-	var best_score := 0
-	var best_combo := 0
-	var best_dps := 0.0
-	if cfg.load(_RECORDS_PATH) == OK:
-		best_score = int(cfg.get_value("records", "best_score", 0))
-		best_combo = int(cfg.get_value("records", "best_combo", 0))
-		best_dps = float(cfg.get_value("records", "best_dps", 0.0))
+	var records := RecordsService.load_best_records()
+	var best_score := int(records.get("best_score", 0))
+	var best_combo := int(records.get("best_combo", 0))
+	var best_dps := float(records.get("best_dps", 0.0))
 	if _score_label != null:
 		_score_label.text = str(best_score)
 	if _combo_label != null:

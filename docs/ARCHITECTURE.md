@@ -37,5 +37,6 @@
 ### 单例与配置（Autoload & Config）
 
 - `AudioManager`（`scripts/audio_manager.gd`）通过 autoload 提供全局音频播放服务。
+- `SettingsService`（`scripts/systems/settings_service.gd`）统一读写 `user://settings.cfg` 中的附加设置（如震动、画面缩放）。
 - `project.godot` 中配置窗口拉伸（`viewport` + `keep`）、基准分辨率 `720×1280`，主场景为 `MainMenu.tscn`。
-- 本地成绩存储在 `user://records.cfg`，由 `scripts/main.gd` 负责读写。
+- 本地成绩存储在 `user://records.cfg`，由 `scripts/systems/records_service.gd` 统一读写，`main.gd` 与成绩查询面板复用该服务。

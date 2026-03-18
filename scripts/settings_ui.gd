@@ -2,6 +2,7 @@ extends ModalPanel
 
 class_name SettingsPanel
 
+const SettingsService := preload("res://scripts/systems/settings_service.gd")
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 var _root: Control
@@ -20,7 +21,6 @@ var _debug_upgrades_button: Button
 var _debug_combo_row: HBoxContainer
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
-const _SETTINGS_FILE_PATH: String = "user://settings.cfg"
 var _syncing_audio_ui: bool = false
 
 
@@ -362,13 +362,9 @@ func _on_scale_selected(_index: int) -> void:
 
 
 func _load_extra_settings() -> void:
-	var cfg := ConfigFile.new()
-	var err := cfg.load(_SETTINGS_FILE_PATH)
-	var vibration_enabled := true
-	var scale_percent := 100
-	if err == OK:
-		vibration_enabled = bool(cfg.get_value("settings", "vibration_enabled", true))
-		scale_percent = int(cfg.get_value("settings", "scale_percent", 100))
+	var loaded := SettingsService.load_extra_settings()
+	var vibration_enabled := bool(loaded.get("vibration_enabled", true))
+	var scale_percent := int(loaded.get("scale_percent", 100))
 	if _vibration_check != null:
 		_vibration_check.button_pressed = vibration_enabled
 	if _scale_option != null:
@@ -381,14 +377,11 @@ func _load_extra_settings() -> void:
 
 
 func _save_extra_settings() -> void:
-	var cfg := ConfigFile.new()
-	cfg.load(_SETTINGS_FILE_PATH)
-	cfg.set_value("settings", "vibration_enabled", _vibration_check != null and _vibration_check.button_pressed)
+	var vibration_enabled := _vibration_check != null and _vibration_check.button_pressed
 	var scale_percent := 100
 	if _scale_option != null:
 		scale_percent = _scale_option.get_selected_id()
-	cfg.set_value("settings", "scale_percent", scale_percent)
-	cfg.save(_SETTINGS_FILE_PATH)
+	SettingsService.save_extra_settings(vibration_enabled, scale_percent)
 
 
 func _apply_scale_percent(scale_percent: int) -> void:

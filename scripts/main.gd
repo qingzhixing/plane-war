@@ -3,7 +3,7 @@ extends Node2D
 signal level_up
 signal spell_used
 
-const UpgradeManager := preload("res://scripts/systems/upgrade_manager.gd")
+const RecordsService := preload("res://scripts/systems/records_service.gd")
 
 @export var player_path: NodePath = NodePath("Player")
 
@@ -47,7 +47,6 @@ var best_combo: int = 0
 const GRAZE_SCORE: int = 9
 const _DPS_WINDOW_SECONDS: float = 5.0
 const _BOSS_WAVE_START: int = 8
-const _RECORDS_FILE_PATH: String = "user://records.cfg"
 
 var _damage_events: Array = [] # 每项为 { "time": float, "amount": float }
 @onready var _spawner: Node = null
@@ -533,21 +532,14 @@ func _get_combo_buff_tier(current_combo: int) -> int:
 
 
 func _load_records() -> void:
-	var cfg := ConfigFile.new()
-	var err := cfg.load(_RECORDS_FILE_PATH)
-	if err != OK:
-		return
-	best_score = int(cfg.get_value("records", "best_score", 0))
-	best_dps = float(cfg.get_value("records", "best_dps", 0.0))
-	best_combo = int(cfg.get_value("records", "best_combo", 0))
+	var records := RecordsService.load_best_records()
+	best_score = int(records.get("best_score", 0))
+	best_dps = float(records.get("best_dps", 0.0))
+	best_combo = int(records.get("best_combo", 0))
 
 
 func _save_records() -> void:
-	var cfg := ConfigFile.new()
-	cfg.set_value("records", "best_score", best_score)
-	cfg.set_value("records", "best_dps", best_dps)
-	cfg.set_value("records", "best_combo", best_combo)
-	cfg.save(_RECORDS_FILE_PATH)
+	RecordsService.save_best_records(best_score, best_dps, best_combo)
 
 
 func is_boss_spawned() -> bool:
