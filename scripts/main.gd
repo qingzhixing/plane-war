@@ -3,6 +3,8 @@ extends Node2D
 signal level_up
 signal spell_used
 
+const _BattleProgressionConfigRef = preload("res://scripts/systems/battle_progression_config.gd")
+
 @export var player_path: NodePath = NodePath("Player")
 
 var _exp: int = 0
@@ -18,11 +20,19 @@ var threat_tier: int = 0
 var _pending_post_boss_upgrade: bool = false
 ## 续关/接着玩 后进续战前还须完成的三选一次数（每次进块 = 3）
 var _post_continue_upgrades_left: int = 0
-const _POST_CONTINUE_UPGRADE_COUNT: int = 3
 ## 续战块：1～7 小怪波，8 = 续战 Boss 进行中
 var _extension_wave: int = 0
-const _EXTENSION_MOB_WAVES: int = 7
-const _EXTENSION_BLOCK_SIZE: int = 8
+var _post_continue_upgrade_count: int = 3
+var _extension_mob_waves: int = 7
+var _extension_block_size: int = 8
+var _boss_wave_start: int = 8
+var _threat_hp_mult_base: float = 1.12
+var _boss_hp_tier_base: float = 1.2
+var _extension_boss_hp_flat_base: float = 3.2
+var _boss_min_hp: int = 200
+var _boss_spawn_y: float = -100.0
+var _score_multiplier_per_tier: float = 0.08
+var _combo_guard_per_tier: int = 1
 var best_score: int = 0
 var best_dps: float = 0.0
 var _score_multiplier: float = 1.0
@@ -44,7 +54,6 @@ var best_combo: int = 0
 
 const GRAZE_SCORE: int = 9
 const _DPS_WINDOW_SECONDS: float = 5.0
-const _BOSS_WAVE_START: int = 8
 
 var _damage_events: Array = [] # 每项为 { "time": float, "amount": float }
 @onready var _spawner: Node = null
@@ -57,6 +66,7 @@ var _spell_cooldown_remaining: float = 0.0
 ## 符卡区短按检测
 var _spell_tap_start: Dictionary = {}
 var _upgrade_manager: UpgradeManager
+var _battle_cfg = _BattleProgressionConfigRef.new()
 
 const _SPELL_COOLDOWN_SECONDS: float = 12.0
 const _SPELL_BURST_WAVE_COUNT: int = 4
@@ -72,6 +82,7 @@ func _ready() -> void:
 	add_to_group("battle_stats_manager")
 	level_up.connect(_on_level_up)
 	_load_records()
+	_apply_battle_progression_config()
 
 	_spawner = get_node_or_null("EnemySpawner")
 	_upgrade_manager = UpgradeManager.new(self)
@@ -108,7 +119,7 @@ func get_threat_tier() -> int:
 
 
 func get_threat_hp_mult() -> float:
-	return pow(1.12, float(threat_tier))
+	return pow(_threat_hp_mult_base, float(threat_tier))
 
 
 func on_wave_cleared() -> void:
@@ -121,14 +132,14 @@ func on_wave_cleared() -> void:
 	if _lives_remaining < 2:
 		_lives_remaining += 1
 	# 续战：每波清场 → 升级（第 7 波小怪升级后再开 Boss，不在此弹「接着玩」）
-	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+	if _extension_wave > 0 and _extension_wave < _extension_block_size:
 		_waiting_upgrade_choice = true
 		emit_signal("level_up")
 		return
 	_waiting_upgrade_choice = true
 	emit_signal("level_up")
 	_wave += 1
-	if _wave >= _BOSS_WAVE_START and not _boss_spawned and not _boss_defeated_once:
+	if _wave >= _boss_wave_start and not _boss_spawned and not _boss_defeated_once:
 		_pending_boss_spawn = true
 	else:
 		_pending_boss_spawn = false
@@ -150,12 +161,12 @@ func on_upgrade_selected() -> void:
 			_spawner.start_extension_wave(1, threat_tier)
 		return
 
-	if _extension_wave == _EXTENSION_MOB_WAVES:
-		_extension_wave = _EXTENSION_BLOCK_SIZE
+	if _extension_wave == _extension_mob_waves:
+		_extension_wave = _extension_block_size
 		_spawn_boss()
 		return
 
-	if _extension_wave > 0 and _extension_wave < _EXTENSION_MOB_WAVES:
+	if _extension_wave > 0 and _extension_wave < _extension_mob_waves:
 		_extension_wave += 1
 		if _spawner != null and _spawner.has_method("start_extension_wave"):
 			_spawner.start_extension_wave(_extension_wave, threat_tier)
@@ -171,7 +182,7 @@ func on_upgrade_selected() -> void:
 
 		# 所有调试升级已完成，直接跳转到 Boss 波
 		_debug_skip_to_boss_active = false
-		_wave = _BOSS_WAVE_START
+		_wave = _boss_wave_start
 		_pending_boss_spawn = false
 		_spawn_boss()
 		return
@@ -532,9 +543,9 @@ func _spawn_boss() -> void:
 	if _boss_spawned:
 		return
 	_boss_spawned = true
-	# 续战第 8 波：便于 HUD 显示
-	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
-		_extension_wave = _EXTENSION_BLOCK_SIZE
+	# 续战 Boss 波：便于 HUD 显示
+	if _extension_wave > 0 and _extension_wave < _extension_block_size:
+		_extension_wave = _extension_block_size
 
 	# 确保进入 Boss 关时游戏不处于暂停状态
 	get_tree().paused = false
@@ -558,19 +569,19 @@ func _spawn_boss() -> void:
 	var boss := boss_scene.instantiate()
 	if boss == null:
 		return
-	# Boss 血量：主线用 1.2^tier；续战第 8 波再乘 (3.2+tier)，避免高强化下秒没
+	# Boss 血量倍率由配置驱动
 	var tier_f := float(threat_tier)
-	var hp_m: float = pow(1.2, tier_f)
-	var is_extension_boss: bool = (_extension_wave >= _EXTENSION_BLOCK_SIZE)
+	var hp_m: float = pow(_boss_hp_tier_base, tier_f)
+	var is_extension_boss: bool = (_extension_wave >= _extension_block_size)
 	if is_extension_boss:
-		hp_m *= 3.2 + tier_f
+		hp_m *= _extension_boss_hp_flat_base + tier_f
 	if "max_hp" in boss:
-		boss.max_hp = maxi(200, int(round(float(boss.max_hp) * hp_m)))
+		boss.max_hp = maxi(_boss_min_hp, int(round(float(boss.max_hp) * hp_m)))
 	if boss.has_method("apply_threat_scaling"):
 		boss.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
-	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
+	boss.global_position = Vector2(viewport_rect.size.x * 0.5, _boss_spawn_y)
 	get_tree().current_scene.add_child(boss)
 
 
@@ -609,10 +620,10 @@ func _debug_skip_to_boss() -> void:
 			(timer as Timer).stop()
 
 	# 续战小怪 1～7 波：直接刷续战 Boss
-	if _extension_wave > 0 and _extension_wave < _EXTENSION_BLOCK_SIZE:
+	if _extension_wave > 0 and _extension_wave < _extension_block_size:
 		_waiting_upgrade_choice = false
 		_debug_skip_to_boss_active = false
-		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_extension_wave = _extension_block_size
 		_spawn_boss()
 		return
 
@@ -622,7 +633,7 @@ func _debug_skip_to_boss() -> void:
 		_pending_post_boss_upgrade = false
 		_post_continue_upgrades_left = 0
 		_debug_skip_to_boss_active = false
-		_extension_wave = _EXTENSION_BLOCK_SIZE
+		_extension_wave = _extension_block_size
 		_spawn_boss()
 		return
 
@@ -631,10 +642,10 @@ func _debug_skip_to_boss() -> void:
 		return
 	_debug_skip_to_boss_used = true
 	_debug_skip_to_boss_active = true
-	_debug_upgrades_needed = max(0, _BOSS_WAVE_START - _wave)
+	_debug_upgrades_needed = max(0, _boss_wave_start - _wave)
 	if _debug_upgrades_needed <= 0:
 		_debug_skip_to_boss_active = false
-		_wave = _BOSS_WAVE_START
+		_wave = _boss_wave_start
 		_spawn_boss()
 		return
 	_waiting_upgrade_choice = true
@@ -651,7 +662,7 @@ func on_boss_defeated() -> void:
 		get_tree().call_group("game_over_ui", "show_game_over")
 		return
 	# 续战块 Boss 击破 → 与「每轮续战结束」相同二选一
-	if _extension_wave >= _EXTENSION_BLOCK_SIZE:
+	if _extension_wave >= _extension_block_size:
 		_extension_wave = 0
 		if pbc.has_method("show_choice_after_block"):
 			pbc.show_choice_after_block()
@@ -673,10 +684,24 @@ func continue_next_extension_block() -> void:
 	_begin_next_extension_block()
 
 
+func _apply_battle_progression_config() -> void:
+	_post_continue_upgrade_count = _battle_cfg.get_post_continue_upgrade_count()
+	_extension_block_size = _battle_cfg.get_extension_block_size()
+	_extension_mob_waves = _battle_cfg.get_extension_mob_waves()
+	_boss_wave_start = _battle_cfg.get_boss_wave_start()
+	_threat_hp_mult_base = _battle_cfg.get_threat_hp_mult_base()
+	_boss_hp_tier_base = _battle_cfg.get_boss_hp_tier_base()
+	_extension_boss_hp_flat_base = _battle_cfg.get_extension_boss_hp_flat_base()
+	_boss_min_hp = _battle_cfg.get_boss_min_hp()
+	_boss_spawn_y = _battle_cfg.get_boss_spawn_y()
+	_score_multiplier_per_tier = _battle_cfg.get_score_multiplier_per_tier()
+	_combo_guard_per_tier = _battle_cfg.get_combo_guard_per_tier()
+
+
 func _begin_next_extension_block() -> void:
 	threat_tier += 1
-	_score_multiplier += 0.08
-	_combo_guard_charges += 1
+	_score_multiplier += _score_multiplier_per_tier
+	_combo_guard_charges += _combo_guard_per_tier
 	_debug_skip_to_boss_used = false
 	var p_guard := get_node_or_null(player_path)
 	if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
@@ -690,5 +715,5 @@ func _begin_next_extension_block() -> void:
 	get_tree().paused = false
 	_waiting_upgrade_choice = true
 	_pending_post_boss_upgrade = true
-	_post_continue_upgrades_left = _POST_CONTINUE_UPGRADE_COUNT
+	_post_continue_upgrades_left = _post_continue_upgrade_count
 	emit_signal("level_up")

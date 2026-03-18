@@ -1,0 +1,19 @@
+{
+  "progression": {
+    "post_continue_upgrade_count": 3,
+    "extension_mob_waves": 7,
+    "extension_block_size": 8,
+    "boss_wave_start": 8,
+    "score_multiplier_per_tier": 0.08,
+    "combo_guard_per_tier": 1
+  },
+  "scaling": {
+    "threat_hp_mult_base": 1.12,
+    "boss_hp_tier_base": 1.2,
+    "extension_boss_hp_flat_base": 3.2,
+    "boss_min_hp": 200
+  },
+  "spawn": {
+    "boss_spawn_y": -100.0
+  }
+}
