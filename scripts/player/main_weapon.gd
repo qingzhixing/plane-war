@@ -12,14 +12,14 @@ var _fire_timer: float = 0.0
 
 
 func _init(
-	owner: Node,
+	owner_node: Node,
 	bullet_scene_basic: PackedScene,
 	max_bullet_count: int,
 	get_effective_shot_interval: Callable,
 	get_bullet_params: Callable,
 	play_shoot_sfx: Callable
 ) -> void:
-	self.owner = owner
+	self.owner = owner_node
 	self.bullet_scene_basic = bullet_scene_basic
 	self.max_bullet_count = max_bullet_count
 	self.get_effective_shot_interval = get_effective_shot_interval
