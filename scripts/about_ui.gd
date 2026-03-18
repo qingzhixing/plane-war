@@ -35,7 +35,6 @@ func _input(event: InputEvent) -> void:
 		if event.pressed:
 			if _is_in_about_area(event.position):
 				_dragging_about = true
-				_last_drag_pos = event.position.y
 		else:
 			_dragging_about = false
 	elif event is InputEventScreenDrag and _dragging_about:
@@ -44,7 +43,6 @@ func _input(event: InputEvent) -> void:
 		if event.pressed:
 			if _is_in_about_area(event.position):
 				_dragging_about = true
-				_last_drag_pos = event.position.y
 		else:
 			_dragging_about = false
 	elif event is InputEventMouseMotion and _dragging_about and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
