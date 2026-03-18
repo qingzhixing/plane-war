@@ -288,13 +288,13 @@ mouse_filter = 2
 theme_override_font_sizes/normal_font_size = 18
 bbcode_enabled = true
 text = "[b]plane-war 更新日志（节选）[/b]
-[color=#8af]v0.2.2[/color] - 2026-03-17
-- 引入 2 条命离散生命值系统，生命归零当次立刻结算本局。
-- 每波结束若生命未满 2 条，会自动恢复 1 命。
-- HUD 补全生命展示，并加强死亡结算提示。
+[color=#8af]v0.2.3[/color] - 2026-03-18
+- 架构重构：引入 SceneManager 与多项服务拆分，升级与武器系统模块化。
+- 配置数据化：升级目录、升级效果、战斗与刷怪参数迁移到配置文件。
+- 扩展能力：接入 Mod Loader 与扩展桥，补齐 Mod 文档与开发说明。
 
-[color=#8af]v0.2.1[/color] - 2026-03-16
-- 新增发版检查清单章节，对齐工程与导出版本号。
+[color=#8af]v0.2.2[/color] - 2026-03-17
+- 引入 2 条命离散生命值系统，并在波次间支持生命恢复。
 
 完整更新记录请见下方 GitHub 按钮。"
 fit_content = true
