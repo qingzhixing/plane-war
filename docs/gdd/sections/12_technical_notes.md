@@ -183,3 +183,24 @@
 - 外部 Mod 可独立新增至少 1 个敌人、1 个武器行为、1 个升级并在实战生效。
 - 混合加载（builtin + external）时不出现重复 ID 导致的崩溃，冲突有可读日志。
 
+### 三期收敛（去适配壳重构）
+
+- 目标：在三期纯 Mod 驱动基础上，进一步移除主工程中的“过渡适配壳”，把升级应用生命周期统一收敛到 Bridge。
+
+#### 收敛范围
+
+- 删除/下线过渡适配层：
+  - `PlayerUpgradeEffectsService`
+  - `MainUpgradeEffectsService`
+- 主流程改造：
+  - `UpgradeManager` 直接调用 Bridge 的统一升级应用入口。
+  - `Player.apply_upgrade` 直接调用 Bridge 的统一升级应用入口。
+- 配置归属收敛：
+  - 内置核心 Mod 使用自身目录配置（`mods-unpacked/planewar-core_mod`），不再依赖主工程 `scripts/config`。
+
+#### 三期收敛验收标准
+
+- 主工程中不再依赖玩家/主场景升级适配服务壳。
+- 升级应用前后事件（player/main）都由 Bridge 统一触发并返回一致字段。
+- 内置核心 Mod 在不读取 `scripts/config` 的前提下，仍可完整复现基线战斗内容。
+
