@@ -2,10 +2,9 @@ extends CanvasLayer
 
 const GITHUB_URL := "https://github.com/qingzhixing/plane-war"
 
-@onready var _about_scroll: ScrollContainer = %AboutScroll
+@onready var _about_scroll: ScrollContainer = $AboutCenter/AboutPanel/AboutMargin/AboutVBox/AboutScroll
 
 var _dragging_about := false
-var _last_drag_pos := 0.0
 
 
 func _ready() -> void:
