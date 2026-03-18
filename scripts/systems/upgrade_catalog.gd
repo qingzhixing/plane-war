@@ -46,6 +46,36 @@ const DIRECT_COMBAT_IDS = [
 	"bomb_side_cooldown",
 ]
 
+const MAIN_EFFECT_IDS = [
+	"score_up",
+	"combo_boost",
+	"combo_guard",
+	"spell_cooldown",
+	"spell_auto",
+]
+
+const PLAYER_EFFECT_IDS = [
+	"fire_rate",
+	"damage",
+	"multi_shot",
+	"bullet_speed",
+	"damage_percent",
+	"spread_focus",
+	"arrow_cooldown",
+	"arrow_multi",
+	"boomerang_speed",
+	"boomerang_cooldown",
+	"boomerang_multi",
+	"bomb_multi",
+	"bomb_side_cooldown",
+]
+
+const ALIASES = {
+	"bomb_cooldown": "spell_cooldown",
+	"bomb_auto": "spell_auto",
+	"bomb_weapon": "bomb_multi",
+}
+
 
 func get_all_upgrades() -> Array[Dictionary]:
 	return ALL.duplicate(true)
@@ -53,3 +83,17 @@ func get_all_upgrades() -> Array[Dictionary]:
 
 func is_direct_combat_upgrade(upgrade_id: String) -> bool:
 	return upgrade_id in DIRECT_COMBAT_IDS
+
+
+func resolve_upgrade_id(upgrade_id: String) -> String:
+	if ALIASES.has(upgrade_id):
+		return str(ALIASES[upgrade_id])
+	return upgrade_id
+
+
+func has_main_effect(upgrade_id: String) -> bool:
+	return resolve_upgrade_id(upgrade_id) in MAIN_EFFECT_IDS
+
+
+func has_player_effect(upgrade_id: String) -> bool:
+	return resolve_upgrade_id(upgrade_id) in PLAYER_EFFECT_IDS
