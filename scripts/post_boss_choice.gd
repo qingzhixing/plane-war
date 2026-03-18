@@ -59,14 +59,14 @@ func _build_ui() -> void:
 	hb.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_child(hb)
 	var b_settle := Button.new()
-	b_settle.text = tr("本局结算")
+	b_settle.text = "本局结算"
 	b_settle.custom_minimum_size = Vector2(200, 56)
 	b_settle.add_theme_font_size_override("font_size", 22)
 	b_settle.pressed.connect(_on_settle)
 	hb.add_child(b_settle)
 	var b_cont := Button.new()
 	b_cont.name = "ContinueButton"
-	b_cont.text = tr("继续挑战")
+	b_cont.text = "继续挑战"
 	b_cont.custom_minimum_size = Vector2(200, 56)
 	b_cont.add_theme_font_size_override("font_size", 22)
 	b_cont.pressed.connect(_on_continue)
@@ -81,32 +81,32 @@ func show_choice() -> void:
 	_after_block = false
 	visible = true
 	if _title_label != null:
-		_title_label.text = tr("Boss 击破")
+		_title_label.text = "Boss 击破"
 	var tier := 0
 	if _main != null and _main.has_method("get_threat_tier"):
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = tr("当前威胁 %d。继续：威胁+1、护盾+1，连续 3 次三选一后进续战 8 波（7 波小怪 + 第 8 波 Boss）。") % tier
+		body.text = "当前威胁 %d。继续：威胁+1、护盾+1，连续 3 次三选一后进续战 8 波（7 波小怪 + 第 8 波 Boss）。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
-		cont.text = tr("继续挑战")
+		cont.text = "继续挑战"
 
 
 func show_choice_after_block() -> void:
 	_after_block = true
 	visible = true
 	if _title_label != null:
-		_title_label.text = tr("续战一轮结束")
+		_title_label.text = "续战一轮结束"
 	var tier := 0
 	if _main != null and _main.has_method("get_threat_tier"):
 		tier = _main.get_threat_tier()
 	var body := find_child("BodyLabel", true, false) as Label
 	if body != null:
-		body.text = tr("已完成一轮续战（威胁 %d）。结算或接着玩（再威胁+1、护盾+1、3 次三选一后 8 波含 Boss）。") % tier
+		body.text = "已完成一轮续战（威胁 %d）。结算或接着玩（再威胁+1、护盾+1、3 次三选一后 8 波含 Boss）。" % tier
 	var cont := find_child("ContinueButton", true, false) as Button
 	if cont != null:
-		cont.text = tr("接着玩")
+		cont.text = "接着玩"
 
 
 func _on_settle() -> void:
