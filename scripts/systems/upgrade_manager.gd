@@ -24,7 +24,18 @@ func apply_upgrade(upgrade_id: String) -> void:
 		return
 	var player := main.get_node_or_null(main.player_path)
 	if player == null:
+		_warn_unknown_upgrade_id(resolved_id)
 		return
 	if _upgrade_catalog.has_player_effect(resolved_id):
 		_player_upgrade_effects.apply_player_upgrade(player, resolved_id)
-	return
+		return
+	_warn_unknown_upgrade_id(resolved_id)
+
+
+func _warn_unknown_upgrade_id(resolved_id: String) -> void:
+	var msg := "UpgradeManager received unknown upgrade id: %s" % resolved_id
+	var log_service := main.get_node_or_null("/root/LogService")
+	if log_service != null and log_service.has_method("warn"):
+		log_service.warn(msg)
+	else:
+		push_warning(msg)
