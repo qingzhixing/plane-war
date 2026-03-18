@@ -8,6 +8,9 @@ var spawn_bullet: Callable
 var choose_direction: Callable
 
 var _airborne_count: int = 0
+var _pending_spawns: int = 0
+var _cooldown: float = 0.0
+var _spawn_interval: float = 0.18
 
 
 func _init(
@@ -22,16 +25,29 @@ func _init(
 	self.get_max_count = get_max_count_fn
 	self.spawn_bullet = spawn_bullet_fn
 	self.choose_direction = choose_direction_fn
+	_cooldown = 0.0
 
 
-func try_spawn() -> void:
+func request_spawn() -> void:
+	var max_count := int(get_max_count.call())
+	if max_count <= 0:
+		return
+	_pending_spawns = min(max_count, _pending_spawns + 1)
+
+
+func process(delta: float) -> void:
 	if owner == null or bullet_scene_boomerang == null:
 		return
 	var max_count := int(get_max_count.call())
 	if max_count <= 0:
 		return
-	if _airborne_count >= max_count:
+	if _airborne_count >= max_count or _pending_spawns <= 0:
 		return
+	_cooldown -= delta
+	if _cooldown > 0.0:
+		return
+	_cooldown = _spawn_interval
+	_pending_spawns = max(0, _pending_spawns - 1)
 	var dir := choose_direction.call() as Vector2
 	if dir == Vector2.ZERO:
 		dir = Vector2(0, -1)
@@ -53,4 +69,5 @@ func try_spawn() -> void:
 
 func notify_returned() -> void:
 	_airborne_count = max(0, _airborne_count - 1)
+	request_spawn()
 

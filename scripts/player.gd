@@ -287,7 +287,7 @@ func _spawn_single_boomerang() -> void:
 				return _boomerang_aim_dir()
 		)
 	if _boomerang_weapon != null:
-		_boomerang_weapon.try_spawn()
+		_boomerang_weapon.request_spawn()
 
 
 func _boomerang_aim_dir() -> Vector2:
