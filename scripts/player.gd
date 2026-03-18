@@ -148,6 +148,8 @@ func _process(delta: float) -> void:
 	_update_movement(delta)
 	_update_shooting(delta)
 	_update_side_weapons(delta)
+	if _shoot_sfx_timer > 0.0:
+		_shoot_sfx_timer = maxf(0.0, _shoot_sfx_timer - delta)
 	if _hit_invulnerable_timer > 0.0:
 		_hit_invulnerable_timer = maxf(0.0, _hit_invulnerable_timer - delta)
 	_update_hit_blink()
@@ -203,7 +205,6 @@ func _update_shooting(delta: float) -> void:
 	if _fire_timer > effective_interval:
 		_fire_timer = effective_interval
 	_fire_timer -= delta
-	_shoot_sfx_timer -= delta
 	if _fire_timer <= 0.0:
 		_fire_timer = effective_interval
 		_spawn_weapon_shot()
