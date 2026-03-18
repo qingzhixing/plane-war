@@ -1,5 +1,6 @@
 extends RefCounted
 
+const LogBridge = preload("res://scripts/systems/log_bridge.gd")
 const _CONFIG_JSON_PATH := "res://assets/data/waves/enemy_combat_config.json"
 
 const _DEFAULT_SCALING := {
@@ -36,36 +37,54 @@ const _DEFAULT_BOSS01 := {
 	"spell_name": "符：星屑环舞",
 	"spell_name_duration": 1.2,
 }
+const _DEFAULT_ENEMY_ELITE := {
+	"pattern_bullet_count": 10,
+}
+const _DEFAULT_ENEMY_TURRET := {
+	"fan_angles": [0.0, -0.18, 0.18],
+}
 
 var _scaling_cfg: Dictionary = {}
 var _despawn_cfg: Dictionary = {}
 var _boss01_cfg: Dictionary = {}
+var _enemy_elite_cfg: Dictionary = {}
+var _enemy_turret_cfg: Dictionary = {}
 
 
 func _init() -> void:
 	_scaling_cfg = _DEFAULT_SCALING.duplicate(true)
 	_despawn_cfg = _DEFAULT_DESPAWN.duplicate(true)
 	_boss01_cfg = _DEFAULT_BOSS01.duplicate(true)
+	_enemy_elite_cfg = _DEFAULT_ENEMY_ELITE.duplicate(true)
+	_enemy_turret_cfg = _DEFAULT_ENEMY_TURRET.duplicate(true)
 	_load_from_json()
 
 
 func _load_from_json() -> void:
 	var file := FileAccess.open(_CONFIG_JSON_PATH, FileAccess.READ)
 	if file == null:
+		LogBridge.warn("EnemyCombatConfig missing file: %s" % _CONFIG_JSON_PATH)
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
+		LogBridge.error("EnemyCombatConfig parse failed: root is not dictionary")
 		return
 	var cfg: Dictionary = parsed as Dictionary
 	var scaling_raw: Variant = cfg.get("scaling", {})
 	var despawn_raw: Variant = cfg.get("despawn", {})
 	var boss_raw: Variant = cfg.get("boss01", {})
+	var elite_raw: Variant = cfg.get("enemy_elite", {})
+	var turret_raw: Variant = cfg.get("enemy_turret", {})
 	if typeof(scaling_raw) == TYPE_DICTIONARY:
 		_scaling_cfg.merge(scaling_raw as Dictionary, true)
 	if typeof(despawn_raw) == TYPE_DICTIONARY:
 		_despawn_cfg.merge(despawn_raw as Dictionary, true)
 	if typeof(boss_raw) == TYPE_DICTIONARY:
 		_boss01_cfg.merge(boss_raw as Dictionary, true)
+	if typeof(elite_raw) == TYPE_DICTIONARY:
+		_enemy_elite_cfg.merge(elite_raw as Dictionary, true)
+	if typeof(turret_raw) == TYPE_DICTIONARY:
+		_enemy_turret_cfg.merge(turret_raw as Dictionary, true)
 
 
 func get_scaled_hp(base_hp: int, wave: int, threat_tier: int) -> int:
@@ -99,3 +118,17 @@ func get_boss_int(key: String, default_value: int) -> int:
 
 func get_boss_string(key: String, default_value: String) -> String:
 	return str(_boss01_cfg.get(key, default_value))
+
+
+func get_enemy_elite_int(key: String, default_value: int) -> int:
+	return int(_enemy_elite_cfg.get(key, default_value))
+
+
+func get_enemy_turret_float_array(key: String, default_value: Array[float]) -> Array[float]:
+	var raw: Variant = _enemy_turret_cfg.get(key, default_value)
+	if typeof(raw) != TYPE_ARRAY:
+		return default_value.duplicate(true)
+	var out: Array[float] = []
+	for item in raw:
+		out.append(float(item))
+	return out

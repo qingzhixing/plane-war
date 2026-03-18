@@ -67,7 +67,7 @@ func _fire_pattern() -> void:
 		return
 
 	# 稀疏圆环/扇形：围绕自身发射多发慢速子弹，训练基础躲避
-	var bullet_count := 10
+	var bullet_count := _combat_cfg.get_enemy_elite_int("pattern_bullet_count", 10)
 	var base_speed_dir := Vector2(0, 1)
 	for i in bullet_count:
 		var angle := TAU * float(i) / float(bullet_count)

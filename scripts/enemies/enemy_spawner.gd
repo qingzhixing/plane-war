@@ -1,5 +1,6 @@
 extends Node
 
+const LogBridge = preload("res://scripts/systems/log_bridge.gd")
 @export var enemy_scene: PackedScene
 @export var enemy_scene_turret: PackedScene
 @export var enemy_scene_elite: PackedScene
@@ -19,10 +20,16 @@ var _spawn_cfg = _EnemySpawnConfigRef.new()
 func _ready() -> void:
 	if enemy_scene == null:
 		enemy_scene = preload("res://scenes/enemies/EnemyBasic01.tscn")
+		if enemy_scene == null:
+			LogBridge.error("EnemySpawner failed to preload EnemyBasic01.tscn")
 	if enemy_scene_turret == null:
 		enemy_scene_turret = preload("res://scenes/enemies/EnemyBasic02_Turret.tscn")
+		if enemy_scene_turret == null:
+			LogBridge.error("EnemySpawner failed to preload EnemyBasic02_Turret.tscn")
 	if enemy_scene_elite == null:
 		enemy_scene_elite = preload("res://scenes/enemies/EnemyElite01.tscn")
+		if enemy_scene_elite == null:
+			LogBridge.error("EnemySpawner failed to preload EnemyElite01.tscn")
 	_timer = get_node_or_null("Timer") as Timer
 	if _timer != null:
 		_default_timer_wait = _timer.wait_time
@@ -32,6 +39,7 @@ func _ready() -> void:
 func start_wave(wave: int) -> void:
 	_extension_index = 0
 	if _timer == null:
+		LogBridge.error("EnemySpawner timer node missing in scene tree.")
 		return
 	_timer.wait_time = _spawn_cfg.get_normal_interval(_default_timer_wait)
 	_remaining_to_spawn = _spawn_cfg.get_normal_enemy_count(wave)
@@ -42,6 +50,7 @@ func start_wave(wave: int) -> void:
 func start_extension_wave(ext: int, threat_tier: int) -> void:
 	_extension_index = clampi(ext, 1, _spawn_cfg.get_extension_wave_max())
 	if _timer == null:
+		LogBridge.error("EnemySpawner timer node missing in extension wave start.")
 		return
 	_remaining_to_spawn = _spawn_cfg.get_extension_enemy_count(_extension_index, threat_tier)
 	_timer.wait_time = _spawn_cfg.get_extension_interval(_extension_index, _default_timer_wait)
@@ -92,6 +101,7 @@ func _on_spawn_timeout() -> void:
 			scene_to_use = enemy_scene if not use_turret else enemy_scene_turret
 
 	if scene_to_use == null:
+		LogBridge.warn("EnemySpawner resolved null enemy scene, skip this spawn tick.")
 		return
 
 	var enemy := scene_to_use.instantiate()

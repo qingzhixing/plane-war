@@ -30,5 +30,11 @@
     "phase_b_ring_speed": 280.0,
     "spell_name": "符：星屑环舞",
     "spell_name_duration": 1.2
+  },
+  "enemy_elite": {
+    "pattern_bullet_count": 10
+  },
+  "enemy_turret": {
+    "fan_angles": [0.0, -0.18, 0.18]
   }
 }

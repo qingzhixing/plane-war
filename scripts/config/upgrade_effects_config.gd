@@ -1,5 +1,6 @@
 extends RefCounted
 
+const LogBridge = preload("res://scripts/systems/log_bridge.gd")
 const _CONFIG_JSON_PATH := "res://assets/data/upgrades/upgrade_effects.json"
 
 const _DEFAULT_MAIN := {
@@ -41,9 +42,11 @@ func _init() -> void:
 func _load_from_json() -> void:
 	var file := FileAccess.open(_CONFIG_JSON_PATH, FileAccess.READ)
 	if file == null:
+		LogBridge.warn("UpgradeEffectsConfig missing file: %s" % _CONFIG_JSON_PATH)
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
+		LogBridge.error("UpgradeEffectsConfig parse failed: root is not dictionary")
 		return
 	var cfg := parsed as Dictionary
 	var main_raw: Variant = cfg.get("main", {})

@@ -567,6 +567,10 @@ func _spawn_boss() -> void:
 	# 在屏幕上方中间生成 Boss
 	var boss_scene := load("res://scenes/enemies/Boss01.tscn") as PackedScene
 	if boss_scene == null:
+		if Engine.has_singleton("LogService"):
+			var logger := Engine.get_singleton("LogService")
+			if logger != null and logger.has_method("error"):
+				logger.error("Main failed to load boss scene: res://scenes/enemies/Boss01.tscn")
 		return
 	var boss := boss_scene.instantiate()
 	if boss == null:

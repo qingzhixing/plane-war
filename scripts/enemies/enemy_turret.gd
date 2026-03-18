@@ -76,7 +76,7 @@ func _fire_pattern() -> void:
 		return
 
 	# 向下发射 3 发子弹：中间 + 左右微小角度，形成轻微扇形
-	var angles := [0.0, -0.18, 0.18]
+	var angles := _combat_cfg.get_enemy_turret_float_array("fan_angles", [0.0, -0.18, 0.18])
 	for angle in angles:
 		var bullet := bullet_scene.instantiate()
 		bullet.global_position = global_position + Vector2(0, 20)
