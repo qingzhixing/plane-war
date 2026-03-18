@@ -40,8 +40,8 @@ func process(delta: float) -> void:
 
 
 func _spawn_arrow_volley() -> void:
-	var n := max(1, int(get_shot_count.call()))
-	var spread := 0.12
+	var n: int = max(1, int(get_shot_count.call()))
+	var spread: float = 0.12
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
