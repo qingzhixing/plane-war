@@ -3,7 +3,7 @@ extends RefCounted
 class_name PlayerUpgradeEffectsService
 
 const _UpgradeEffectsConfigRef = preload("res://scripts/config/upgrade_effects_config.gd")
-const ModExtensionBridge = preload("res://scripts/systems/mod_extension_bridge.gd")
+const _ModExtensionBridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
 var _effects_cfg = _UpgradeEffectsConfigRef.new()
 
 
@@ -13,9 +13,9 @@ func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 		"upgrade_id": upgrade_id,
 		"cancel": false,
 	}
-	before_payload = ModExtensionBridge.dispatch_event("before_apply_upgrade", before_payload)
+	before_payload = _ModExtensionBridgeRef.dispatch_event("before_apply_upgrade", before_payload)
 	if bool(before_payload.get("cancel", false)):
-		ModExtensionBridge.dispatch_event(
+		_ModExtensionBridgeRef.dispatch_event(
 			"after_apply_upgrade",
 			{
 				"player": player,
@@ -33,9 +33,9 @@ func apply_player_upgrade(player: Node, upgrade_id: String) -> bool:
 
 	var applied := _apply_builtin_upgrade(player, resolved_upgrade_id)
 	if not applied:
-		applied = ModExtensionBridge.try_apply_upgrade_effect(player, resolved_upgrade_id)
+		applied = _ModExtensionBridgeRef.try_apply_upgrade_effect(player, resolved_upgrade_id)
 
-	ModExtensionBridge.dispatch_event(
+	_ModExtensionBridgeRef.dispatch_event(
 		"after_apply_upgrade",
 		{
 			"player": player,
