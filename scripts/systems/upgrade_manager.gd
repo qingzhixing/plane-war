@@ -33,12 +33,12 @@ func apply_upgrade(upgrade_id: String) -> void:
 
 
 func _apply_spell_cooldown_upgrade() -> void:
-	var old_scale := main._spell_cooldown_scale
-	var new_scale := maxf(0.45, main._spell_cooldown_scale * 0.85)
+	var old_scale: float = float(main._spell_cooldown_scale)
+	var new_scale: float = maxf(0.45, float(main._spell_cooldown_scale) * 0.85)
 	main._spell_cooldown_scale = new_scale
 	if main._spell_cooldown_remaining > 0.0 and old_scale > 0.0:
-		var factor := new_scale / old_scale
-		var new_total := main._SPELL_COOLDOWN_SECONDS * new_scale
+		var factor: float = new_scale / old_scale
+		var new_total: float = float(main._SPELL_COOLDOWN_SECONDS) * new_scale
 		main._spell_cooldown_remaining = clampf(main._spell_cooldown_remaining * factor, 0.0, new_total)
 
 
@@ -46,12 +46,12 @@ func _apply_spell_auto_upgrade() -> void:
 	if main._spell_auto:
 		return
 	main._spell_auto = true
-	var old_scale_auto := main._spell_cooldown_scale
-	var new_scale_auto := maxf(0.2, main._spell_cooldown_scale * 0.5)
+	var old_scale_auto: float = float(main._spell_cooldown_scale)
+	var new_scale_auto: float = maxf(0.2, float(main._spell_cooldown_scale) * 0.5)
 	main._spell_cooldown_scale = new_scale_auto
 	if main._spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
-		var factor_auto := new_scale_auto / old_scale_auto
-		var new_total_auto := main._SPELL_COOLDOWN_SECONDS * new_scale_auto
+		var factor_auto: float = new_scale_auto / old_scale_auto
+		var new_total_auto: float = float(main._SPELL_COOLDOWN_SECONDS) * new_scale_auto
 		main._spell_cooldown_remaining = clampf(main._spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
 	if main._spell_cooldown_remaining <= 0.0 and main.has_method("try_use_spell"):
 		main.try_use_spell()
