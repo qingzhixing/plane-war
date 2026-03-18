@@ -27,7 +27,7 @@ func _on_github_pressed() -> void:
 	OS.shell_open(GITHUB_URL)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 
