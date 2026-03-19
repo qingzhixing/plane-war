@@ -21,6 +21,12 @@ var _debug_combo_row: HBoxContainer
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 var _syncing_audio_ui: bool = false
+var _mods_scroll: ScrollContainer
+var _mods_vbox: VBoxContainer
+var _mods_restart_hint: Label
+var _mods_restart_button: Button
+var _syncing_mods_ui: bool = false
+var _mods_needs_restart: bool = false
 
 
 func _ready() -> void:
@@ -143,6 +149,38 @@ func _ready() -> void:
 	_scale_option.item_selected.connect(_on_scale_selected)
 	scale_row.add_child(_scale_option)
 
+	# 模组管理（启用/禁用，需要重启生效）
+	var mods_title := Label.new()
+	mods_title.text = "Mod 管理"
+	mods_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mods_title.add_theme_font_size_override("font_size", 24)
+	vbox.add_child(mods_title)
+
+	_mods_scroll = ScrollContainer.new()
+	_mods_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_mods_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_mods_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
+	vbox.add_child(_mods_scroll)
+
+	_mods_vbox = VBoxContainer.new()
+	_mods_vbox.mouse_filter = Control.MOUSE_FILTER_STOP
+	_mods_scroll.add_child(_mods_vbox)
+
+	_mods_restart_hint = Label.new()
+	_mods_restart_hint.text = "需要重启生效"
+	_mods_restart_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_mods_restart_hint.visible = false
+	vbox.add_child(_mods_restart_hint)
+
+	_mods_restart_button = Button.new()
+	_mods_restart_button.text = "立即重启"
+	_mods_restart_button.custom_minimum_size = Vector2(200, 64)
+	_mods_restart_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_mods_restart_button.add_theme_font_size_override("font_size", 24)
+	_mods_restart_button.visible = false
+	_mods_restart_button.pressed.connect(_on_mod_restart_pressed)
+	vbox.add_child(_mods_restart_button)
+
 	# 关闭按钮
 	_close_button = Button.new()
 	_close_button.text = "返回"
@@ -211,6 +249,7 @@ func show_settings() -> void:
 	get_tree().paused = true
 	_apply_run_only_buttons_visibility(true)
 	_sync_audio_controls_from_manager()
+	_refresh_mod_list()
 	open_panel()
 
 
@@ -218,7 +257,96 @@ func show_settings_from_menu() -> void:
 	_is_from_menu = true
 	_apply_run_only_buttons_visibility(false)
 	_sync_audio_controls_from_manager()
+	_refresh_mod_list()
 	open_panel()
+
+
+func _refresh_mod_list() -> void:
+	if _mods_vbox == null:
+		return
+	if ModLoader == null:
+		return
+
+	_syncing_mods_ui = true
+	for c in _mods_vbox.get_children():
+		c.queue_free()
+
+	_mods_needs_restart = false
+	if _mods_restart_hint != null:
+		_mods_restart_hint.visible = false
+	if _mods_restart_button != null:
+		_mods_restart_button.visible = false
+
+	var mods_all: Dictionary = ModLoader.get_mod_data_all()
+	var mod_ids: Array[String] = mods_all.keys()
+	mod_ids.sort()
+
+	for mod_id in mod_ids:
+		var mod_data: ModData = mods_all.get(mod_id, null)
+		if mod_data == null:
+			continue
+
+		var is_active := bool(mod_data.is_active)
+		var is_loadable := bool(mod_data.is_loadable)
+		var is_locked := bool(mod_data.is_locked)
+
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		row.add_theme_constant_override("separation", 12)
+		_mods_vbox.add_child(row)
+
+		var mod_name := ""
+		if mod_data.manifest != null:
+			# manifest.name 是人类可读名称（namespace-name 的 mod_id 另可用于定位）
+			mod_name = str(mod_data.manifest.name)
+
+		var label := Label.new()
+		label.text = mod_id if mod_name.is_empty() else "%s (%s)" % [mod_name, mod_id]
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(label)
+
+		var cb := CheckBox.new()
+		cb.button_pressed = is_active
+		cb.disabled = is_locked or not is_loadable
+		if is_locked:
+			cb.hint_tooltip = "此 Mod 被锁定，无法切换"
+		elif not is_loadable:
+			cb.hint_tooltip = "此 Mod 无法加载（manifest/文件错误）"
+		row.add_child(cb)
+
+		cb.toggled.connect(_on_mod_checkbox_toggled.bind(mod_id, cb))
+
+	_syncing_mods_ui = false
+
+
+func _on_mod_checkbox_toggled(enabled: bool, mod_id: String, cb: CheckBox) -> void:
+	if _syncing_mods_ui:
+		return
+	if ModLoader == null:
+		return
+
+	var ok := false
+	if enabled:
+		ok = ModLoaderUserProfile.enable_mod(mod_id)
+	else:
+		ok = ModLoaderUserProfile.disable_mod(mod_id)
+
+	if not ok:
+		# 失败时回滚 UI 状态
+		var mod_data: ModData = ModLoader.get_mod_data(mod_id)
+		cb.button_pressed = mod_data != null and bool(mod_data.is_active)
+		return
+
+	_mods_needs_restart = true
+	if _mods_restart_hint != null:
+		_mods_restart_hint.visible = true
+	if _mods_restart_button != null:
+		_mods_restart_button.visible = true
+
+
+func _on_mod_restart_pressed() -> void:
+	OS.set_restart_on_exit(true)
+	get_tree().quit()
 
 
 func _sync_audio_controls_from_manager() -> void:
