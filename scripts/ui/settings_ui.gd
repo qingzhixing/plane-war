@@ -291,6 +291,17 @@ func _refresh_mod_list() -> void:
 		var is_active := bool(mod_data.is_active)
 		var is_loadable := bool(mod_data.is_loadable)
 		var is_locked := bool(mod_data.is_locked)
+		
+		# 核心 Mod 检测：命名空间为 "planewar" 的 Mod 视为核心 Mod
+		var is_core := false
+		var namespace := ""
+		if mod_data.manifest != null:
+			namespace = str(mod_data.manifest.mod_namespace)
+			if namespace == "planewar":
+				is_core = true
+				# 核心 Mod 强制锁定且激活
+				is_locked = true
+				is_active = true
 
 		var row := HBoxContainer.new()
 		row.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -310,7 +321,9 @@ func _refresh_mod_list() -> void:
 		var cb := CheckBox.new()
 		cb.button_pressed = is_active
 		cb.disabled = is_locked or not is_loadable
-		if is_locked:
+		if is_core:
+			cb.hint_tooltip = "核心功能，不可禁用"
+		elif is_locked:
 			cb.hint_tooltip = "此 Mod 被锁定，无法切换"
 		elif not is_loadable:
 			cb.hint_tooltip = "此 Mod 无法加载（manifest/文件错误）"
@@ -325,6 +338,13 @@ func _on_mod_checkbox_toggled(enabled: bool, mod_id: String, cb: CheckBox) -> vo
 	if _syncing_mods_ui:
 		return
 	if ModLoader == null:
+		return
+	
+	# 核心 Mod 保护：命名空间为 "planewar" 的 Mod 不可被禁用
+	if mod_id.begins_with("planewar-"):
+		# 恢复为激活状态
+		cb.button_pressed = true
+		# 可选：给出提示（如播放音效或显示临时文本）
 		return
 
 	var ok := false
