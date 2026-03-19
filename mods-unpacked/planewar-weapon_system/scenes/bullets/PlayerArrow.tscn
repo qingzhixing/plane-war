@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cs67ap8o7es0i"]
 
-[ext_resource type="Script" path="res://mods-unpacked/planewar-weapon-system/scripts/bullets/PlayerArrow.gd" id="1_script"]
+[ext_resource type="Script" path="res://mods-unpacked/planewar-weapon_system/scripts/bullets/PlayerArrow.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/Arrow.png" id="2_tex"]
 
 [sub_resource type="CapsuleShape2D" id="1_shape"]

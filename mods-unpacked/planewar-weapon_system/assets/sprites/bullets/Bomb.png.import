@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://7s1kaquky2ca"
-path="res://.godot/imported/Bomb.png-378c22f595feb815625227013ed7fb3a.ctex"
+path="res://.godot/imported/Bomb.png-e731152992ef6566f45e23a6e8304440.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/Bomb.png"
-dest_files=["res://.godot/imported/Bomb.png-378c22f595feb815625227013ed7fb3a.ctex"]
+source_file="res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Bomb.png"
+dest_files=["res://.godot/imported/Bomb.png-e731152992ef6566f45e23a6e8304440.ctex"]
 
 [params]
 

@@ -9,7 +9,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"bullet",
 		{
-			"scene": preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBullet.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBullet.tscn"),
 			"count_from_property": "_bullet_count",
 			"spread_from_property": "_spread_rad_per_bullet",
 			"damage_bonus": 0.0,
@@ -24,7 +24,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"arrow",
 		{
-			"scene": preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerArrow.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerArrow.tscn"),
 			"count_from_property": "_arrow_shot_count",
 			"spread": 0.12,
 			"damage_bonus": 1.0,
@@ -40,7 +40,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"bomb",
 		{
-			"scene": preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBomb.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBomb.tscn"),
 			"count_from_property": "_bomb_shot_count",
 			"spread": 0.14,
 			"damage_bonus": 0.0,
@@ -55,7 +55,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"boomerang",
 		{
-			"scene": preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBoomerang.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBoomerang.tscn"),
 			"count_from_property": "_boomerang_shot_count",
 			"damage_bonus": 0.35,
 			"speed_mult": 1.0,

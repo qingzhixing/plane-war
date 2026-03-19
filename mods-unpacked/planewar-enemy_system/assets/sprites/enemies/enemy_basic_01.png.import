@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cbbujfsfctoh0"
-path="res://.godot/imported/enemy_basic_01.png-45449b662a193171646ae9f6d29c7c31.ctex"
+path="res://.godot/imported/enemy_basic_01.png-81c5eae913ee4d3ee7565a16def23d6c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/planewar-enemy-system/assets/sprites/enemies/enemy_basic_01.png"
-dest_files=["res://.godot/imported/enemy_basic_01.png-45449b662a193171646ae9f6d29c7c31.ctex"]
+source_file="res://mods-unpacked/planewar-enemy_system/assets/sprites/enemies/enemy_basic_01.png"
+dest_files=["res://.godot/imported/enemy_basic_01.png-81c5eae913ee4d3ee7565a16def23d6c.ctex"]
 
 [params]
 

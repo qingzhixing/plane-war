@@ -6,7 +6,7 @@ const _ENEMY_BASIC_ID := "builtin.basic"
 const _ENEMY_TURRET_ID := "builtin.turret"
 const _ENEMY_ELITE_ID := "builtin.elite"
 
-const _ENEMY_SPAWN_CONFIG_PATH := "res://mods-unpacked/planewar-enemy-system/config/enemy_spawn_config.json"
+const _ENEMY_SPAWN_CONFIG_PATH := "res://mods-unpacked/planewar-enemy_system/config/enemy_spawn_config.json"
 
 const _DEFAULT_ENEMY_NORMAL := {
 	"elite_wave_min": 4,
@@ -35,7 +35,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_BASIC_ID,
 		{
-			"scene": preload("res://mods-unpacked/planewar-enemy-system/scenes/enemies/EnemyBasic01.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-enemy_system/scenes/enemies/EnemyBasic01.tscn"),
 			"weight": 1.0,
 			"wave_min": 1,
 			"extension_only": false,
@@ -45,7 +45,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_TURRET_ID,
 		{
-			"scene": preload("res://mods-unpacked/planewar-enemy-system/scenes/enemies/EnemyBasic02_Turret.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-enemy_system/scenes/enemies/EnemyBasic02_Turret.tscn"),
 			"weight": 1.0,
 			"wave_min": 2,
 			"extension_only": false,
@@ -55,7 +55,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_ELITE_ID,
 		{
-			"scene": preload("res://mods-unpacked/planewar-enemy-system/scenes/enemies/EnemyElite01.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-enemy_system/scenes/enemies/EnemyElite01.tscn"),
 			"weight": 0.8,
 			"wave_min": 4,
 			"extension_only": false,

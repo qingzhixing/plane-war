@@ -20,7 +20,7 @@ const _UPGRADES: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%", "main_effect": true, "player_effect": false},
 ]
 
-const _UPGRADE_EFFECTS_CONFIG_PATH := "res://mods-unpacked/planewar-upgrade-system/config/upgrade_effects.json"
+const _UPGRADE_EFFECTS_CONFIG_PATH := "res://mods-unpacked/planewar-upgrade_system/config/upgrade_effects.json"
 
 const _DEFAULT_MAIN_EFFECTS := {
 	"score_up_add": 0.15,

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://enemyelite01"]
 
-[ext_resource type="Script" path="res://mods-unpacked/planewar-enemy-system/scripts/enemies/enemy_elite.gd" id="1_script"]
+[ext_resource type="Script" path="res://mods-unpacked/planewar-enemy_system/scripts/enemies/enemy_elite.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://mods-unpacked/planewar-enemy-system/assets/sprites/enemies/enemy_basic_02.png" id="2_tex"]
 
 [node name="EnemyElite01" type="Area2D"]

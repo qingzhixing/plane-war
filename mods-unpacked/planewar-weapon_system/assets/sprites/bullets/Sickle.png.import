@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cyw4slfnau0mf"
-path="res://.godot/imported/Sickle.png-9807174d99615e9871c7de27fb61da86.ctex"
+path="res://.godot/imported/Sickle.png-b655c88b6935ed625acf24999f3d1d4c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/Sickle.png"
-dest_files=["res://.godot/imported/Sickle.png-9807174d99615e9871c7de27fb61da86.ctex"]
+source_file="res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Sickle.png"
+dest_files=["res://.godot/imported/Sickle.png-b655c88b6935ed625acf24999f3d1d4c.ctex"]
 
 [params]
 

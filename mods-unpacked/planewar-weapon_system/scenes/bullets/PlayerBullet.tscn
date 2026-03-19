@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://mods-unpacked/planewar-weapon-system/scripts/bullets/PlayerBullet.gd" id="1_script"]
+[ext_resource type="Script" path="res://mods-unpacked/planewar-weapon_system/scripts/bullets/PlayerBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/bullet_player_basic.png" id="2_tex"]
 
 [sub_resource type="CapsuleShape2D" id="1_shape"]
