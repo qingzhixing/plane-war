@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://mods-unpacked/planewar-core_mod/scripts/bullets/BulletBase.gd"
 
 @export var return_speed_multiplier: float = 1.0
 @export var spin_speed_deg: float = 720.0

@@ -49,8 +49,8 @@ var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBullet.tscn")
 @onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn")
-@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://scenes/bullets/PlayerBoomerang.tscn")
-@onready var _fallback_bullet_scene_bomb: PackedScene = preload("res://scenes/bullets/PlayerBomb.tscn")
+@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBoomerang.tscn")
+@onready var _fallback_bullet_scene_bomb: PackedScene = preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBomb.tscn")
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
 const _HIT_BLINK_FREQ := 20.0
@@ -62,9 +62,6 @@ const _PlayerShieldScene := preload("res://scenes/vfx/PlayerShield.tscn")
 ## 相对 75/s 每溢出 1% → 主炮 +0.02 伤害（进乘区前）
 const _ROF_OVERFLOW_DAMAGE_PER_PCT: float = 0.02
 var _rof_overflow_damage: float = 0.0
-var _main_weapon: MainWeapon
-var _arrow_weapon: ArrowWeapon
-var _bomb_weapon: BombWeapon
 var _boomerang_weapon: BoomerangWeapon
 
 func _ready() -> void:
@@ -89,30 +86,8 @@ func _ready() -> void:
 		_bomb_shot_count = maxi(_bomb_shot_count, 1)
 	_init_shield()
 	if has_weapon_unlocked("boomerang") and _boomerang_airborne == 0:
-		call_deferred("_spawn_boomerang_volley")
+		call_deferred("_spawn_single_boomerang")
 	_recompute_rof_overflow_damage()
-
-	_main_weapon = MainWeapon.new(
-		self,
-		bullet_scene_basic,
-		_max_bullet_count,
-		func() -> float:
-			return _effective_shot_interval(),
-		func() -> Dictionary:
-			return {
-				"bullet_count": _bullet_count,
-				"spread_rad_per_bullet": _spread_rad_per_bullet,
-				"damage": float(bullet_damage),
-				"speed": bullet_speed,
-				"bullet_speed_mult": _combo_bullet_speed_mult,
-				"damage_multiplier": _damage_multiplier,
-				"combo_damage_bonus": float(_combo_damage_bonus),
-				"rof_overflow_damage": _rof_overflow_damage,
-				"boss_damage_multiplier": _boss_damage_multiplier,
-			},
-		func() -> void:
-			_play_shoot_sfx()
-	)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -199,11 +174,7 @@ func _effective_shot_interval() -> float:
 
 
 func _update_shooting(delta: float) -> void:
-	if _main_weapon != null:
-		_main_weapon.process(delta)
-		return
-
-	# 兜底：旧逻辑（理论上不会走到）
+	# 主武器发射：优先走 ModExtensionBridge weapon_entry（scene 来自注册表）
 	var effective_interval := _effective_shot_interval()
 	if _fire_timer > effective_interval:
 		_fire_timer = effective_interval
@@ -332,31 +303,43 @@ func _spawn_bomb_shot() -> void:
 func _spawn_single_boomerang() -> void:
 	if not has_weapon_unlocked("boomerang"):
 		return
-	if _boomerang_weapon == null and bullet_scene_boomerang != null:
+	var weapon_entry := _ModExtensionBridgeRef.get_weapon_entry("boomerang")
+	var weapon_scene := weapon_entry.get("scene", null) as PackedScene
+	var scene_to_use := weapon_scene if weapon_scene != null else bullet_scene_boomerang
+	if scene_to_use == null:
+		return
+	var player_ref := self
+	var damage_bonus_reg := float(weapon_entry.get("damage_bonus", 0.35))
+	var speed_mult_base_reg := float(weapon_entry.get("speed_mult", 1.0))
+	var penetration_reg := int(weapon_entry.get("penetration", 0))
+	var visual_type_reg := str(weapon_entry.get("visual_type", "bullet"))
+	var motion_mode_reg := str(weapon_entry.get("motion_mode", "boomerang"))
+	var side_offset_step_reg := float(weapon_entry.get("side_offset_step", 18.0))
+	if _boomerang_weapon == null:
 		_boomerang_weapon = BoomerangWeapon.new(
 			self,
-			bullet_scene_boomerang,
+			scene_to_use,
 			func() -> int:
 				return _boomerang_shot_count,
 			func(
 				scene_res: PackedScene,
 				dir: Vector2,
-				damage_bonus: float,
-				speed_mult: float,
-				penetration: int,
-				visual_type: String,
-				bullet_motion_mode: String,
-				side_offset: Vector2
+				_damage_bonus: float,
+				_speed_mult: float,
+				_penetration: int,
+				_visual_type: String,
+				_bullet_motion_mode: String,
+				_side_offset: Vector2
 			) -> void:
 				_spawn_configured_bullet(
 					scene_res,
 					dir,
-					damage_bonus,
-					speed_mult,
-					penetration,
-					visual_type,
-					bullet_motion_mode,
-					side_offset
+					damage_bonus_reg,
+					player_ref.boomerang_speed_mult * speed_mult_base_reg,
+					penetration_reg,
+					visual_type_reg,
+					motion_mode_reg,
+					Vector2(-dir.y, dir.x) * side_offset_step_reg
 				),
 			func() -> Vector2:
 				return _boomerang_aim_dir()
@@ -388,75 +371,24 @@ func on_boomerang_returned() -> void:
 
 func _update_side_weapons(delta: float) -> void:
 	if has_weapon_unlocked("arrow"):
-		if _arrow_weapon == null and bullet_scene_arrow != null:
-			_arrow_weapon = ArrowWeapon.new(
-				self,
-				bullet_scene_arrow,
-				func() -> float:
-					return arrow_auto_interval,
-				func() -> int:
-					return _arrow_shot_count,
-				func(
-					scene_res: PackedScene,
-					dir: Vector2,
-					damage_bonus: float,
-					speed_mult: float,
-					penetration: int,
-					visual_type: String,
-					bullet_motion_mode: String,
-					side_offset: Vector2
-				) -> void:
-					_spawn_configured_bullet(
-						scene_res,
-						dir,
-						damage_bonus,
-						speed_mult,
-						penetration,
-						visual_type,
-						bullet_motion_mode,
-						side_offset
-					),
-				func(cd: float) -> void:
-					_arrow_auto_timer = cd
-			)
-		if _arrow_weapon != null:
-			_arrow_weapon.process(delta)
+		_arrow_auto_timer -= delta
+		if _arrow_auto_timer <= 0.0:
+			var spawned := _spawn_weapon_entry_shot("arrow")
+			if not spawned:
+				_spawn_arrow_shot()
+			_arrow_auto_timer += arrow_auto_interval
+
 	if has_weapon_unlocked("bomb"):
-		if _bomb_weapon == null and bullet_scene_bomb != null:
-			_bomb_weapon = BombWeapon.new(
-				self,
-				bullet_scene_bomb,
-				func() -> float:
-					return bomb_auto_interval,
-				func() -> int:
-					return _bomb_shot_count,
-				func(
-					scene_res: PackedScene,
-					dir: Vector2,
-					damage_bonus: float,
-					speed_mult: float,
-					penetration: int,
-					visual_type: String,
-					bullet_motion_mode: String,
-					side_offset: Vector2
-				) -> void:
-					_spawn_configured_bullet(
-						scene_res,
-						dir,
-						damage_bonus,
-						speed_mult,
-						penetration,
-						visual_type,
-						bullet_motion_mode,
-						side_offset
-					),
-				func(cd: float) -> void:
-					_bomb_auto_timer = cd
-			)
-		if _bomb_weapon != null:
-			_bomb_weapon.process(delta)
+		_bomb_auto_timer -= delta
+		if _bomb_auto_timer <= 0.0:
+			var spawned := _spawn_weapon_entry_shot("bomb")
+			if not spawned:
+				_spawn_bomb_shot()
+			_bomb_auto_timer += bomb_auto_interval
+
 	if has_weapon_unlocked("boomerang") and _boomerang_weapon != null:
 		_boomerang_weapon.process(delta)
+
 	_ModExtensionBridgeRef.process_mod_weapons(self, delta)
 
 

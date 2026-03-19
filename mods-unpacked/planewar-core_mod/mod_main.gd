@@ -151,6 +151,36 @@ func _register_weapon_entries() -> void:
 	)
 
 
+	_BridgeRef.register_weapon_entry(
+		"bomb",
+		{
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBomb.tscn"),
+			"count_from_property": "_bomb_shot_count",
+			"spread": 0.14,
+			"damage_bonus": 0.0,
+			"speed_mult": 0.72,
+			"penetration": 0,
+			"visual_type": "bullet",
+			"motion_mode": "straight",
+			"side_offset_step": 14.0,
+		},
+		true
+	)
+	_BridgeRef.register_weapon_entry(
+		"boomerang",
+		{
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBoomerang.tscn"),
+			"count_from_property": "_boomerang_shot_count",
+			"damage_bonus": 0.35,
+			"speed_mult": 1.0,
+			"penetration": 0,
+			"visual_type": "bullet",
+			"motion_mode": "boomerang",
+			"side_offset_step": 18.0,
+		},
+		true
+	)
+
 func _register_upgrade_entries() -> void:
 	for item in _UPGRADES:
 		var d := item.duplicate(true)

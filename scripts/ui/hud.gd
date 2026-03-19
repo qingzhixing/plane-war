@@ -437,7 +437,7 @@ func _ensure_side_weapon_textures() -> void:
 		return
 	_side_weapon_textures["arrow"] = preload("res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/Arrow.png") as Texture2D
 	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
-	_side_weapon_textures["boomerang"] = preload("res://assets/sprites/bullets/Sickle.png") as Texture2D
+	_side_weapon_textures["boomerang"] = preload("res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/Sickle.png") as Texture2D
 
 
 func _ensure_left_slots_panel() -> void:

@@ -70,4 +70,3 @@ func process(delta: float) -> void:
 func notify_returned() -> void:
 	_airborne_count = max(0, _airborne_count - 1)
 	request_spawn()
-
