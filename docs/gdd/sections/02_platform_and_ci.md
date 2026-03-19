@@ -2,7 +2,7 @@
 
 ## 版本与变更记录
 
-- **当前版本**：`0.2.3`（`project.godot` → `application/config/version`；Android 导出 `version/name` 与 `version/code=203` 对齐）。
+- **当前版本**：`0.2.4`（`project.godot` → `application/config/version`；Android 导出 `version/name` 与 `version/code=204` 对齐）。
 - **面向玩家的变更说明**：仓库根 **`CHANGELOG.md`**。
 
 ## 目标平台
