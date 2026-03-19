@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b13ouvorm5y54"
-path="res://.godot/imported/bullet_enemy_basic.png-3dce122693d5a8098e6cfe5902bfe0b5.ctex"
+uid="uid://c0yfi8g3vqq3o"
+path="res://.godot/imported/enemy_basic_02.png-1b3f428c6055f21b94453be3584e6498.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/bullets/bullet_enemy_basic.png"
-dest_files=["res://.godot/imported/bullet_enemy_basic.png-3dce122693d5a8098e6cfe5902bfe0b5.ctex"]
+source_file="res://mods-unpacked/planewar-core_mod/assets/sprites/enemies/enemy_basic_02.png"
+dest_files=["res://.godot/imported/enemy_basic_02.png-1b3f428c6055f21b94453be3584e6498.ctex"]
 
 [params]
 

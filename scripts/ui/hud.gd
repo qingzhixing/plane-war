@@ -435,7 +435,7 @@ func _play_combo_break_sfx() -> void:
 func _ensure_side_weapon_textures() -> void:
 	if _side_weapon_textures.size() > 0:
 		return
-	_side_weapon_textures["arrow"] = preload("res://assets/sprites/bullets/Arrow.png") as Texture2D
+	_side_weapon_textures["arrow"] = preload("res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/Arrow.png") as Texture2D
 	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
 	_side_weapon_textures["boomerang"] = preload("res://assets/sprites/bullets/Sickle.png") as Texture2D
 
@@ -457,7 +457,7 @@ func _ensure_left_slots_panel() -> void:
 	_left_slots_vbox.offset_bottom = 308.0
 	_left_slots_vbox.add_theme_constant_override("separation", 12)
 	root.add_child(_left_slots_vbox)
-	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
+	var tex_gun: Texture2D = preload("res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/bullet_player_basic.png") as Texture2D
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
 	var tex_life: Texture2D = LIFE_ICON
 	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
