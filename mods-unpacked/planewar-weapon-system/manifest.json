@@ -2,6 +2,7 @@
   "name": "weapon_system",
   "namespace": "planewar",
   "version_number": "1.0.0",
+  "website_url": "https://plane-war.example.com",
   "author": "Plane War Team",
   "description": "Core weapon system including configuration, logic and related resources",
   "dependencies": [],

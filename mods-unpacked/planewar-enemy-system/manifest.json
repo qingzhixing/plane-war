@@ -2,6 +2,7 @@
   "name": "enemy_system",
   "namespace": "planewar",
   "version_number": "1.0.0",
+  "website_url": "https://plane-war.example.com",
   "author": "Plane War Team",
   "description": "Core enemy system including configuration, spawn rules and related resources",
   "dependencies": [],
