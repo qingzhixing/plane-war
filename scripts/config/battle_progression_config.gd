@@ -1,6 +1,6 @@
 extends RefCounted
 
-const LogBridge = preload("res://scripts/systems/log_bridge.gd")
+const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
 const _CONFIG_JSON_PATH := "res://assets/data/waves/battle_progression_config.json"
 
 const _DEFAULT_PROGRESSION := {
@@ -59,11 +59,11 @@ func _init() -> void:
 func _load_from_json() -> void:
 	var file := FileAccess.open(_CONFIG_JSON_PATH, FileAccess.READ)
 	if file == null:
-		LogBridge.warn("BattleProgressionConfig missing file: %s" % _CONFIG_JSON_PATH)
+		_LogBridgeRef.warn("BattleProgressionConfig missing file: %s" % _CONFIG_JSON_PATH)
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
-		LogBridge.error("BattleProgressionConfig parse failed: root is not dictionary")
+		_LogBridgeRef.error("BattleProgressionConfig parse failed: root is not dictionary")
 		return
 	var cfg: Dictionary = parsed as Dictionary
 	var progression_raw: Variant = cfg.get("progression", {})

@@ -1,7 +1,7 @@
 extends RefCounted
 
 class_name SpellEffectService
-const LogBridge = preload("res://scripts/systems/log_bridge.gd")
+const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
 
 
 func trigger_spell(
@@ -41,7 +41,7 @@ func trigger_spell(
 			burst_bullet_count
 		)
 	else:
-		LogBridge.error("SpellEffectService failed to load burst scene: %s" % burst_scene_path)
+		_LogBridgeRef.error("SpellEffectService failed to load burst scene: %s" % burst_scene_path)
 
 	var audio := tree.get_first_node_in_group("audio_manager")
 	if audio != null and audio.has_method("play_enemy_explosion"):
@@ -77,7 +77,7 @@ func _fire_spell_burst_waves(
 			if tree.current_scene != null:
 				tree.current_scene.add_child(bullet)
 			else:
-				LogBridge.warn("SpellEffectService current_scene is null, skip bullet spawn.")
+				_LogBridgeRef.warn("SpellEffectService current_scene is null, skip bullet spawn.")
 				bullet.queue_free()
 		if wave < burst_wave_count - 1:
 			await tree.create_timer(burst_wave_interval).timeout
