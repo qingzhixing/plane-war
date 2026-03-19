@@ -1,6 +1,6 @@
 extends Area2D
 
-const _EnemyCombatConfigRef = preload("res://mods-unpacked/planewar-core_mod/scripts/config/enemy_combat_config.gd")
+const _EnemyCombatConfigRef = preload("res://scripts/config/enemy_combat_config.gd")
 
 @export var speed: float = 250.0
 @export var max_hp: int = 4

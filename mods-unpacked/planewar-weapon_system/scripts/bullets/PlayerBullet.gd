@@ -1,4 +1,4 @@
-extends "res://mods-unpacked/planewar-weapon-system/scripts/bullets/BulletBase.gd"
+extends "res://scripts/bullets/BulletBase.gd"
 
 
 func _ready() -> void:
