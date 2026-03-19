@@ -87,6 +87,7 @@
 
 - 当前核心战斗内容由 `builtin core mod` 提供（`mods-unpacked/planewar-core_mod`），主工程负责流程壳与调度。
 - 扩展入口统一通过 `ModExtensionBridge`，确保敌人、武器、升级的注册与生命周期一致。
+- 由 `core_mod` 实现的功能代码与内容资源（如子弹/敌人场景、对应脚本与配置）应放在 `mods-unpacked/planewar-core_mod` 内，避免继续引用主工程同类实现文件。
 
 ### 生命周期与入口
 
