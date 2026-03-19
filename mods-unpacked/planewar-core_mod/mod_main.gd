@@ -89,7 +89,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_BASIC_ID,
 		{
-			"scene": preload("res://scenes/enemies/EnemyBasic01.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyBasic01.tscn"),
 			"weight": 1.0,
 			"wave_min": 1,
 			"extension_only": false,
@@ -99,7 +99,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_TURRET_ID,
 		{
-			"scene": preload("res://scenes/enemies/EnemyBasic02_Turret.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyBasic02_Turret.tscn"),
 			"weight": 1.0,
 			"wave_min": 2,
 			"extension_only": false,
@@ -109,7 +109,7 @@ func _register_enemy_entries() -> void:
 	_BridgeRef.register_enemy_entry(
 		_ENEMY_ELITE_ID,
 		{
-			"scene": preload("res://scenes/enemies/EnemyElite01.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyElite01.tscn"),
 			"weight": 0.8,
 			"wave_min": 4,
 			"extension_only": false,
@@ -122,7 +122,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"bullet",
 		{
-			"scene": preload("res://scenes/bullets/PlayerBullet.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBullet.tscn"),
 			"count_from_property": "_bullet_count",
 			"spread_from_property": "_spread_rad_per_bullet",
 			"damage_bonus": 0.0,
@@ -137,7 +137,7 @@ func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
 		"arrow",
 		{
-			"scene": preload("res://scenes/bullets/PlayerArrow.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn"),
 			"count_from_property": "_arrow_shot_count",
 			"spread": 0.12,
 			"damage_bonus": 1.0,

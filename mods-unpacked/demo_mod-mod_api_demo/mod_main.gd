@@ -16,7 +16,7 @@ func _register_enemy_entry() -> void:
 	_ModExtensionBridgeRef.register_enemy_entry(
 		DEMO_ENEMY_ID,
 		{
-			"scene": preload("res://scenes/enemies/EnemyElite01.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyElite01.tscn"),
 			"weight": 0.65,
 			"wave_min": 2,
 			"extension_only": false,
@@ -46,7 +46,7 @@ func _before_main_shot(payload: Dictionary) -> Dictionary:
 	var requests: Array = out.get("spawn_requests", [])
 	requests.append(
 		{
-			"scene": preload("res://scenes/bullets/PlayerArrow.tscn"),
+			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn"),
 			"dir": Vector2(0.0, -1.0),
 			"damage_bonus": 0.0,
 			"speed_mult": 1.1,

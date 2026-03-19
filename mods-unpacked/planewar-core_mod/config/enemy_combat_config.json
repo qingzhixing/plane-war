@@ -1,0 +1,40 @@
+{
+  "scaling": {
+    "wave_hp_gain_per_wave": 0.25,
+    "threat_hp_base": 1.12
+  },
+  "despawn": {
+    "y_margin": 100.0
+  },
+  "boss01": {
+    "bullet_speed_cap": 1.38,
+    "bullet_speed_base": 1.045,
+    "phase_b_hp_ratio": 0.5,
+    "phase_transition_pause": 0.3,
+    "phase_transition_fire_delay": 0.8,
+    "move_frequency": 0.5,
+    "move_lerp_speed": 2.5,
+    "center_y_ratio": 0.25,
+    "amplitude_x_ratio": 0.3,
+    "phase_a_count": 8,
+    "phase_a_start_angle": 0.78539816339,
+    "phase_a_end_angle": 2.35619449019,
+    "phase_a_spawn_radius": 40.0,
+    "phase_b_fan_count": 9,
+    "phase_b_fan_half_angle": 0.55,
+    "phase_b_fan_spawn_radius": 34.0,
+    "phase_b_fan_speed": 380.0,
+    "phase_b_ring_count": 14,
+    "phase_b_ring_rotate_speed": 1.4,
+    "phase_b_ring_spawn_radius": 44.0,
+    "phase_b_ring_speed": 280.0,
+    "spell_name": "符：星屑环舞",
+    "spell_name_duration": 1.2
+  },
+  "enemy_elite": {
+    "pattern_bullet_count": 10
+  },
+  "enemy_turret": {
+    "fan_angles": [0.0, -0.18, 0.18]
+  }
+}

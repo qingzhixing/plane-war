@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://mods-unpacked/planewar-core_mod/scripts/bullets/BulletBase.gd"
 
 var _target: Node2D = null
 var _initialized_direction: bool = false
@@ -26,9 +26,7 @@ func _process(delta: float) -> void:
 		if is_instance_valid(_target):
 			var to_target := (_target.global_position - global_position).normalized()
 			direction = to_target
-			# 让箭头朝向发射方向（贴图当前朝左，因此需要 + PI/2 校正）
 			rotation = direction.angle() + PI / 2.0
-	# 之后按固定 direction 直线飞行，不再跟踪
 	super._process(delta)
 
 

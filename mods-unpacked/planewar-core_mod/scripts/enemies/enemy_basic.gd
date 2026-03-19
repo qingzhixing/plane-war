@@ -1,6 +1,6 @@
 extends Area2D
 
-const _EnemyCombatConfigRef = preload("res://scripts/config/enemy_combat_config.gd")
+const _EnemyCombatConfigRef = preload("res://mods-unpacked/planewar-core_mod/scripts/config/enemy_combat_config.gd")
 
 @export var speed: float = 250.0
 @export var max_hp: int = 4
@@ -84,7 +84,7 @@ func _init_hit_material() -> void:
 		return
 	var mat: Material = _sprite.material
 	if mat == null or not (mat is ShaderMaterial):
-		var shader_res := load("res://shaders/enemy_hit.gdshader")
+		var shader_res := load("res://mods-unpacked/planewar-core_mod/shaders/enemy_hit.gdshader")
 		if shader_res == null:
 			return
 		var new_mat := ShaderMaterial.new()
@@ -102,5 +102,3 @@ func _update_hit_material() -> void:
 	if _HIT_FLASH_DURATION > 0.0:
 		strength = _hit_flash_timer / _HIT_FLASH_DURATION
 	_hit_material.set_shader_parameter("hit_strength", strength)
-
-

@@ -1,33 +1,36 @@
 extends Area2D
 
-const _EnemyCombatConfigRef = preload("res://scripts/config/enemy_combat_config.gd")
+const _EnemyCombatConfigRef = preload("res://mods-unpacked/planewar-core_mod/scripts/config/enemy_combat_config.gd")
 
-@export var move_speed: float = 90.0
-@export var max_hp: int = 14
-@export var exp_value: int = 18
-@export var score_value: int = 50
-@export var fire_interval: float = 2.0
+@export var move_speed: float = 120.0
+@export var stop_y: float = 320.0
+@export var horizontal_amplitude: float = 80.0
+@export var horizontal_speed: float = 1.2
+@export var max_hp: int = 7
+@export var exp_value: int = 8
+@export var fire_interval: float = 1.5
+@export var pre_fire_delay: float = 0.7
 @export var bullet_scene: PackedScene
 
 var _hp: float
 var _time: float = 0.0
+var _origin_x: float
 var _fire_timer: float = 0.0
-var _combat_cfg = _EnemyCombatConfigRef.new()
-@export var pre_fire_delay: float = 0.7
 var _is_charging: bool = false
 var _charge_timer: float = 0.0
+var _combat_cfg = _EnemyCombatConfigRef.new()
 
 const _HIT_FLASH_DURATION := 0.12
 var _hit_flash_timer: float = 0.0
 var _hit_material: ShaderMaterial
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
-@onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
+@onready var _fallback_bullet_scene: PackedScene = preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/EnemyBasicBullet.tscn")
 
 func _ready() -> void:
 	_hp = max_hp
+	_origin_x = global_position.x
 	add_to_group("enemy")
-	add_to_group("elite")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
 	_init_hit_material()
@@ -35,16 +38,14 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-
-	# 缓慢向下移动，用作“弹幕核心”
-	global_position.y += move_speed * delta
-
-	# 超出屏幕下缘时清理
+	if global_position.y < stop_y:
+		global_position.y += move_speed * delta
+	else:
+		global_position.y = stop_y
+	global_position.x = _origin_x + sin(_time * horizontal_speed) * horizontal_amplitude
 	var viewport_rect := get_viewport_rect()
 	if global_position.y > viewport_rect.size.y + _combat_cfg.get_despawn_y_margin():
 		queue_free()
-
-	# 射击逻辑：周期性发射稀疏环状/扇形弹幕，发射前有可读前摇
 	if _is_charging:
 		_charge_timer -= delta
 		if _charge_timer <= 0.0:
@@ -65,28 +66,21 @@ func _process(delta: float) -> void:
 func _fire_pattern() -> void:
 	if bullet_scene == null:
 		return
-
-	# 稀疏圆环/扇形：围绕自身发射多发慢速子弹，训练基础躲避
-	var bullet_count := _combat_cfg.get_enemy_elite_int("pattern_bullet_count", 10)
-	var base_speed_dir := Vector2(0, 1)
-	for i in bullet_count:
-		var angle := TAU * float(i) / float(bullet_count)
-		var dir := base_speed_dir.rotated(angle)
+	var angles := _combat_cfg.get_enemy_turret_float_array("fan_angles", [0.0, -0.18, 0.18])
+	for angle in angles:
 		var bullet := bullet_scene.instantiate()
-		bullet.global_position = global_position
+		bullet.global_position = global_position + Vector2(0, 20)
 		if bullet.has_method("setup_direction"):
-			bullet.setup_direction(dir)
+			bullet.setup_direction(Vector2(0, 1).rotated(angle))
 		get_tree().current_scene.add_child(bullet)
 
 
 func _give_exp() -> void:
 	get_tree().call_group("experience_listener", "add_exp", exp_value)
 
-
 func apply_damage(amount: float) -> void:
 	_hp -= amount
 	if _hp <= 0:
-		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_play_enemy_explosion_sfx()
 		_give_exp()
 		queue_free()
@@ -98,12 +92,27 @@ func apply_damage(amount: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body.has_method("apply_damage") and body.is_in_group("player"):
 		body.apply_damage(1)
-		get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
 		_play_enemy_explosion_sfx()
 		_give_exp()
 		queue_free()
-		
-		
+
+
+func _get_audio_manager() -> Node:
+	return get_tree().get_first_node_in_group("audio_manager")
+
+
+func _play_enemy_injured_sfx() -> void:
+	var audio := _get_audio_manager()
+	if audio != null and audio.has_method("play_enemy_injured"):
+		audio.play_enemy_injured()
+
+
+func _play_enemy_explosion_sfx() -> void:
+	var audio := _get_audio_manager()
+	if audio != null and audio.has_method("play_enemy_explosion"):
+		audio.play_enemy_explosion()
+
+
 func apply_wave_scaling(wave: int, threat_tier: int = 0) -> void:
 	max_hp = _combat_cfg.get_scaled_hp(max_hp, wave, threat_tier)
 	if wave > 1 or threat_tier > 0:
@@ -120,7 +129,7 @@ func _init_hit_material() -> void:
 		return
 	var mat: Material = _sprite.material
 	if mat == null or not (mat is ShaderMaterial):
-		var shader_res := load("res://shaders/enemy_hit.gdshader")
+		var shader_res := load("res://mods-unpacked/planewar-core_mod/shaders/enemy_hit.gdshader")
 		if shader_res == null:
 			return
 		var new_mat := ShaderMaterial.new()
@@ -138,20 +147,3 @@ func _update_hit_material() -> void:
 	if _HIT_FLASH_DURATION > 0.0:
 		strength = _hit_flash_timer / _HIT_FLASH_DURATION
 	_hit_material.set_shader_parameter("hit_strength", strength)
-
-
-
-func _get_audio_manager() -> Node:
-	return get_tree().get_first_node_in_group("audio_manager")
-
-
-func _play_enemy_injured_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_injured"):
-		audio.play_enemy_injured()
-
-
-func _play_enemy_explosion_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_explosion"):
-		audio.play_enemy_explosion()
