@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://w478a7uockj4"
-path="res://.godot/imported/bullet_player_basic.png-59d71491f194355669b3c97cd5b17f30.ctex"
+path="res://.godot/imported/bullet_player_basic.png-81bdce64d8ef6136bbf009da4601b16f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/bullet_player_basic.png"
-dest_files=["res://.godot/imported/bullet_player_basic.png-59d71491f194355669b3c97cd5b17f30.ctex"]
+source_file="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/bullet_player_basic.png"
+dest_files=["res://.godot/imported/bullet_player_basic.png-81bdce64d8ef6136bbf009da4601b16f.ctex"]
 
 [params]
 

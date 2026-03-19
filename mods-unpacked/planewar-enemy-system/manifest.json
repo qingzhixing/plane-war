@@ -1,9 +1,9 @@
 {
-  "name": "Enemy System",
-  "version": "1.0.0",
+  "name": "enemy_system",
+  "namespace": "planewar",
+  "version_number": "1.0.0",
   "author": "Plane War Team",
   "description": "Core enemy system including configuration, spawn rules and related resources",
-  "mod_id": "planewar.enemy_system",
   "dependencies": [],
   "extra": {
     "godot": {
