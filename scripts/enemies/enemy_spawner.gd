@@ -4,6 +4,8 @@ const _LogBridgeRef = preload("res://scripts/systems/log_bridge.gd")
 const _ModExtensionBridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
 @export var enemies_per_wave_base: int = 7
 @export var enemies_per_wave_increment: int = 3
+@export var enemy_scene: PackedScene
+@export var enemy_scene_elite: PackedScene
 
 const _EnemySpawnConfigRef = preload("res://scripts/config/enemy_spawn_config.gd")
 
@@ -92,6 +94,10 @@ func _on_spawn_timeout() -> void:
 		if not mod_enemy_pick.is_empty() and mod_enemy_pick.has("scene"):
 			scene_to_use = mod_enemy_pick["scene"]
 			enemy_id = str(mod_enemy_pick.get("id", "mod.enemy"))
+	if scene_to_use == null:
+		scene_to_use = _pick_builtin_enemy_scene(wave)
+		if scene_to_use != null:
+			enemy_id = "builtin.default"
 
 	var after_payload := {
 		"wave": wave,
@@ -141,3 +147,11 @@ func _pick_mod_enemy_entry(wave: int) -> Dictionary:
 		if roll <= acc:
 			return e
 	return mod_entries[mod_entries.size() - 1]
+
+
+func _pick_builtin_enemy_scene(wave: int) -> PackedScene:
+	if enemy_scene == null and enemy_scene_elite == null:
+		return null
+	if wave >= 4 and enemy_scene_elite != null and randf() < 0.2:
+		return enemy_scene_elite
+	return enemy_scene

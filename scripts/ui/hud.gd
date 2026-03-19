@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const _ModExtensionBridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
+
 @export var player_path: NodePath
 
 var _player: Node = null
@@ -435,9 +437,15 @@ func _play_combo_break_sfx() -> void:
 func _ensure_side_weapon_textures() -> void:
 	if _side_weapon_textures.size() > 0:
 		return
-	_side_weapon_textures["arrow"] = preload("res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Arrow.png") as Texture2D
-	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
-	_side_weapon_textures["boomerang"] = preload("res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Sickle.png") as Texture2D
+	_side_weapon_textures["arrow"] = _resolve_hud_icon(
+		"weapon.arrow",
+		preload("res://assets/sprites/bullets/spell_bullet.png") as Texture2D
+	)
+	_side_weapon_textures["bomb"] = _resolve_hud_icon("weapon.bomb", preload("res://assets/ui/bomb.png") as Texture2D)
+	_side_weapon_textures["boomerang"] = _resolve_hud_icon(
+		"weapon.boomerang",
+		preload("res://assets/sprites/bullets/spell_bullet.png") as Texture2D
+	)
 
 
 func _ensure_left_slots_panel() -> void:
@@ -457,7 +465,10 @@ func _ensure_left_slots_panel() -> void:
 	_left_slots_vbox.offset_bottom = 308.0
 	_left_slots_vbox.add_theme_constant_override("separation", 12)
 	root.add_child(_left_slots_vbox)
-	var tex_gun: Texture2D = preload("res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/bullet_player_basic.png") as Texture2D
+	var tex_gun: Texture2D = _resolve_hud_icon(
+		"weapon.main_gun",
+		preload("res://assets/sprites/bullets/spell_bullet.png") as Texture2D
+	)
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
 	var tex_life: Texture2D = LIFE_ICON
 	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
@@ -470,6 +481,18 @@ func _ensure_left_slots_panel() -> void:
 	if tex_life != null:
 		_life_slot.set_icon_texture(tex_life)
 	_left_slots_vbox.add_child(_life_slot)
+
+
+func _resolve_hud_icon(icon_id: String, fallback: Texture2D) -> Texture2D:
+	var mod_icon: Texture2D = null
+	var bridge := _ModExtensionBridgeRef.new()
+	if bridge != null and bridge.has_method("get_hud_icon"):
+		var icon_variant: Variant = bridge.call("get_hud_icon", icon_id)
+		if icon_variant is Texture2D:
+			mod_icon = icon_variant as Texture2D
+	if mod_icon != null:
+		return mod_icon
+	return fallback
 
 
 func _update_left_slots() -> void:

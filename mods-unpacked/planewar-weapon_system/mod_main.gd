@@ -4,6 +4,7 @@ const _BridgeRef = preload("res://scripts/systems/mod_extension_bridge.gd")
 
 func _init() -> void:
 	_register_weapon_entries()
+	_register_hud_icons()
 
 func _register_weapon_entries() -> void:
 	_BridgeRef.register_weapon_entry(
@@ -65,4 +66,30 @@ func _register_weapon_entries() -> void:
 			"side_offset_step": 18.0,
 		},
 		true
+	)
+
+
+func _register_hud_icons() -> void:
+	var bridge := _BridgeRef.new()
+	if bridge == null or not bridge.has_method("register_hud_icon"):
+		return
+	bridge.call(
+		"register_hud_icon",
+		"weapon.main_gun",
+		"res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/bullet_player_basic.png"
+	)
+	bridge.call(
+		"register_hud_icon",
+		"weapon.arrow",
+		"res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Arrow.png"
+	)
+	bridge.call(
+		"register_hud_icon",
+		"weapon.boomerang",
+		"res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Sickle.png"
+	)
+	bridge.call(
+		"register_hud_icon",
+		"weapon.bomb",
+		"res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Bomb.png"
 	)

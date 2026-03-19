@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://mods-unpacked/planewar-weapon_system/scripts/bullets/mod_bullet_base.gd"
 ## 命中敌机后播放爆炸；仅在爆炸动画第 7 帧（index 6）对 Explosion Shape 范围内敌人造成一次 AoE 伤害。
 
 const _DAMAGE_FRAME_INDEX := 6 # 第 7 帧（0-based）

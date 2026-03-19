@@ -13,10 +13,14 @@ func _init() -> void:
 
 
 func _register_enemy_entry() -> void:
+	var enemy_entry := _ModExtensionBridgeRef.get_enemy_entry("builtin.elite")
+	var enemy_scene := enemy_entry.get("scene", null) as PackedScene
+	if enemy_scene == null:
+		return
 	_ModExtensionBridgeRef.register_enemy_entry(
 		DEMO_ENEMY_ID,
 		{
-			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyElite01.tscn"),
+			"scene": enemy_scene,
 			"weight": 0.65,
 			"wave_min": 2,
 			"extension_only": false,
@@ -43,10 +47,14 @@ func _register_weapon_hooks() -> void:
 
 func _before_main_shot(payload: Dictionary) -> Dictionary:
 	var out := payload
+	var arrow_entry := _ModExtensionBridgeRef.get_weapon_entry("arrow")
+	var arrow_scene := arrow_entry.get("scene", null) as PackedScene
+	if arrow_scene == null:
+		return out
 	var requests: Array = out.get("spawn_requests", [])
 	requests.append(
 		{
-			"scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn"),
+			"scene": arrow_scene,
 			"dir": Vector2(0.0, -1.0),
 			"damage_bonus": 0.0,
 			"speed_mult": 1.1,

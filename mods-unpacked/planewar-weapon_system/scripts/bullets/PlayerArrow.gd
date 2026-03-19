@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://mods-unpacked/planewar-weapon_system/scripts/bullets/mod_bullet_base.gd"
 
 var _target: Node2D = null
 var _initialized_direction: bool = false

@@ -68,3 +68,14 @@
   - 支持的 Mod Loader 版本
   - 是否与其他 Mod 冲突
   - 安装目录和卸载方式
+
+## 七、依赖边界规则（作者必读）
+
+- Mod 允许依赖桥接 API：`res://scripts/systems/mod_extension_bridge.gd`。
+- Mod 不应依赖主程序业务资源（例如 `res://scenes/**`、`res://scripts/**` 的具体玩法实现）。
+- Mod 之间禁止互相路径依赖：不要引用 `res://mods-unpacked/<other_mod>/...`。
+- HUD 图标请通过 bridge 注册（`register_hud_icon`），不要让主程序去硬编码读取某个 mod 的贴图路径。
+
+建议在发布前运行边界检查脚本（仓库内）：
+
+- `res://scripts/tools/check_mod_boundaries.gd`

@@ -358,6 +358,28 @@ ModExtensionBridge.clear_upgrade_registry()
 
 ---
 
+### 4.10 HUD 图标注册
+
+```gdscript
+ModExtensionBridge.register_hud_icon("weapon.main_gun", "res://mods-unpacked/my_mod/assets/ui/main_gun.png")
+ModExtensionBridge.register_hud_icon("weapon.arrow", preload("res://mods-unpacked/my_mod/assets/ui/arrow.png"))
+
+var tex := ModExtensionBridge.get_hud_icon("weapon.arrow")
+ModExtensionBridge.unregister_hud_icon("weapon.arrow")
+ModExtensionBridge.clear_hud_icons()
+```
+
+约定图标 ID（当前 HUD 会读取）：
+
+- `weapon.main_gun`
+- `weapon.arrow`
+- `weapon.boomerang`
+- `weapon.bomb`
+
+未注册图标时，HUD 自动回退主程序默认图标，不会导致加载失败。
+
+---
+
 ## 5. 最小可运行模板
 
 ```gdscript
@@ -409,3 +431,5 @@ func _apply_upgrade(player: Node, upgrade_id: String) -> bool:
 - 敌人条目缺少 `scene: PackedScene` 会被拒绝。
 - 升级条目缺少 `id/name/desc` 会被拒绝。
 - 只在导出版本安装 mod 时，本地 `mods` 来源按 zip 扫描。
+- 不要在主程序目录（`scripts/`、`scenes/`）写入 `mods-unpacked` 硬路径。
+- 不要在 mod 中引用其他 mod 目录（`res://mods-unpacked/<other_mod>/...`）。

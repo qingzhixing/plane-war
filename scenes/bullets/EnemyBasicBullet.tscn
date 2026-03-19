@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bm1io1ijyvqyb"]
 
 [ext_resource type="Script" path="res://scripts/bullets/enemy_turret_bullet.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://b13ouvorm5y54" path="res://mods-unpacked/planewar-enemy_system/assets/sprites/bullets/bullet_enemy_basic.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://bcf54jkmqsmnk" path="res://assets/sprites/bullets/spell_bullet.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="1"]
 radius = 22.022715

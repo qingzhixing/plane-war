@@ -27,6 +27,7 @@ static var _player_effect_upgrade_ids: Dictionary = {}
 static var _upgrade_effect_handlers: Array[Callable] = []
 static var _main_upgrade_effect_handlers: Array[Callable] = []
 static var _weapon_registry: Dictionary = {}
+static var _hud_icon_registry: Dictionary = {}
 
 
 static func reset_all_registries() -> void:
@@ -38,6 +39,7 @@ static func reset_all_registries() -> void:
 	_main_effect_upgrade_ids.clear()
 	_player_effect_upgrade_ids.clear()
 	_weapon_registry.clear()
+	_hud_icon_registry.clear()
 	clear_upgrade_effect_handlers()
 	clear_main_upgrade_effect_handlers()
 
@@ -54,6 +56,7 @@ static func get_registry_stats() -> Dictionary:
 		"upgrade_effect_handlers": _upgrade_effect_handlers.size(),
 		"main_upgrade_effect_handlers": _main_upgrade_effect_handlers.size(),
 		"weapon_entries": _weapon_registry.size(),
+		"hud_icons": _hud_icon_registry.size(),
 	}
 
 
@@ -338,6 +341,53 @@ static func get_weapon_entries() -> Array[Dictionary]:
 			continue
 		out.append((entry_variant as Dictionary).duplicate(true))
 	return out
+
+
+static func register_hud_icon(icon_id: String, icon: Variant, replace_existing: bool = true) -> bool:
+	var id := icon_id.strip_edges()
+	if id.is_empty():
+		_LogBridgeRef.warn("ModExtensionBridge reject hud icon with empty id.")
+		return false
+	var texture: Texture2D = null
+	if icon is Texture2D:
+		texture = icon as Texture2D
+	elif typeof(icon) == TYPE_STRING:
+		var path := str(icon).strip_edges()
+		if path.is_empty():
+			return false
+		var loaded := load(path)
+		if loaded is Texture2D:
+			texture = loaded as Texture2D
+	if texture == null:
+		_LogBridgeRef.warn("ModExtensionBridge reject hud icon %s: invalid icon resource." % id)
+		return false
+	if _hud_icon_registry.has(id) and not replace_existing:
+		return false
+	_hud_icon_registry[id] = texture
+	return true
+
+
+static func unregister_hud_icon(icon_id: String) -> bool:
+	var id := icon_id.strip_edges()
+	if id.is_empty() or not _hud_icon_registry.has(id):
+		return false
+	_hud_icon_registry.erase(id)
+	return true
+
+
+static func clear_hud_icons() -> int:
+	var removed := _hud_icon_registry.size()
+	_hud_icon_registry.clear()
+	return removed
+
+
+static func get_hud_icon(icon_id: String) -> Texture2D:
+	if not _hud_icon_registry.has(icon_id):
+		return null
+	var icon: Variant = _hud_icon_registry[icon_id]
+	if icon is Texture2D:
+		return icon as Texture2D
+	return null
 
 
 static func register_upgrade_alias(alias_id: String, target_id: String) -> void:
