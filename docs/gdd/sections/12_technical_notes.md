@@ -169,5 +169,15 @@
   - `planewar-upgrade-system`：升级系统
 - **扩展性**：未来可通过在 manifest 中添加 `"is_core": true` 字段来标记其他核心 Mod，保持向后兼容。
 
+### 开发规范
+
+- **Mod 功能扩展原则**：当需要实现 Mod 相关的功能变更（如核心 Mod 默认加载、锁定等）时，**不得**直接修改 `addons/mod_loader/` 下的插件代码。
+- **唯一修改点**：所有 Mod 管理功能应通过游戏内的 **Mod 管理器**（`scripts/ui/settings_ui.gd` 中的 `_refresh_mod_list` 与 `_on_mod_checkbox_toggled` 等）实现。
+- **理由**：
+  - 保持插件原样，便于未来升级 ModLoader 版本。
+  - 将游戏特定的逻辑与通用插件解耦。
+  - 通过 UI 层控制核心 Mod 的锁定状态，无需侵入插件内部。
+- **实现方式**：在 Mod 管理器中，通过检查 Mod 的 `namespace` 属性（可通过 `mod_data.manifest.mod_namespace` 获取）来识别核心 Mod，并强制将对应的复选框设为 `disabled` 与 `button_pressed = true`，同时提供适当的提示文本（如“核心功能，不可禁用”）。
+
 
 
