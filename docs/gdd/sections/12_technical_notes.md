@@ -157,3 +157,17 @@
   - 其相关事件/条目注册不会被注入
 - 切换并启用回 enabled 后，表现恢复为 ModLoader 正常加载。
 
+### 核心 Mod 与默认加载
+
+- **识别方式**：命名空间（namespace）为 `"planewar"` 的 Mod 被视为核心 Mod。
+- **默认加载**：核心 Mod 在游戏启动时自动加载，不受 `enable_mods` 选项影响。
+- **不可禁用**：核心 Mod 不能在游戏内被禁用，Mod 管理器中相关条目显示为锁定状态，禁用复选框不可用。
+- **加载逻辑**：ModLoader 在初始化时会确保核心 Mod 的 `is_active` 始终为 `true`，并从禁用列表中自动移除核心 Mod 的 ID。
+- **核心功能**：当前核心 Mod 包括：
+  - `planewar-weapon-system`：武器系统
+  - `planewar-enemy-system`：敌人系统
+  - `planewar-upgrade-system`：升级系统
+- **扩展性**：未来可通过在 manifest 中添加 `"is_core": true` 字段来标记其他核心 Mod，保持向后兼容。
+
+
+
