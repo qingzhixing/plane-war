@@ -311,19 +311,19 @@ func _handle_compatible_mod_loader_version(mod_id: String, godot_details: Dictio
 	return [string_value]
 
 
-# A valid namespace may only use letters (any case), numbers and underscores
+# A valid namespace/name may only use letters (any case), numbers, underscores, and hyphens
 # and has to be longer than 3 characters
-# a-z A-Z 0-9 _ (longer than 3 characters)
+# a-z A-Z 0-9 _ - (longer than 3 characters)
 func is_name_or_namespace_valid(check_name: String, is_silent := false) -> bool:
 	var re := RegEx.new()
-	var _compile_error_1 = re.compile("^[a-zA-Z0-9_]*$") # alphanumeric and _
+	var _compile_error_1 = re.compile("^[a-zA-Z0-9_-]*$") # alphanumeric, _, and -
 
 	if re.search(check_name) == null:
 		if not is_silent:
-			validation_messages_error.push_back("Invalid name or namespace: \"%s\". You may only use letters, numbers and underscores." % check_name)
+			validation_messages_error.push_back("Invalid name or namespace: \"%s\". You may only use letters, numbers, underscores, and hyphens." % check_name)
 		return false
 
-	var _compile_error_2 = re.compile("^[a-zA-Z0-9_]{3,}$") # at least 3 long
+	var _compile_error_2 = re.compile("^[a-zA-Z0-9_-]{3,}$") # at least 3 long
 	if re.search(check_name) == null:
 		if not is_silent:
 			validation_messages_error.push_back("Invalid name or namespace: \"%s\". Must be longer than 3 characters." % check_name)
