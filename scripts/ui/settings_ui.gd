@@ -293,11 +293,11 @@ func _refresh_mod_list() -> void:
 		var is_locked := bool(mod_data.is_locked)
 		
 		# Core mod detection: mods with namespace "planewar" are core
-		var is_core = false
-		var namespace = ""
+		var is_core := false
+		var ns := ""
 		if mod_data.manifest != null:
-			namespace = str(mod_data.manifest.mod_namespace)
-			if namespace == "planewar":
+			ns = str(mod_data.manifest.mod_namespace)
+			if ns == "planewar":
 				is_core = true
 				# Core mod: force lock and activate
 				is_locked = true
@@ -322,11 +322,11 @@ func _refresh_mod_list() -> void:
 		cb.button_pressed = is_active
 		cb.disabled = is_locked or not is_loadable
 		if is_core:
-			cb.hint_tooltip = "Core feature, cannot disable"
+			cb.tooltip_text = "Core feature, cannot disable"
 		elif is_locked:
-			cb.hint_tooltip = "This mod is locked, cannot toggle"
+			cb.tooltip_text = "This mod is locked, cannot toggle"
 		elif not is_loadable:
-			cb.hint_tooltip = "This mod cannot load (manifest/file error)"
+			cb.tooltip_text = "This mod cannot load (manifest/file error)"
 		row.add_child(cb)
 
 		cb.toggled.connect(_on_mod_checkbox_toggled.bind(mod_id, cb))
