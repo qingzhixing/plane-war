@@ -81,11 +81,12 @@
 - `unregister_upgrade_entry(upgrade_id)`
 - `clear_enemy_registry() / clear_weapon_registry() / clear_upgrade_registry()`
 - `get_registered_enemy_entries() / get_weapon_entries() / get_registered_upgrades()`
-- `mark_main_effect_upgrade(upgrade_id) / mark_player_effect_upgrade(upgrade_id)`
 - `unregister_event_handler(event_name, handler)`
 - `clear_event_handlers(event_name = "")`
 - `get_event_handler_count(event_name)`
 - `get_registry_stats()`
+
+`get_registry_stats().events` 表示“当前有处理器的事件名数量”，不是处理器总数。
 
 ---
 
@@ -93,7 +94,7 @@
 
 - **敌人生成**：`EnemySpawner` 已移除内建敌人硬编码，默认从 Bridge 注册表与事件结果决定最终敌人。
 - **主武器发射**：`Player` 在发射前后派发事件，并优先尝试按 Bridge `weapon entry` 生成发射请求。
-- **升级池合并**：`UpgradeCatalog` 直接消费 Bridge 已注册升级（无本地默认升级常量）。
+- **升级池合并**：`UpgradeService` 直接消费 Bridge 已注册升级（无本地默认升级常量）。
 - **升级效果执行**：主流程通过 `ModExtensionBridge` 统一升级入口分发（支持 player/main 的前后生命周期事件）。
 
 ---
@@ -109,7 +110,17 @@
 
 ---
 
-## 8. 验证与排障建议
+## 8. 回归验证建议
+
+建议每次改动后至少执行三组场景：
+
+1. **仅 builtin core mod**：禁用 `demo_mod-mod_api_demo`，确认核心战斗完整可玩。
+2. **builtin + demo mod**：启用 `demo_mod-mod_api_demo`，确认 demo 升级/附加发射生效。
+3. **重复 ID 冲突**：准备冲突测试 Mod，确认重复注册被拒绝并输出稳定告警。
+
+---
+
+## 9. 验证与排障建议
 
 1. 启动后查看 `ModLoader` 日志是否有：
    - mod 被发现

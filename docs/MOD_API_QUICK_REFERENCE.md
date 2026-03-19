@@ -1,4 +1,4 @@
-# Plane War Mod API 速查（一期 + 二期 + 三期）
+# Plane War Mod API 速查（当前实现）
 
 面向 Mod 作者的快速参考文档。  
 本页聚焦当前项目实际可用的扩展点：事件、注册接口、字段约束与最小模板。
@@ -145,7 +145,7 @@ func _handler(payload: Dictionary) -> Dictionary:
 
 ### 3.6 `collect_upgrade_entries`
 
-触发点：升级池收集阶段（`UpgradeCatalog.get_all_upgrades()` 内）。  
+触发点：升级池收集阶段（`UpgradeService.get_all_upgrades()` 内）。  
 输入字段：
 
 - `upgrades: Array[Dictionary]`
@@ -293,13 +293,13 @@ ModExtensionBridge.register_upgrade_alias("old_id", "new_id")
 
 ---
 
-### 4.5 武器条目注册（预留）
+### 4.5 武器条目注册（已接入）
 
 ```gdscript
 ModExtensionBridge.register_weapon_entry("my_weapon", {"id": "my_weapon"})
 ```
 
-当前核心战斗流程里尚未直接消费该注册表，可视为预留能力。
+当前玩家主武器流程会优先读取该注册表，未命中时再回退到默认发射逻辑。
 
 ---
 
