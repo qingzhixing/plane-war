@@ -2,15 +2,15 @@ extends RefCounted
 
 class_name UpgradePickService
 
-var _upgrade_catalog: UpgradeCatalog
+var _upgrade_service: UpgradeService
 
 
-func _init(upgrade_catalog: UpgradeCatalog) -> void:
-	_upgrade_catalog = upgrade_catalog
+func _init(upgrade_service: UpgradeService) -> void:
+	_upgrade_service = upgrade_service
 
 
 func build_pick_candidates(main: Node, player: Node) -> Array[Dictionary]:
-	var all_upgrades := _upgrade_catalog.get_all_upgrades()
+	var all_upgrades := _upgrade_service.get_all_upgrades()
 	var pool: Array[Dictionary] = []
 	var at_max_bullets := false
 	var bullet_count := 1
@@ -48,12 +48,12 @@ func choose_upgrades(pool: Array[Dictionary], pick_count: int = 3) -> Array[Dict
 	# 保证至少出现 1 张直接战斗收益词条，避免鸡肋三选
 	var has_combat_card := false
 	for c in chosen:
-		if _upgrade_catalog.is_direct_combat_upgrade(c["id"]):
+		if _upgrade_service.is_direct_combat_upgrade(c["id"]):
 			has_combat_card = true
 			break
 	if not has_combat_card:
 		for c in mutable_pool:
-			if _upgrade_catalog.is_direct_combat_upgrade(c["id"]):
+			if _upgrade_service.is_direct_combat_upgrade(c["id"]):
 				if chosen.is_empty():
 					chosen.append(c)
 				else:

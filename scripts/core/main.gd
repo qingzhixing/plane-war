@@ -81,7 +81,7 @@ var _debug_upgrades_needed: int = 0
 var _spell_cooldown_remaining: float = 0.0
 ## 符卡区短按检测
 var _spell_tap_start: Dictionary = {}
-var _upgrade_manager: UpgradeManager
+var _upgrade_service: UpgradeService
 var _battle_cfg = _BattleProgressionConfigRef.new()
 var _battle_stats_snapshot_service = _BattleStatsSnapshotServiceClass.new()
 var _battlefield_cleanup_service = _BattlefieldCleanupServiceClass.new()
@@ -99,7 +99,7 @@ func _ready() -> void:
 	_apply_battle_progression_config()
 
 	_spawner = get_node_or_null("EnemySpawner")
-	_upgrade_manager = UpgradeManager.new(self)
+	_upgrade_service = UpgradeService.new(self)
 	_game_stats = get_node_or_null("/root/GameStats")
 	var pbc := get_node_or_null("PostBossChoice")
 	if pbc != null and pbc.has_method("bind_main"):
@@ -238,8 +238,8 @@ func _on_level_up() -> void:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
-	if _upgrade_manager != null:
-		_upgrade_manager.apply_upgrade(upgrade_id)
+	if _upgrade_service != null:
+		_upgrade_service.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
 	_exp += amount

@@ -1,4 +1,4 @@
-# Plane War Mod API 速查（一期 + 二期 + 三期）
+# Plane War Mod API 速查（当前实现）
 
 面向 Mod 作者的快速参考文档。  
 本页聚焦当前项目实际可用的扩展点：事件、注册接口、字段约束与最小模板。
@@ -145,7 +145,7 @@ func _handler(payload: Dictionary) -> Dictionary:
 
 ### 3.6 `collect_upgrade_entries`
 
-触发点：升级池收集阶段（`UpgradeCatalog.get_all_upgrades()` 内）。  
+触发点：升级池收集阶段（`UpgradeService.get_all_upgrades()` 内）。  
 输入字段：
 
 - `upgrades: Array[Dictionary]`
@@ -230,7 +230,7 @@ func _handler(payload: Dictionary) -> Dictionary:
 ModExtensionBridge.register_enemy_entry(
     "my_enemy_id",
     {
-        "scene": preload("res://scenes/enemies/EnemyElite01.tscn"),
+        "scene": preload("res://mods-unpacked/planewar-enemy-system/scenes/enemies/EnemyElite01.tscn"),
         "weight": 1.0,
         "wave_min": 1,
         "extension_only": false,
@@ -293,13 +293,14 @@ ModExtensionBridge.register_upgrade_alias("old_id", "new_id")
 
 ---
 
-### 4.5 武器条目注册（预留）
+### 4.5 武器条目注册（已接入）
 
 ```gdscript
 ModExtensionBridge.register_weapon_entry("my_weapon", {"id": "my_weapon"})
 ```
 
-当前核心战斗流程里尚未直接消费该注册表，可视为预留能力。
+当前玩家主武器流程会优先读取该注册表，未命中时再回退到默认发射逻辑。
+此外，玩家的副武器（`arrow` / `bomb` / `boomerang`）在自动发射阶段也同样会优先读取该注册表的 `scene` 与生成参数来实例化子弹；未命中时才会回退到内建的默认发射实现。
 
 ---
 
@@ -357,6 +358,28 @@ ModExtensionBridge.clear_upgrade_registry()
 
 ---
 
+### 4.10 HUD 图标注册
+
+```gdscript
+ModExtensionBridge.register_hud_icon("weapon.main_gun", "res://mods-unpacked/my_mod/assets/ui/main_gun.png")
+ModExtensionBridge.register_hud_icon("weapon.arrow", preload("res://mods-unpacked/my_mod/assets/ui/arrow.png"))
+
+var tex := ModExtensionBridge.get_hud_icon("weapon.arrow")
+ModExtensionBridge.unregister_hud_icon("weapon.arrow")
+ModExtensionBridge.clear_hud_icons()
+```
+
+约定图标 ID（当前 HUD 会读取）：
+
+- `weapon.main_gun`
+- `weapon.arrow`
+- `weapon.boomerang`
+- `weapon.bomb`
+
+未注册图标时，HUD 自动回退主程序默认图标，不会导致加载失败。
+
+---
+
 ## 5. 最小可运行模板
 
 ```gdscript
@@ -382,7 +405,7 @@ func _before_main_shot(payload: Dictionary) -> Dictionary:
     var reqs: Array = out.get("spawn_requests", [])
     reqs.append(
         {
-            "scene": preload("res://scenes/bullets/PlayerArrow.tscn"),
+            "scene": preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerArrow.tscn"),
             "dir": Vector2(0.0, -1.0),
             "speed_mult": 1.1,
         }
@@ -408,3 +431,5 @@ func _apply_upgrade(player: Node, upgrade_id: String) -> bool:
 - 敌人条目缺少 `scene: PackedScene` 会被拒绝。
 - 升级条目缺少 `id/name/desc` 会被拒绝。
 - 只在导出版本安装 mod 时，本地 `mods` 来源按 zip 扫描。
+- 不要在主程序目录（`scripts/`、`scenes/`）写入 `mods-unpacked` 硬路径。
+- 不要在 mod 中引用其他 mod 目录（`res://mods-unpacked/<other_mod>/...`）。

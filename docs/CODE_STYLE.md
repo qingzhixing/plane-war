@@ -38,7 +38,7 @@
   - `scripts/enemies/`：敌人基类与具体敌人逻辑（如 `enemy_base.gd`, `enemy_spawner.gd`）。
   - `scripts/bullets/`：子弹与武器相关脚本（如 `player_bullet.gd`, `player_bomb.gd`）。
   - `scripts/ui/`：HUD 和通用 UI 组件脚本（如 `hud.gd`, `status_slot.gd`, `spell_star_button.gd`）。
-  - `scripts/systems/`：全局系统与服务（如 `audio_manager.gd`, `wave_manager.gd`, `upgrade_manager.gd`）。
+  - `scripts/systems/`：全局系统与服务（如 `audio_manager.gd`, `wave_manager.gd`, `upgrade_service.gd`）。
 
 ### 5. 代码风格细节
 

@@ -43,9 +43,9 @@
 ## 本轮新增资源接入约定（MVP）
 
 - 子弹贴图：
-  - 玩家子弹优先使用 `res://assets/sprites/bullets/bullet_player_basic.png`
+  - 玩家子弹优先使用 `res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/bullet_player_basic.png`
   - 符卡弹幕贴图：`res://assets/sprites/bullets/spell_bullet.png`（与主武器弹区分）
-  - 敌方基础子弹优先使用 `res://assets/sprites/bullets/bullet_enemy_basic.png`
+  - 敌方基础子弹优先使用 `res://mods-unpacked/planewar-core_mod/assets/sprites/bullets/bullet_enemy_basic.png`
   - 符卡/炸弹 UI 默认使用文字或独立单帧图，不直接使用多帧 sprite sheet
 - 玩家反馈音效：
   - 开火：`res://assets/SFX/player/Shoot.wav`

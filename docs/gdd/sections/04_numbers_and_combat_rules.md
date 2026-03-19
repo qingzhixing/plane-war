@@ -15,7 +15,7 @@
 
 - **基础子弹（主武器 1）**
   - 行为：直线向上飞行，不带追踪与穿透。
-  - 使用独立场景：`res://scenes/bullets/PlayerBullet.tscn`。
+  - 使用独立场景：`res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBullet.tscn`。
   - 主要用于前几波清理小怪，数值上偏稳定、泛用。
 - **弓箭（副武器，词条解锁）**
   - 首发瞄准最近敌大致方向后直线飞行；命中敌机后消失。

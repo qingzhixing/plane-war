@@ -6,7 +6,7 @@ const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 var _main: Node
 var _root: Control
 var _open: bool = false
-var _upgrade_catalog: UpgradeCatalog = UpgradeCatalog.new()
+var _upgrade_service: UpgradeService = UpgradeService.new()
 
 
 func _ready() -> void:
@@ -92,7 +92,7 @@ func _build_ui() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 
-	for u in _upgrade_catalog.get_all_upgrades():
+	for u in _upgrade_service.get_all_upgrades():
 		var id: String = u["id"]
 		var b := Button.new()
 		b.text = "%s — %s" % [u["name"], u["desc"]]

@@ -8,8 +8,8 @@ var _panel: ColorRect
 var _title: Label
 var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
 var _main: Node
-var _upgrade_catalog: UpgradeCatalog = UpgradeCatalog.new()
-var _pick_service = _UpgradePickServiceClass.new(_upgrade_catalog)
+var _upgrade_service: UpgradeService = UpgradeService.new()
+var _pick_service = _UpgradePickServiceClass.new(_upgrade_service)
 
 const CARD_WIDTH: float = 280.0
 const CARD_HEIGHT: float = 140.0
