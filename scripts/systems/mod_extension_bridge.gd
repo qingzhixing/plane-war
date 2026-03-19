@@ -368,78 +368,12 @@ static func resolve_upgrade_alias(upgrade_id: String) -> String:
 	return upgrade_id
 
 
-static func mark_direct_combat_upgrade(upgrade_id: String) -> void:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty():
-		return
-	_direct_combat_upgrade_ids[id] = true
-
-
-static func unmark_direct_combat_upgrade(upgrade_id: String) -> bool:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty() or not _direct_combat_upgrade_ids.has(id):
-		return false
-	_direct_combat_upgrade_ids.erase(id)
-	return true
-
-
-static func get_direct_combat_upgrade_ids() -> Array[String]:
-	var out: Array[String] = []
-	for key in _direct_combat_upgrade_ids.keys():
-		out.append(str(key))
-	return out
-
-
 static func is_direct_combat_upgrade(upgrade_id: String) -> bool:
 	return _direct_combat_upgrade_ids.has(upgrade_id)
 
 
-static func mark_main_effect_upgrade(upgrade_id: String) -> void:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty():
-		return
-	_main_effect_upgrade_ids[id] = true
-
-
-static func unmark_main_effect_upgrade(upgrade_id: String) -> bool:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty() or not _main_effect_upgrade_ids.has(id):
-		return false
-	_main_effect_upgrade_ids.erase(id)
-	return true
-
-
-static func get_main_effect_upgrade_ids() -> Array[String]:
-	var out: Array[String] = []
-	for key in _main_effect_upgrade_ids.keys():
-		out.append(str(key))
-	return out
-
-
 static func is_main_effect_upgrade(upgrade_id: String) -> bool:
 	return _main_effect_upgrade_ids.has(upgrade_id)
-
-
-static func mark_player_effect_upgrade(upgrade_id: String) -> void:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty():
-		return
-	_player_effect_upgrade_ids[id] = true
-
-
-static func unmark_player_effect_upgrade(upgrade_id: String) -> bool:
-	var id := upgrade_id.strip_edges()
-	if id.is_empty() or not _player_effect_upgrade_ids.has(id):
-		return false
-	_player_effect_upgrade_ids.erase(id)
-	return true
-
-
-static func get_player_effect_upgrade_ids() -> Array[String]:
-	var out: Array[String] = []
-	for key in _player_effect_upgrade_ids.keys():
-		out.append(str(key))
-	return out
 
 
 static func is_player_effect_upgrade(upgrade_id: String) -> bool:
