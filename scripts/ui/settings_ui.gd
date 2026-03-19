@@ -292,14 +292,14 @@ func _refresh_mod_list() -> void:
 		var is_loadable := bool(mod_data.is_loadable)
 		var is_locked := bool(mod_data.is_locked)
 		
-		# 核心 Mod 检测：命名空间为 "planewar" 的 Mod 视为核心 Mod
-		var is_core := false
-		var namespace := ""
+		# Core mod detection: mods with namespace "planewar" are core
+		var is_core = false
+		var namespace = ""
 		if mod_data.manifest != null:
 			namespace = str(mod_data.manifest.mod_namespace)
 			if namespace == "planewar":
 				is_core = true
-				# 核心 Mod 强制锁定且激活
+				# Core mod: force lock and activate
 				is_locked = true
 				is_active = true
 
@@ -322,11 +322,11 @@ func _refresh_mod_list() -> void:
 		cb.button_pressed = is_active
 		cb.disabled = is_locked or not is_loadable
 		if is_core:
-			cb.hint_tooltip = "核心功能，不可禁用"
+			cb.hint_tooltip = "Core feature, cannot disable"
 		elif is_locked:
-			cb.hint_tooltip = "此 Mod 被锁定，无法切换"
+			cb.hint_tooltip = "This mod is locked, cannot toggle"
 		elif not is_loadable:
-			cb.hint_tooltip = "此 Mod 无法加载（manifest/文件错误）"
+			cb.hint_tooltip = "This mod cannot load (manifest/file error)"
 		row.add_child(cb)
 
 		cb.toggled.connect(_on_mod_checkbox_toggled.bind(mod_id, cb))
@@ -340,11 +340,11 @@ func _on_mod_checkbox_toggled(enabled: bool, mod_id: String, cb: CheckBox) -> vo
 	if ModLoader == null:
 		return
 	
-	# 核心 Mod 保护：命名空间为 "planewar" 的 Mod 不可被禁用
+	# Core mod protection: mods with namespace "planewar" cannot be disabled
 	if mod_id.begins_with("planewar-"):
-		# 恢复为激活状态
+		# Restore to active state
 		cb.button_pressed = true
-		# 可选：给出提示（如播放音效或显示临时文本）
+		# Option: give hint (e.g., play sound or show temporary text)
 		return
 
 	var ok := false
