@@ -127,3 +127,33 @@
 - 加载 builtin + external mod：可在不改主工程分支下新增敌人/武器行为/升级并实战生效。
 - 冲突场景（重复 ID）：行为可预期（拒绝 + 告警），且无启动/运行崩溃。
 
+---
+
+## Mod 管理（游戏内禁用）
+
+### 目标
+- 在游戏内提供“Mod 管理器”，允许玩家对已安装的 Mod 进行启用/禁用。
+- 禁用后的 Mod 在“下次游戏启动”不再生效；当前会话默认提示重启生效（避免运行期卸载导致的状态残留）。
+
+### 实现方式
+- UI 层通过 ModLoader 提供的用户配置 API 修改启用状态：
+  - `ModLoaderUserProfile.disable_mod(mod_id)`
+  - `ModLoaderUserProfile.enable_mod(mod_id)`
+- 修改结果持久化到 `user://mod_user_profiles.json`。
+
+### UI 行为
+- 在设置界面新增一个 Mod 列表区：
+  - 显示 mod_id / mod manifest 的 `name`
+  - 提供勾选框表示当前启用状态
+  - 对 `is_locked`（锁定）或 `!is_loadable`（无法加载）条目显示不可用状态
+- 当玩家切换启用/禁用：
+  - UI 立即反映勾选框状态（以当前内存 ModLoaderStore 为准）
+  - 同屏给出“需要重启生效”的提示
+  - 提供“立即重启”按钮：调用 `OS.set_restart_on_exit(true)` 后退出
+
+### 验收标准（Mod 管理）
+- 切换某个 Mod 为 disabled 后，关闭游戏并重新启动：
+  - 该 Mod 不会再初始化（不再执行其 `mod_main.gd`）
+  - 其相关事件/条目注册不会被注入
+- 切换并启用回 enabled 后，表现恢复为 ModLoader 正常加载。
+
