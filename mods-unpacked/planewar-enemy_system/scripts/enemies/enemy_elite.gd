@@ -22,7 +22,7 @@ var _hit_flash_timer: float = 0.0
 var _hit_material: ShaderMaterial
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
-@onready var _fallback_bullet_scene: PackedScene = preload("res://mods-unpacked/planewar-enemy-system/scenes/bullets/EnemyBasicBullet.tscn")
+@onready var _fallback_bullet_scene: PackedScene = preload("res://mods-unpacked/planewar-enemy_system/scenes/bullets/EnemyBasicBullet.tscn")
 
 func _ready() -> void:
 	_hp = max_hp
@@ -112,7 +112,7 @@ func _init_hit_material() -> void:
 		return
 	var mat: Material = _sprite.material
 	if mat == null or not (mat is ShaderMaterial):
-		var shader_res := load("res://mods-unpacked/planewar-enemy-system/shaders/enemy_hit.gdshader")
+		var shader_res := load("res://mods-unpacked/planewar-enemy_system/shaders/enemy_hit.gdshader")
 		if shader_res == null:
 			return
 		var new_mat := ShaderMaterial.new()

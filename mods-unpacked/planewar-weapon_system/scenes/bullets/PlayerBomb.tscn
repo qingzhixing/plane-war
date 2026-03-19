@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dnccqe6etmx3l"]
 
 [ext_resource type="Script" path="res://mods-unpacked/planewar-weapon_system/scripts/bullets/PlayerBomb.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/Bomb.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Bomb.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="1_shape"]
 radius = 5.7142854

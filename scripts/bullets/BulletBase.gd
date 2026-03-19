@@ -76,4 +76,3 @@ func _spawn_hit_vfx(_area: Node) -> void:
 	if tree == null or tree.current_scene == null:
 		return
 	tree.current_scene.add_child(vfx2d)
-

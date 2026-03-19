@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dyr2asbsbh0sp"]
 
 [ext_resource type="Script" path="res://mods-unpacked/planewar-weapon_system/scripts/bullets/PlayerBoomerang.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon-system/assets/sprites/bullets/Sickle.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-weapon_system/assets/sprites/bullets/Sickle.png" id="2_tex"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_t2844"]
 radius = 13.333333

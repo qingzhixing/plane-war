@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://26wp3qfsbfo7"]
 
 [ext_resource type="Script" path="res://mods-unpacked/planewar-enemy_system/scripts/enemies/enemy_turret.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-enemy-system/assets/sprites/enemies/enemy_basic_02.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://mods-unpacked/planewar-enemy_system/assets/sprites/enemies/enemy_basic_02.png" id="2_tex"]
 
 [node name="EnemyBasic02_Turret" type="Area2D"]
 scale = Vector2(0.7, 0.7)
