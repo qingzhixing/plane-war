@@ -230,7 +230,7 @@ func _handler(payload: Dictionary) -> Dictionary:
 ModExtensionBridge.register_enemy_entry(
     "my_enemy_id",
     {
-        "scene": preload("res://mods-unpacked/planewar-core_mod/scenes/enemies/EnemyElite01.tscn"),
+        "scene": preload("res://mods-unpacked/planewar-enemy_system/scenes/enemies/EnemyElite01.tscn"),
         "weight": 1.0,
         "wave_min": 1,
         "extension_only": false,
@@ -383,7 +383,7 @@ func _before_main_shot(payload: Dictionary) -> Dictionary:
     var reqs: Array = out.get("spawn_requests", [])
     reqs.append(
         {
-            "scene": preload("res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn"),
+            "scene": preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerArrow.tscn"),
             "dir": Vector2(0.0, -1.0),
             "speed_mult": 1.1,
         }

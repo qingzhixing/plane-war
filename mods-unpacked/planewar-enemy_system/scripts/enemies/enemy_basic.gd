@@ -84,7 +84,7 @@ func _init_hit_material() -> void:
 		return
 	var mat: Material = _sprite.material
 	if mat == null or not (mat is ShaderMaterial):
-		var shader_res := load("res://mods-unpacked/planewar-core_mod/shaders/enemy_hit.gdshader")
+		var shader_res := load("res://mods-unpacked/planewar-enemy_system/shaders/enemy_hit.gdshader")
 		if shader_res == null:
 			return
 		var new_mat := ShaderMaterial.new()
