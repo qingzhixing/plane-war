@@ -1,0 +1,14 @@
+{
+  "name": "Upgrade System",
+  "version": "1.0.0",
+  "author": "Plane War Team",
+  "description": "Core upgrade system including configuration, logic and effects",
+  "mod_id": "planewar.upgrade_system",
+  "dependencies": [],
+  "extra": {
+    "godot": {
+      "min_version": "4.2",
+      "max_version": "4.2"
+    }
+  }
+}

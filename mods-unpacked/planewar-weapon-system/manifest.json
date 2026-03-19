@@ -1,0 +1,14 @@
+{
+  "name": "Weapon System",
+  "version": "1.0.0",
+  "author": "Plane War Team",
+  "description": "Core weapon system including configuration, logic and related resources",
+  "mod_id": "planewar.weapon_system",
+  "dependencies": [],
+  "extra": {
+    "godot": {
+      "min_version": "4.2",
+      "max_version": "4.2"
+    }
+  }
+}

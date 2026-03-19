@@ -1,0 +1,14 @@
+{
+  "name": "Enemy System",
+  "version": "1.0.0",
+  "author": "Plane War Team",
+  "description": "Core enemy system including configuration, spawn rules and related resources",
+  "mod_id": "planewar.enemy_system",
+  "dependencies": [],
+  "extra": {
+    "godot": {
+      "min_version": "4.2",
+      "max_version": "4.2"
+    }
+  }
+}
