@@ -81,126 +81,48 @@
 
 > 后续实现脚本时，应优先遵循上述结构；如需结构调整，请先在本节更新约定，再进行实现变更。
 
-## Mod API（一期：Hook 优先）
+## Mod API（当前实现）
 
 ### 目标
 
-- 在不破坏现有战斗流程的前提下，为 Mod 提供稳定扩展点：敌人生成、武器行为、升级池。
-- 一期保持“原逻辑可独立运行”，Mod 仅作为增量注入，失败时不应导致对局中断。
+- 当前核心战斗内容由 `builtin core mod` 提供（`mods-unpacked/planewar-core_mod`），主工程负责流程壳与调度。
+- 扩展入口统一通过 `ModExtensionBridge`，确保敌人、武器、升级的注册与生命周期一致。
 
 ### 生命周期与入口
 
-- Mod 通过 Godot Mod Loader 加载后，可调用游戏侧扩展桥接口（`ModExtensionBridge`）。
-- 游戏关键节点在运行时向扩展桥抛出事件负载（payload），Mod 可读写约定字段并返回结果。
-- 同一事件允许多个 Mod 参与，按 Mod Loader 的加载顺序执行。
+- Mod 由 Godot Mod Loader 加载后，在 `mod_main.gd` 中调用 Bridge 接口注册事件/条目/处理器。
+- 运行期由主流程派发事件 payload；Mod 可返回字典覆写字段。
+- 同一事件允许多个 Mod 参与，按加载顺序执行。
 
-### 事件约定（一期）
+### 事件约定（当前）
 
 - 敌人生成：
-  - `before_enemy_select`：输入 `wave/threat_tier/extension_index`，可建议 `scene` 或 `enemy_id`。
-  - `after_enemy_select`：输入主流程已选结果，Mod 可替换或取消本次生成。
+  - `before_enemy_select` 与 `after_enemy_select` 字段：`wave`、`effective_wave`、`threat_tier`、`extension_index`、`enemy_id`、`scene`、`cancel_spawn`。
+  - 可改写 `scene` / `enemy_id`，或设置 `cancel_spawn=true` 取消本次生成。
 - 武器流程：
-  - `before_main_shot`：可修改本次主武器发射参数，或附加额外发射请求。
-  - `after_main_shot`：用于特效、追踪统计、触发后处理。
-  - `process_mod_weapons`：每帧（或固定节奏）驱动 Mod 自定义副武器逻辑。
+  - `before_main_shot`：可改写发射模式、取消默认发射、附加 `spawn_requests`。
+  - `after_main_shot`：用于统计与后处理。
+  - `process_mod_weapons`：每帧驱动 Mod 副武器。
 - 升级流程：
-  - `collect_upgrade_entries`：注入可进入三选一的升级条目（`id/name/desc`）。
-  - `apply_upgrade_effect`：当内建逻辑未命中时，尝试交由 Mod 执行升级效果。
+  - `collect_upgrade_entries`：注入升级候选（最低字段 `id/name/desc`）。
+  - `before_apply_upgrade` / `after_apply_upgrade`：玩家升级生命周期。
+  - `before_apply_main_upgrade` / `after_apply_main_upgrade`：Main 侧升级生命周期。
 
 ### 数据与安全约束
 
-- 注册类数据（如敌人、升级）必须具备唯一 `id`；重复 `id` 采用“拒绝并告警”策略。
-- 资源路径无效、字段缺失、类型错误时，跳过该条目并记录日志。
-- Mod 抛错隔离：单个 Mod 回调异常只影响该回调，不影响主流程和其他 Mod。
+- 注册类数据（敌人/武器/升级）必须唯一 `id`；重复 ID 默认拒绝并告警。
+- 关键字段缺失或类型错误时，跳过条目并记录日志。
+- Mod 回调异常隔离：单个回调失败不应阻断主流程。
 
-### 验收标准（一期）
+### 已完成收敛项
 
-- 无 Mod：敌人波次、武器节奏、三选一升级行为与当前版本一致。
-- 有 Mod：
-  - 可注入至少 1 个敌人并在实战中生成；
-  - 可注入至少 1 个升级词条并在三选一出现且可生效；
-  - 可通过武器事件在不改原分支的情况下附加 1 次发射行为。
+- 过渡壳 `PlayerUpgradeEffectsService` 与 `MainUpgradeEffectsService` 已移除。
+- 升级应用生命周期统一走 Bridge。
+- 内置核心 Mod 使用自身配置目录，不依赖 `scripts/config`。
 
-### 二期扩展（Bridge 管理与升级生命周期）
+### 验收标准（当前）
 
-- 在一期能力基础上，补充 Bridge 级别的“可管理性”与“升级生命周期事件”：
-  - 事件处理器管理：支持按事件移除单个 handler、清空指定事件 handler、统计事件 handler 数量。
-  - 升级生命周期事件：
-    - `before_apply_upgrade`：在升级效果应用前触发，可改写 `upgrade_id` 或取消本次应用；
-    - `after_apply_upgrade`：在升级处理结束后触发，用于统计、日志、附加后处理。
-
-#### 二期事件约定
-
-- `before_apply_upgrade` 输入字段：
-  - `player`
-  - `upgrade_id`
-  - `cancel`（默认 `false`）
-- `before_apply_upgrade` 可写字段：
-  - `upgrade_id`：允许重定向到其他升级 ID
-  - `cancel`：置 `true` 直接取消本次升级应用
-- `after_apply_upgrade` 输入字段：
-  - `player`
-  - `original_upgrade_id`
-  - `resolved_upgrade_id`
-  - `applied`（是否成功应用）
-  - `cancelled`（是否在 before 阶段被取消）
-
-#### 二期验收标准
-
-- 能通过 API 对指定事件完成 handler 注册、移除、清空，并返回可预期结果。
-- Mod 可在 `before_apply_upgrade` 中改写升级 ID，且主流程按改写结果执行。
-- Mod 可在 `before_apply_upgrade` 中取消升级，且不会触发内建或 Mod 升级效果。
-- `after_apply_upgrade` 在“成功应用 / 未命中 / 被取消”三种场景都能收到准确状态字段。
-
-### 三期目标（纯 Mod 驱动核心）
-
-- 目标：武器、敌人、升级的“内容定义与效果实现”全部由 Mod 提供，主工程仅保留战斗流程壳与调度能力。
-- 迁移方式：一次性切换（big-bang），并将当前内置内容封装为 `builtin core mod`。
-
-#### 三期架构约束
-
-- 主工程保留：
-  - 战斗主循环与波次时序；
-  - 玩家、敌人实例化时机与生命周期管理；
-  - UI 展示与结算框架；
-  - Mod Bridge 注册、校验、分发机制。
-- 主工程移除：
-  - 具体武器/敌人/升级条目与数值硬编码；
-  - 具体升级效果实现分支（改为由 Bridge 调用 Mod 处理器）。
-- 内容来源：
-  - `builtin core mod`（项目内默认提供）负责注册当前基线内容；
-  - 外部 Mod 在此基础上新增或覆盖。
-
-#### 冲突与覆盖策略（三期）
-
-- `id` 唯一：同一注册表内（武器/敌人/升级）默认拒绝重复 ID，并输出告警。
-- 覆盖策略：若需要覆盖，必须显式走“卸载旧条目 + 注册新条目”或专用覆盖接口（后续统一）。
-- 缺失回退：关键内容缺失时，主流程不得崩溃；应记录日志并跳过该条目。
-
-#### 三期验收标准
-
-- 无外部 Mod 时，仅依赖 `builtin core mod` 即可完整进行一局战斗（刷怪、射击、升级、生效、结算）。
-- 外部 Mod 可独立新增至少 1 个敌人、1 个武器行为、1 个升级并在实战生效。
-- 混合加载（builtin + external）时不出现重复 ID 导致的崩溃，冲突有可读日志。
-
-### 三期收敛（去适配壳重构）
-
-- 目标：在三期纯 Mod 驱动基础上，进一步移除主工程中的“过渡适配壳”，把升级应用生命周期统一收敛到 Bridge。
-
-#### 收敛范围
-
-- 删除/下线过渡适配层：
-  - `PlayerUpgradeEffectsService`
-  - `MainUpgradeEffectsService`
-- 主流程改造：
-  - `UpgradeManager` 直接调用 Bridge 的统一升级应用入口。
-  - `Player.apply_upgrade` 直接调用 Bridge 的统一升级应用入口。
-- 配置归属收敛：
-  - 内置核心 Mod 使用自身目录配置（`mods-unpacked/planewar-core_mod`），不再依赖主工程 `scripts/config`。
-
-#### 三期收敛验收标准
-
-- 主工程中不再依赖玩家/主场景升级适配服务壳。
-- 升级应用前后事件（player/main）都由 Bridge 统一触发并返回一致字段。
-- 内置核心 Mod 在不读取 `scripts/config` 的前提下，仍可完整复现基线战斗内容。
+- 仅加载 builtin core mod：可完整进行战斗（刷怪、射击、升级、生效、结算）。
+- 加载 builtin + external mod：可在不改主工程分支下新增敌人/武器行为/升级并实战生效。
+- 冲突场景（重复 ID）：行为可预期（拒绝 + 告警），且无启动/运行崩溃。
 
