@@ -47,10 +47,10 @@ var _arrow_shot_count: int = 0
 var _boomerang_airborne: int = 0
 var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
-@onready var _fallback_bullet_scene_basic: PackedScene = preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBullet.tscn")
-@onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerArrow.tscn")
-@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBoomerang.tscn")
-@onready var _fallback_bullet_scene_bomb: PackedScene = preload("res://mods-unpacked/planewar-weapon-system/scenes/bullets/PlayerBomb.tscn")
+@onready var _fallback_bullet_scene_basic: PackedScene = preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBullet.tscn")
+@onready var _fallback_bullet_scene_arrow: PackedScene = preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerArrow.tscn")
+@onready var _fallback_bullet_scene_boomerang: PackedScene = preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBoomerang.tscn")
+@onready var _fallback_bullet_scene_bomb: PackedScene = preload("res://mods-unpacked/planewar-weapon_system/scenes/bullets/PlayerBomb.tscn")
 @onready var _sprite: Node2D = get_node_or_null("Sprite2D")
 
 const _HIT_BLINK_FREQ := 20.0

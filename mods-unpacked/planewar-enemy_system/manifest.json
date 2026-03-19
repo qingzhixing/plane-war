@@ -3,11 +3,19 @@
   "namespace": "planewar",
   "version_number": "1.0.0",
   "website_url": "https://plane-war.example.com",
-  "author": "Plane War Team",
   "description": "Core enemy system including configuration, spawn rules and related resources",
   "dependencies": [],
   "extra": {
     "godot": {
+      "authors": [
+        "Plane War Team"
+      ],
+      "compatible_mod_loader_version": [
+        "999.999.999"
+      ],
+      "compatible_game_version": [
+        "999.999.999"
+      ],
       "min_version": "4.2",
       "max_version": "4.2"
     }
