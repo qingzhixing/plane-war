@@ -277,8 +277,10 @@ func _refresh_mod_list() -> void:
 	if _mods_restart_button != null:
 		_mods_restart_button.visible = false
 
-	var mods_all: Dictionary = ModLoader.get_mod_data_all()
-	var mod_ids: Array[String] = mods_all.keys()
+	var mods_all: Dictionary = ModLoaderMod.get_mod_data_all()
+	var mod_ids: Array[String] = []
+	for k in mods_all.keys():
+		mod_ids.append(str(k))
 	mod_ids.sort()
 
 	for mod_id in mod_ids:
@@ -333,7 +335,7 @@ func _on_mod_checkbox_toggled(enabled: bool, mod_id: String, cb: CheckBox) -> vo
 
 	if not ok:
 		# 失败时回滚 UI 状态
-		var mod_data: ModData = ModLoader.get_mod_data(mod_id)
+		var mod_data: ModData = ModLoaderMod.get_mod_data(mod_id)
 		cb.button_pressed = mod_data != null and bool(mod_data.is_active)
 		return
 
