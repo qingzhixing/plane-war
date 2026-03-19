@@ -34,15 +34,15 @@
   - 节点类型：`CharacterBody2D`
   - 脚本：`res://scripts/player/player.gd`
 - 子弹：
-  - 基类脚本：`res://scripts/bullets/BulletBase.gd`（提供 `damage/speed/direction` 等通用属性与基础移动逻辑）。
-  - 玩家基础子弹：场景 `res://scenes/bullets/PlayerBullet.tscn`，脚本 `res://scripts/bullets/PlayerBullet.gd`（直线向上、不穿透）。
-  - 玩家弓箭子弹：场景 `res://scenes/bullets/PlayerArrow.tscn`，脚本 `res://scripts/bullets/PlayerArrow.gd`。
+  - core_mod 子弹实现：`res://mods-unpacked/planewar-core_mod/scenes/bullets/` 与 `res://mods-unpacked/planewar-core_mod/scripts/bullets/`。
+  - 玩家基础子弹：`res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerBullet.tscn`。
+  - 玩家弓箭子弹：`res://mods-unpacked/planewar-core_mod/scenes/bullets/PlayerArrow.tscn`。
   - 玩家回旋镖：`PlayerBoomerang` **重写 `area_entered`**，命中只伤不 `queue_free`；`boomerang_multi` 解锁与齐射 +1。
   - 符卡爆发弹幕：`PlayerSpellBullet.tscn`（遇 `enemy_bullet` 只清该弹、不全场清弹）；主武器仍 `PlayerBullet.tscn`。
   - **弓箭**：`_on_area_entered` 遇 `enemy_bullet` 只清弹；炸弹仅爆炸 AoE 清弹；炸弹弹速倍率高于旧版。
 - 敌人：
   - 基类脚本：`res://scripts/enemies/EnemyBase.gd`（提供 `max_hp/hp` 与 `apply_damage/_on_dead` 等统一接口）。
-  - 基础敌人场景可继续使用如 `res://scenes/enemies/EnemyBasic01.tscn`、`EnemyBasic02.tscn` 等，脚本统一继承 `EnemyBase` 来实现各自的移动与攻击逻辑。
+  - core_mod 敌人场景：`res://mods-unpacked/planewar-core_mod/scenes/enemies/`（如 `EnemyBasic01.tscn`、`EnemyBasic02_Turret.tscn`、`EnemyElite01.tscn`）。
 
 ## 视觉反馈与 Shader 约定
 

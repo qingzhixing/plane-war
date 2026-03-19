@@ -103,6 +103,7 @@
 
 - 内置核心内容包：`mods-unpacked/planewar-core_mod`
   - 注册基线敌人、武器条目、升级条目、别名、主/玩家升级效果处理器。
+  - 子弹/敌人等核心内容场景与脚本放在 core mod 目录内，不再依赖主工程同类实现路径。
   - 使用自身配置文件（`config/upgrade_effects.json`、`config/enemy_spawn_config.json`），不依赖 `scripts/config`。
   - 作为“无外部 Mod”时的默认内容来源。
 - 示例扩展包：`mods-unpacked/demo_mod-mod_api_demo`
