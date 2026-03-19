@@ -300,6 +300,7 @@ ModExtensionBridge.register_weapon_entry("my_weapon", {"id": "my_weapon"})
 ```
 
 当前玩家主武器流程会优先读取该注册表，未命中时再回退到默认发射逻辑。
+此外，玩家的副武器（`arrow` / `bomb` / `boomerang`）在自动发射阶段也同样会优先读取该注册表的 `scene` 与生成参数来实例化子弹；未命中时才会回退到内建的默认发射实现。
 
 ---
 
