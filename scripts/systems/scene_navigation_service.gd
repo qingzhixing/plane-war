@@ -4,6 +4,7 @@ class_name SceneNavigationService
 
 const MAIN_MENU_SCENE_PATH := "res://scenes/MainMenu.tscn"
 const GAME_SCENE_PATH := "res://scenes/Main.tscn"
+const MOD_MANAGER_SCENE_PATH := "res://scenes/ModManager.tscn"
 
 
 static func goto_main_menu(tree: SceneTree) -> void:
@@ -12,6 +13,10 @@ static func goto_main_menu(tree: SceneTree) -> void:
 
 static func goto_game(tree: SceneTree) -> void:
 	_goto_scene(tree, &"goto_game", GAME_SCENE_PATH)
+
+
+static func goto_mod_manager(tree: SceneTree) -> void:
+	_goto_scene(tree, &"goto_mod_manager", MOD_MANAGER_SCENE_PATH)
 
 
 static func _goto_scene(tree: SceneTree, scene_manager_method: StringName, fallback_scene_path: String) -> void:

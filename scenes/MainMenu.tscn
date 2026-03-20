@@ -98,6 +98,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "设置"
 
+[node name="ModManagerButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 72)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Mod 管理"
+
 [node name="AboutButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=719437131]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 72)
@@ -327,6 +334,7 @@ text = "返回"
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/StartButton" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/RecordsButton" to="." method="_on_records_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/SettingsButton" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/ModManagerButton" to="." method="_on_mod_manager_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/AboutButton" to="." method="_on_about_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/QuitButton" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="RecordsQueryUI/Center/Panel/Margin/VBox/CloseRecordsButton" to="RecordsQueryUI" method="_on_close_pressed"]

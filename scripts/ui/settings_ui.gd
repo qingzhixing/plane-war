@@ -16,15 +16,10 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 @onready var _skip_boss_button: Button = %SkipBossButton
 @onready var _debug_upgrades_button: Button = %DebugUpgradesButton
 @onready var _debug_combo_row: HBoxContainer = %DebugComboRow
-@onready var _mods_vbox: VBoxContainer = %ModsVBox
-@onready var _mods_restart_hint: Label = %ModsRestartHint
-@onready var _mods_restart_button: Button = %ModsRestartButton
 
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 var _syncing_audio_ui: bool = false
-var _syncing_mods_ui: bool = false
-var _mods_needs_restart: bool = false
 
 
 func _ready() -> void:
@@ -42,7 +37,6 @@ func _ready() -> void:
 	_end_run_button.pressed.connect(_on_end_run_pressed)
 	_skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
 	_debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
-	_mods_restart_button.pressed.connect(_on_mod_restart_pressed)
 	_bgm_slider.value_changed.connect(_on_bgm_slider_changed)
 	_sfx_slider.value_changed.connect(_on_sfx_slider_changed)
 	_bgm_mute_check.toggled.connect(_on_bgm_mute_toggled)
@@ -79,7 +73,6 @@ func show_settings() -> void:
 	get_tree().paused = true
 	_apply_run_only_buttons_visibility(true)
 	_sync_audio_controls_from_manager()
-	_refresh_mod_list()
 	open_panel()
 
 
@@ -87,118 +80,7 @@ func show_settings_from_menu() -> void:
 	_is_from_menu = true
 	_apply_run_only_buttons_visibility(false)
 	_sync_audio_controls_from_manager()
-	_refresh_mod_list()
 	open_panel()
-
-
-func _refresh_mod_list() -> void:
-	if _mods_vbox == null:
-		return
-	if ModLoader == null:
-		return
-
-	_syncing_mods_ui = true
-	for c in _mods_vbox.get_children():
-		c.queue_free()
-
-	_mods_needs_restart = false
-	if _mods_restart_hint != null:
-		_mods_restart_hint.visible = false
-	if _mods_restart_button != null:
-		_mods_restart_button.visible = false
-
-	var mods_all: Dictionary = ModLoaderMod.get_mod_data_all()
-	var mod_ids: Array[String] = []
-	for k in mods_all.keys():
-		mod_ids.append(str(k))
-	mod_ids.sort()
-
-	for mod_id in mod_ids:
-		var mod_data: ModData = mods_all.get(mod_id, null)
-		if mod_data == null:
-			continue
-
-		var is_active := bool(mod_data.is_active)
-		var is_loadable := bool(mod_data.is_loadable)
-		var is_locked := bool(mod_data.is_locked)
-		
-		# Core mod detection: mods with namespace "planewar" are core
-		var is_core := false
-		var ns := ""
-		if mod_data.manifest != null:
-			ns = str(mod_data.manifest.mod_namespace)
-			if ns == "planewar":
-				is_core = true
-				# Core mod: force lock and activate
-				is_locked = true
-				is_active = true
-
-		var row := HBoxContainer.new()
-		row.mouse_filter = Control.MOUSE_FILTER_STOP
-		row.add_theme_constant_override("separation", 12)
-		_mods_vbox.add_child(row)
-
-		var mod_name := ""
-		if mod_data.manifest != null:
-			# manifest.name 是人类可读名称（namespace-name 的 mod_id 另可用于定位）
-			mod_name = str(mod_data.manifest.name)
-
-		var label := Label.new()
-		label.text = mod_id if mod_name.is_empty() else "%s (%s)" % [mod_name, mod_id]
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-
-		var cb := CheckBox.new()
-		cb.button_pressed = is_active
-		cb.disabled = is_locked or not is_loadable
-		if is_core:
-			cb.tooltip_text = "Core feature, cannot disable"
-		elif is_locked:
-			cb.tooltip_text = "This mod is locked, cannot toggle"
-		elif not is_loadable:
-			cb.tooltip_text = "This mod cannot load (manifest/file error)"
-		row.add_child(cb)
-
-		cb.toggled.connect(_on_mod_checkbox_toggled.bind(mod_id, cb))
-
-	_syncing_mods_ui = false
-
-
-func _on_mod_checkbox_toggled(enabled: bool, mod_id: String, cb: CheckBox) -> void:
-	if _syncing_mods_ui:
-		return
-	if ModLoader == null:
-		return
-	
-	# Core mod protection: mods with namespace "planewar" cannot be disabled
-	if mod_id.begins_with("planewar-"):
-		# Restore to active state
-		cb.button_pressed = true
-		# Option: give hint (e.g., play sound or show temporary text)
-		return
-
-	var ok := false
-	if enabled:
-		ok = ModLoaderUserProfile.enable_mod(mod_id)
-	else:
-		ok = ModLoaderUserProfile.disable_mod(mod_id)
-
-	if not ok:
-		# 失败时回滚 UI 状态
-		var mod_data: ModData = ModLoaderMod.get_mod_data(mod_id)
-		cb.button_pressed = mod_data != null and bool(mod_data.is_active)
-		return
-
-	_mods_needs_restart = true
-	if _mods_restart_hint != null:
-		_mods_restart_hint.visible = true
-	if _mods_restart_button != null:
-		_mods_restart_button.visible = true
-
-
-func _on_mod_restart_pressed() -> void:
-	OS.set_restart_on_exit(true)
-	get_tree().quit()
 
 
 func _sync_audio_controls_from_manager() -> void:
