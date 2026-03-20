@@ -1,14 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://upgrade_ui_scene"]
+[gd_scene format=3 uid="uid://b63trfu3koj8j"]
 
-[ext_resource type="Script" path="res://scripts/ui/upgrade_ui.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/ui/upgrade_ui.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
 
-[node name="UpgradeUI" type="CanvasLayer"]
+[node name="UpgradeUI" type="CanvasLayer" unique_id=1530011009]
 process_mode = 3
 layer = 50
 script = ExtResource("1_script")
 
-[node name="Root" type="Control" parent="."]
+[node name="Root" type="Control" parent="." unique_id=340096900]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="Background" type="ColorRect" parent="Root"]
+[node name="Background" type="ColorRect" parent="Root" unique_id=1067692699]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +27,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.2, 0.85)
 
-[node name="Center" type="CenterContainer" parent="Root"]
+[node name="Center" type="CenterContainer" parent="Root" unique_id=75264187]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,29 +35,28 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="Root/Center"]
+[node name="VBox" type="VBoxContainer" parent="Root/Center" unique_id=776344340]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Title" type="Label" parent="Root/Center/VBox"]
+[node name="Title" type="Label" parent="Root/Center/VBox" unique_id=1579231305]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "升级！选一个强化"
 horizontal_alignment = 1
 
-[node name="CardsBox" type="HBoxContainer" parent="Root/Center/VBox"]
+[node name="CardsBox" type="HBoxContainer" parent="Root/Center/VBox" unique_id=1349333972]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Card0" type="Control" parent="Root/Center/VBox/CardsBox"]
+[node name="Card0" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=959462224]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 140)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.0
 
-[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card0"]
+[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card0" unique_id=1747496136]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,7 +65,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.2, 0.2, 0.3, 0.95)
 
-[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card0"]
+[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card0" unique_id=997714849]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -74,31 +73,33 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card0/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card0/Margin" unique_id=1357595180]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox"]
+[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox" unique_id=311465267]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Card Title"
 horizontal_alignment = 1
 
-[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox" unique_id=1242195999]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(248, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Card Description"
-autowrap_mode = 1
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 1
 
-[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card0"]
+[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card0" unique_id=1206832778]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -108,14 +109,13 @@ grow_horizontal = 2
 grow_vertical = 2
 flat = true
 
-[node name="Card1" type="Control" parent="Root/Center/VBox/CardsBox"]
+[node name="Card1" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=943547070]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 140)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.0
 
-[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card1"]
+[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card1" unique_id=2075742551]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -124,7 +124,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.2, 0.2, 0.3, 0.95)
 
-[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card1"]
+[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card1" unique_id=829709246]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -132,29 +132,31 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card1/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card1/Margin" unique_id=1814273725]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox"]
+[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox" unique_id=1723161969]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Card Title"
 horizontal_alignment = 1
 
-[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox" unique_id=1238550472]
+custom_minimum_size = Vector2(248, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Card Description"
-autowrap_mode = 1
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 1
 
-[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card1"]
+[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card1" unique_id=313803208]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -163,14 +165,13 @@ grow_horizontal = 2
 grow_vertical = 2
 flat = true
 
-[node name="Card2" type="Control" parent="Root/Center/VBox/CardsBox"]
+[node name="Card2" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=1231043590]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 140)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.0
 
-[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card2"]
+[node name="Background" type="ColorRect" parent="Root/Center/VBox/CardsBox/Card2" unique_id=1033522491]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -179,7 +180,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.2, 0.2, 0.3, 0.95)
 
-[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card2"]
+[node name="Margin" type="MarginContainer" parent="Root/Center/VBox/CardsBox/Card2" unique_id=378442062]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -187,29 +188,31 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card2/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Root/Center/VBox/CardsBox/Card2/Margin" unique_id=744167971]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox"]
+[node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox" unique_id=4105510]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Card Title"
 horizontal_alignment = 1
 
-[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox" unique_id=1343061328]
+custom_minimum_size = Vector2(248, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Card Description"
-autowrap_mode = 1
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 1
 
-[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card2"]
+[node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card2" unique_id=1274320910]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

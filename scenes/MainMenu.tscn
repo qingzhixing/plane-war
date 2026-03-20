@@ -168,7 +168,9 @@ text = "历史最佳成绩"
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=438723940]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 16
 text = "数据来自本机存档，完成一局结算后会更新"
