@@ -139,14 +139,12 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Card Title"
 horizontal_alignment = 1
 
 [node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Card Description"
@@ -155,7 +153,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card1"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -197,14 +194,12 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Card Title"
 horizontal_alignment = 1
 
 [node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox"]
-unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Card Description"
@@ -213,7 +208,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Button" type="Button" parent="Root/Center/VBox/CardsBox/Card2"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

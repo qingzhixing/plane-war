@@ -9,15 +9,16 @@ const _UpgradePickServiceClass = preload("res://scripts/systems/upgrade_pick_ser
 @onready var _card0: Control = %Card0
 @onready var _card1: Control = %Card1
 @onready var _card2: Control = %Card2
-@onready var _card0_title: Label = %Card0/Margin/VBox/TitleLabel
-@onready var _card0_desc: Label = %Card0/Margin/VBox/DescLabel
-@onready var _card0_button: Button = %Card0/Button
-@onready var _card1_title: Label = %Card1/Margin/VBox/TitleLabel
-@onready var _card1_desc: Label = %Card1/Margin/VBox/DescLabel
-@onready var _card1_button: Button = %Card1/Button
-@onready var _card2_title: Label = %Card2/Margin/VBox/TitleLabel
-@onready var _card2_desc: Label = %Card2/Margin/VBox/DescLabel
-@onready var _card2_button: Button = %Card2/Button
+
+var _card0_title: Label
+var _card0_desc: Label
+var _card0_button: Button
+var _card1_title: Label
+var _card1_desc: Label
+var _card1_button: Button
+var _card2_title: Label
+var _card2_desc: Label
+var _card2_button: Button
 
 var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
 var _main: Node
@@ -35,6 +36,17 @@ func _ready() -> void:
 	_root.visible = false
 
 func _setup_cards() -> void:
+	# 获取卡片内部节点引用
+	_card0_title = _card0.get_node("Margin/VBox/TitleLabel")
+	_card0_desc = _card0.get_node("Margin/VBox/DescLabel")
+	_card0_button = _card0.get_node("Button")
+	_card1_title = _card1.get_node("Margin/VBox/TitleLabel")
+	_card1_desc = _card1.get_node("Margin/VBox/DescLabel")
+	_card1_button = _card1.get_node("Button")
+	_card2_title = _card2.get_node("Margin/VBox/TitleLabel")
+	_card2_desc = _card2.get_node("Margin/VBox/DescLabel")
+	_card2_button = _card2.get_node("Button")
+
 	_cards = [
 		{"root": _card0, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_button},
 		{"root": _card1, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_button},
