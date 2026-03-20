@@ -1,6 +1,10 @@
 [gd_resource type="Theme" format=3 uid="uid://6gltwgxumk04"]
 
+[ext_resource type="FontFile" uid="uid://svwt4jttgxie" path="res://assets/font/unifont-17.0.04.otf" id="1_gc4rd"]
 [ext_resource type="FontFile" uid="uid://djrchkw4o63jr" path="res://assets/font/JetBrainsMono[wght].ttf" id="2"]
 
 [resource]
 default_font = ExtResource("2")
+Button/fonts/font = ExtResource("1_gc4rd")
+Label/fonts/font = ExtResource("1_gc4rd")
+RichTextLabel/fonts/normal_font = ExtResource("1_gc4rd")
