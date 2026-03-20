@@ -142,11 +142,11 @@ visible = false
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
+visible = false
 script = ExtResource("5_game_over")
 
 [node name="Root" type="Control" parent="GameOver" unique_id=222543225]
 unique_name_in_owner = true
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -203,9 +203,11 @@ text = "主菜单"
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("7_upgrade_ui")]
 
 [node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("8_settings_ui")]
+visible = false
 
 [node name="BossHUD" parent="." unique_id=426736218 instance=ExtResource("10_boss_hud")]
 
 [node name="DebugUpgradePicker" parent="." unique_id=1720892747 instance=ExtResource("12_debug_upgrades")]
+visible = false
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]
