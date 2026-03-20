@@ -4,27 +4,29 @@ class_name SettingsPanel
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
-var _root: Control
-var _dimmer: ColorRect
-var _panel: Panel
-var _bgm_slider: HSlider
-var _sfx_slider: HSlider
-var _bgm_mute_check: CheckBox
-var _sfx_mute_check: CheckBox
-var _close_button: Button
-var _vibration_check: CheckBox
-var _scale_option: OptionButton
-var _end_run_button: Button
-var _skip_boss_button: Button
-var _debug_upgrades_button: Button
-var _debug_combo_row: HBoxContainer
+@onready var _root: Control = %Root
+@onready var _dimmer: ColorRect = %Dimmer
+@onready var _panel: Panel = %Panel
+@onready var _vbox: VBoxContainer = %VBox
+@onready var _bgm_slider: HSlider = %BgmSlider
+@onready var _sfx_slider: HSlider = %SfxSlider
+@onready var _bgm_mute_check: CheckBox = %BgmMuteCheck
+@onready var _sfx_mute_check: CheckBox = %SfxMuteCheck
+@onready var _close_button: Button = %CloseButton
+@onready var _vibration_check: CheckBox = %VibrationCheck
+@onready var _scale_option: OptionButton = %ScaleOption
+@onready var _end_run_button: Button = %EndRunButton
+@onready var _skip_boss_button: Button = %SkipBossButton
+@onready var _debug_upgrades_button: Button = %DebugUpgradesButton
+@onready var _debug_combo_row: HBoxContainer = %DebugComboRow
+@onready var _mods_scroll: ScrollContainer = %ModsScroll
+@onready var _mods_vbox: VBoxContainer = %ModsVBox
+@onready var _mods_restart_hint: Label = %ModsRestartHint
+@onready var _mods_restart_button: Button = %ModsRestartButton
+
 var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 var _syncing_audio_ui: bool = false
-var _mods_scroll: ScrollContainer
-var _mods_vbox: VBoxContainer
-var _mods_restart_hint: Label
-var _mods_restart_button: Button
 var _syncing_mods_ui: bool = false
 var _mods_needs_restart: bool = false
 
@@ -33,195 +35,33 @@ func _ready() -> void:
 	super._ready()
 	add_to_group("settings_menu")
 
-	_root = Control.new()
-	_root.mouse_filter = Control.MOUSE_FILTER_STOP
-	_root.theme = _DEFAULT_UI_THEME
-	add_child(_root)
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
-
-	var dimmer := ColorRect.new()
-	dimmer.color = Color(0, 0, 0, 0.5)
-	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
-	_root.add_child(dimmer)
-	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dimmer.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_dimmer = dimmer
 	if _dimmer != null and not _dimmer.gui_input.is_connected(_on_settings_dimmer_gui_input):
 		_dimmer.gui_input.connect(_on_settings_dimmer_gui_input)
 
-	var center := CenterContainer.new()
-	center.mouse_filter = Control.MOUSE_FILTER_STOP
-	_root.add_child(center)
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.set_offsets_preset(Control.PRESET_FULL_RECT)
-
-	_panel = Panel.new()
-	_panel.custom_minimum_size = Vector2(480, 500)
-	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	center.add_child(_panel)
-
-	var vbox := VBoxContainer.new()
-	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
-	vbox.add_theme_constant_override("separation", 16)
-	_panel.add_child(vbox)
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.set_offsets_preset(Control.PRESET_FULL_RECT)
-
-	var title := Label.new()
-	title.text = "设置"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	vbox.add_child(title)
-
-	# BGM 行
-	var bgm_row := HBoxContainer.new()
-	bgm_row.mouse_filter = Control.MOUSE_FILTER_STOP
-	bgm_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(bgm_row)
-
-	var bgm_label := Label.new()
-	bgm_label.text = "BGM 音量"
-	bgm_label.custom_minimum_size = Vector2(120, 0)
-	bgm_row.add_child(bgm_label)
-
-	_bgm_slider = HSlider.new()
-	_bgm_slider.min_value = 0
-	_bgm_slider.max_value = 100
-	_bgm_slider.step = 1
-	_bgm_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_bgm_slider.value = 80
-	_bgm_slider.value_changed.connect(_on_bgm_slider_changed)
-	bgm_row.add_child(_bgm_slider)
-
-	_bgm_mute_check = CheckBox.new()
-	_bgm_mute_check.text = "静音"
-	_bgm_mute_check.toggled.connect(_on_bgm_mute_toggled)
-	bgm_row.add_child(_bgm_mute_check)
-
-	# SFX 行
-	var sfx_row := HBoxContainer.new()
-	sfx_row.mouse_filter = Control.MOUSE_FILTER_STOP
-	sfx_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(sfx_row)
-
-	var sfx_label := Label.new()
-	sfx_label.text = "SFX 音量"
-	sfx_label.custom_minimum_size = Vector2(120, 0)
-	sfx_row.add_child(sfx_label)
-
-	_sfx_slider = HSlider.new()
-	_sfx_slider.min_value = 0
-	_sfx_slider.max_value = 100
-	_sfx_slider.step = 1
-	_sfx_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_sfx_slider.value = 100
-	_sfx_slider.value_changed.connect(_on_sfx_slider_changed)
-	sfx_row.add_child(_sfx_slider)
-
-	_sfx_mute_check = CheckBox.new()
-	_sfx_mute_check.text = "静音"
-	_sfx_mute_check.toggled.connect(_on_sfx_mute_toggled)
-	sfx_row.add_child(_sfx_mute_check)
-
-	# 震动开关
-	_vibration_check = CheckBox.new()
-	_vibration_check.text = "震动"
-	_vibration_check.button_pressed = true
-	_vibration_check.toggled.connect(_on_vibration_toggled)
-	vbox.add_child(_vibration_check)
-
-	# 画面缩放（内容缩放系数）
-	var scale_row := HBoxContainer.new()
-	scale_row.mouse_filter = Control.MOUSE_FILTER_STOP
-	scale_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(scale_row)
-
-	var scale_label := Label.new()
-	scale_label.text = "画面缩放"
-	scale_label.custom_minimum_size = Vector2(120, 0)
-	scale_row.add_child(scale_label)
-
-	_scale_option = OptionButton.new()
 	_scale_option.add_item("100%", 100)
 	_scale_option.add_item("90%", 90)
 	_scale_option.add_item("80%", 80)
-	_scale_option.item_selected.connect(_on_scale_selected)
-	scale_row.add_child(_scale_option)
 
-	# 模组管理（启用/禁用，需要重启生效）
-	var mods_title := Label.new()
-	mods_title.text = "Mod 管理"
-	mods_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	mods_title.add_theme_font_size_override("font_size", 24)
-	vbox.add_child(mods_title)
-
-	_mods_scroll = ScrollContainer.new()
-	_mods_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_mods_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_mods_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
-	vbox.add_child(_mods_scroll)
-
-	_mods_vbox = VBoxContainer.new()
-	_mods_vbox.mouse_filter = Control.MOUSE_FILTER_STOP
-	_mods_scroll.add_child(_mods_vbox)
-
-	_mods_restart_hint = Label.new()
-	_mods_restart_hint.text = "需要重启生效"
-	_mods_restart_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_mods_restart_hint.visible = false
-	vbox.add_child(_mods_restart_hint)
-
-	_mods_restart_button = Button.new()
-	_mods_restart_button.text = "立即重启"
-	_mods_restart_button.custom_minimum_size = Vector2(200, 64)
-	_mods_restart_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_mods_restart_button.add_theme_font_size_override("font_size", 24)
-	_mods_restart_button.visible = false
-	_mods_restart_button.pressed.connect(_on_mod_restart_pressed)
-	vbox.add_child(_mods_restart_button)
-
-	# 关闭按钮
-	_close_button = Button.new()
-	_close_button.text = "返回"
-	_close_button.custom_minimum_size = Vector2(200, 64)
-	_close_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_close_button.add_theme_font_size_override("font_size", 24)
 	_close_button.pressed.connect(_on_close_pressed)
-	vbox.add_child(_close_button)
-
-	# 提前结算 / 调试项：仅局内（Main）打开设置时显示；主菜单打开时隐藏
-	_end_run_button = Button.new()
-	_end_run_button.text = "提前结算"
-	_end_run_button.custom_minimum_size = Vector2(200, 64)
-	_end_run_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_end_run_button.add_theme_font_size_override("font_size", 24)
 	_end_run_button.pressed.connect(_on_end_run_pressed)
-	vbox.add_child(_end_run_button)
-
-	_skip_boss_button = Button.new()
-	_skip_boss_button.text = "跳到 Boss（调试）"
-	_skip_boss_button.custom_minimum_size = Vector2(220, 64)
-	_skip_boss_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_skip_boss_button.add_theme_font_size_override("font_size", 24)
 	_skip_boss_button.pressed.connect(_on_skip_to_boss_pressed)
-	vbox.add_child(_skip_boss_button)
-
-	_debug_upgrades_button = Button.new()
-	_debug_upgrades_button.text = "自选升级（调试）"
-	_debug_upgrades_button.custom_minimum_size = Vector2(220, 64)
-	_debug_upgrades_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_debug_upgrades_button.add_theme_font_size_override("font_size", 24)
 	_debug_upgrades_button.pressed.connect(_on_debug_upgrades_pressed)
-	vbox.add_child(_debug_upgrades_button)
+	_mods_restart_button.pressed.connect(_on_mod_restart_pressed)
+	_bgm_slider.value_changed.connect(_on_bgm_slider_changed)
+	_sfx_slider.value_changed.connect(_on_sfx_slider_changed)
+	_bgm_mute_check.toggled.connect(_on_bgm_mute_toggled)
+	_sfx_mute_check.toggled.connect(_on_sfx_mute_toggled)
+	_vibration_check.toggled.connect(_on_vibration_toggled)
+	_scale_option.item_selected.connect(_on_scale_selected)
 
-	_debug_combo_row = HBoxContainer.new()
-	_debug_combo_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_debug_combo_row.add_theme_constant_override("separation", 8)
-	var combo_lbl := Label.new()
-	combo_lbl.text = "连击+（调试）"
-	combo_lbl.add_theme_font_size_override("font_size", 18)
-	_debug_combo_row.add_child(combo_lbl)
+	_apply_run_only_buttons_visibility(false)
+
+	_load_extra_settings()
+	_sync_audio_controls_from_manager()
+	_setup_debug_combo_buttons()
+
+
+func _setup_debug_combo_buttons() -> void:
 	for add_n in [10, 50, 100, 500]:
 		var b := Button.new()
 		b.text = "+%d" % add_n
@@ -235,12 +75,6 @@ func _ready() -> void:
 	b0.add_theme_font_size_override("font_size", 18)
 	b0.pressed.connect(_on_debug_combo_clear)
 	_debug_combo_row.add_child(b0)
-	vbox.add_child(_debug_combo_row)
-
-	_apply_run_only_buttons_visibility(false)
-
-	_load_extra_settings()
-	_sync_audio_controls_from_manager()
 
 
 func show_settings() -> void:

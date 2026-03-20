@@ -3,8 +3,11 @@ extends CanvasLayer
 
 const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
+@onready var _root: Control = %Root
+@onready var _close_button: Button = %CloseButton
+@onready var _list: VBoxContainer = %List
+
 var _main: Node
-var _root: Control
 var _open: bool = false
 var _upgrade_service: UpgradeService = UpgradeService.new()
 
@@ -14,7 +17,8 @@ func _ready() -> void:
 	layer = 120
 	visible = false
 	_main = get_parent()
-	_build_ui()
+	_close_button.pressed.connect(_close)
+	_build_upgrade_list()
 
 
 func _open_panel() -> void:
@@ -26,72 +30,18 @@ func _open_panel() -> void:
 		return
 	_open = true
 	visible = true
+	_root.visible = true
 	get_tree().paused = true
 
 
 func _close() -> void:
 	_open = false
 	visible = false
+	_root.visible = false
 	get_tree().paused = false
 
 
-func _build_ui() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.theme = _THEME
-	add_child(_root)
-
-	var dim := ColorRect.new()
-	dim.color = Color(0.05, 0.05, 0.12, 0.92)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(dim)
-
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.set_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 16)
-	margin.add_theme_constant_override("margin_right", 16)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
-	_root.add_child(margin)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	margin.add_child(vbox)
-
-	var title := Label.new()
-	title.text = "调试：自选升级（点关闭返回）"
-	title.add_theme_font_size_override("font_size", 28)
-	vbox.add_child(title)
-
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	vbox.add_child(row)
-
-	var close_btn := Button.new()
-	close_btn.text = "关闭"
-	close_btn.custom_minimum_size = Vector2(120, 48)
-	close_btn.pressed.connect(_close)
-	row.add_child(close_btn)
-
-	var hint := Label.new()
-	hint.text = "点击条目立即生效，可重复叠加"
-	hint.add_theme_font_size_override("font_size", 18)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(hint)
-
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(0, 400)
-	vbox.add_child(scroll)
-
-	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 6)
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(list)
-
+func _build_upgrade_list() -> void:
 	for u in _upgrade_service.get_all_upgrades():
 		var id: String = u["id"]
 		var b := Button.new()
@@ -99,7 +49,7 @@ func _build_ui() -> void:
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(0, 44)
 		b.pressed.connect(_on_pick.bind(id))
-		list.add_child(b)
+		_list.add_child(b)
 
 
 func _on_pick(upgrade_id: String) -> void:

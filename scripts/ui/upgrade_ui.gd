@@ -3,9 +3,22 @@ extends CanvasLayer
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 const _UpgradePickServiceClass = preload("res://scripts/systems/upgrade_pick_service.gd")
 
-var _root: Control
-var _panel: ColorRect
-var _title: Label
+@onready var _root: Control = $Root
+@onready var _title: Label = %Title
+@onready var _cards_box: HBoxContainer = %CardsBox
+@onready var _card0: Control = %Card0
+@onready var _card1: Control = %Card1
+@onready var _card2: Control = %Card2
+@onready var _card0_title: Label = %Card0/Margin/VBox/TitleLabel
+@onready var _card0_desc: Label = %Card0/Margin/VBox/DescLabel
+@onready var _card0_button: Button = %Card0/Button
+@onready var _card1_title: Label = %Card1/Margin/VBox/TitleLabel
+@onready var _card1_desc: Label = %Card1/Margin/VBox/DescLabel
+@onready var _card1_button: Button = %Card1/Button
+@onready var _card2_title: Label = %Card2/Margin/VBox/TitleLabel
+@onready var _card2_desc: Label = %Card2/Margin/VBox/DescLabel
+@onready var _card2_button: Button = %Card2/Button
+
 var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
 var _main: Node
 var _upgrade_service: UpgradeService = UpgradeService.new()
@@ -18,86 +31,21 @@ const CARD_MARGIN: float = 12.0
 func _ready() -> void:
 	_main = get_parent()
 	visible = false
-	_build_ui()
+	_setup_cards()
+	_root.visible = false
 
-func _build_ui() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.theme = _DEFAULT_UI_THEME
-	add_child(_root)
-
-	_panel = ColorRect.new()
-	_panel.color = Color(0.1, 0.1, 0.2, 0.85)
-	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(_panel)
-
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(center)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 24)
-	center.add_child(vbox)
-
-	_title = Label.new()
-	_title.text = "升级！选一个强化"
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override("font_size", 36)
-	vbox.add_child(_title)
-
-	var card_box := HBoxContainer.new()
-	card_box.add_theme_constant_override("separation", 16)
-	vbox.add_child(card_box)
-
-	for i in 3:
-		var card_root := Control.new()
-		card_root.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
-		card_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		card_box.add_child(card_root)
-
-		var bg := ColorRect.new()
-		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-		bg.set_offsets_preset(Control.PRESET_FULL_RECT)
-		bg.color = Color(0.2, 0.2, 0.3, 0.95)
-		card_root.add_child(bg)
-
-		var margin := MarginContainer.new()
-		margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-		margin.set_offsets_preset(Control.PRESET_FULL_RECT)
-		margin.add_theme_constant_override("margin_left", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_right", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_top", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_bottom", int(CARD_MARGIN))
-		card_root.add_child(margin)
-
-		var card_vbox := VBoxContainer.new()
-		card_vbox.add_theme_constant_override("separation", 6)
-		margin.add_child(card_vbox)
-
-		var title_label := Label.new()
-		title_label.add_theme_font_size_override("font_size", 22)
-		title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card_vbox.add_child(title_label)
-
-		var desc_label := Label.new()
-		desc_label.add_theme_font_size_override("font_size", 18)
-		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		desc_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		card_vbox.add_child(desc_label)
-
-		var btn := Button.new()
-		btn.flat = true
-		btn.set_anchors_preset(Control.PRESET_FULL_RECT)
-		btn.set_offsets_preset(Control.PRESET_FULL_RECT)
-		btn.pressed.connect(_on_card_pressed.bind(i))
-		card_root.add_child(btn)
-
-		_cards.append({"root": card_root, "title_label": title_label, "desc_label": desc_label, "button": btn})
-
+func _setup_cards() -> void:
+	_cards = [
+		{"root": _card0, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_button},
+		{"root": _card1, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_button},
+		{"root": _card2, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_button}
+	]
+	for i in _cards.size():
+		var card: Dictionary = _cards[i]
+		var btn: Button = card["button"]
+		if btn != null:
+			btn.pressed.disconnect(_on_card_pressed)
+			btn.pressed.connect(_on_card_pressed.bind(i))
 	_update_card_sizes()
 
 
@@ -142,6 +90,7 @@ func show_pick() -> void:
 		if root_hidden != null:
 			root_hidden.visible = false
 	visible = true
+	_root.visible = true
 	get_tree().paused = true
 
 func _on_card_pressed(card_index: int) -> void:
@@ -158,6 +107,7 @@ func _on_card_pressed(card_index: int) -> void:
 	if audio != null and audio.has_method("play_power_up"):
 		audio.play_power_up()
 	visible = false
+	_root.visible = false
 	get_tree().paused = false
 	if _main.has_method("on_upgrade_selected"):
 		_main.on_upgrade_selected()

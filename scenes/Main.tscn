@@ -6,13 +6,13 @@
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/ui/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/ui/game_over.gd" id="5_game_over"]
 [ext_resource type="Script" uid="uid://cmpx7cpm1wjx" path="res://scripts/core/main.gd" id="6_main"]
-[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/ui/upgrade_ui.gd" id="7_upgrade_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeUI.tscn" id="7_upgrade_ui"]
 [ext_resource type="FontFile" uid="uid://f7l5i1xl7ed6" path="res://assets/font/PixelOperator8-Bold.ttf" id="8_3p2gp"]
-[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/ui/settings_ui.gd" id="8_settings_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/SettingsPanel.tscn" id="8_settings_ui"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/CoreEnemyElite.tscn" id="9_enemy_elite"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BossHud.tscn" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
-[ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug/debug_upgrade_picker.gd" id="12_debug_upgrades"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DebugUpgradePicker.tscn" id="12_debug_upgrades"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PostBossChoicePanel.tscn" id="13_post_boss"]
 [ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
 
@@ -138,6 +138,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="PostBossChoice" parent="." unique_id=1999888771 instance=ExtResource("13_post_boss")]
+visible = false
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
@@ -153,6 +154,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("11_ui_theme")
 
 [node name="Panel" type="ColorRect" parent="GameOver/Root" unique_id=2095839253]
 layout_mode = 1
@@ -198,18 +200,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
-[node name="UpgradeUI" type="CanvasLayer" parent="." unique_id=1043995664]
-process_mode = 3
-script = ExtResource("7_upgrade_ui")
+[node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("7_upgrade_ui")]
 
-[node name="SettingsUI" type="CanvasLayer" parent="." unique_id=317848371]
-process_mode = 3
-script = ExtResource("8_settings_ui")
+[node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("8_settings_ui")]
 
 [node name="BossHUD" parent="." unique_id=426736218 instance=ExtResource("10_boss_hud")]
 
-[node name="DebugUpgradePicker" type="CanvasLayer" parent="." unique_id=1720892747]
-process_mode = 4
-script = ExtResource("12_debug_upgrades")
+[node name="DebugUpgradePicker" parent="." unique_id=1720892747 instance=ExtResource("12_debug_upgrades")]
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]
