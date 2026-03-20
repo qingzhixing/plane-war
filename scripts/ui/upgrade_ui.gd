@@ -4,8 +4,6 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 const _UpgradePickServiceClass = preload("res://scripts/systems/upgrade_pick_service.gd")
 
 @onready var _root: Control = $Root
-@onready var _title: Label = %Title
-@onready var _cards_box: HBoxContainer = %CardsBox
 @onready var _card0: Control = %Card0
 @onready var _card1: Control = %Card1
 @onready var _card2: Control = %Card2
@@ -56,7 +54,6 @@ func _setup_cards() -> void:
 		var card: Dictionary = _cards[i]
 		var btn: Button = card["button"]
 		if btn != null:
-			btn.pressed.disconnect(_on_card_pressed)
 			btn.pressed.connect(_on_card_pressed.bind(i))
 	_update_card_sizes()
 

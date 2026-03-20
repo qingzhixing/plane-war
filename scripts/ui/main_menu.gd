@@ -1,7 +1,7 @@
 extends Control
-## 唯一名称：%StartButton %RecordsButton %SettingsButton %AboutButton %QuitButton %SettingsUI %RecordsQueryUI %AboutUI
+## 唯一名称：%StartButton %RecordsButton %SettingsButton %AboutButton %QuitButton；设置面板为子场景实例，用路径 $SettingsUI 引用
 
-@onready var _settings_ui: CanvasLayer = %SettingsUI
+@onready var _settings_ui: CanvasLayer = $SettingsUI
 @onready var _records_query_ui: RecordsQueryPanel = %RecordsQueryUI
 @onready var _about_ui: AboutPanel = %AboutUI
 

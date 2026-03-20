@@ -4,10 +4,7 @@ class_name SettingsPanel
 
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
-@onready var _root: Control = %Root
 @onready var _dimmer: ColorRect = %Dimmer
-@onready var _panel: Panel = %Panel
-@onready var _vbox: VBoxContainer = %VBox
 @onready var _bgm_slider: HSlider = %BgmSlider
 @onready var _sfx_slider: HSlider = %SfxSlider
 @onready var _bgm_mute_check: CheckBox = %BgmMuteCheck
@@ -19,7 +16,6 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 @onready var _skip_boss_button: Button = %SkipBossButton
 @onready var _debug_upgrades_button: Button = %DebugUpgradesButton
 @onready var _debug_combo_row: HBoxContainer = %DebugComboRow
-@onready var _mods_scroll: ScrollContainer = %ModsScroll
 @onready var _mods_vbox: VBoxContainer = %ModsVBox
 @onready var _mods_restart_hint: Label = %ModsRestartHint
 @onready var _mods_restart_button: Button = %ModsRestartButton

@@ -122,6 +122,7 @@ horizontal_alignment = 1
 vertical_alignment = 2
 
 [node name="SettingsUI" parent="." unique_id=2015724451 instance=ExtResource("3_settings")]
+unique_name_in_owner = true
 
 [node name="RecordsQueryUI" type="CanvasLayer" parent="." unique_id=1684068955]
 unique_name_in_owner = true
