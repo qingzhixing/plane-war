@@ -27,8 +27,8 @@ func _fit_count_label() -> void:
 	if _count_label == null:
 		return
 	var h := size.y if size.y > 1.0 else custom_minimum_size.y
-	_count_label.position = Vector2(0, h - 22)
-	_count_label.size = Vector2(size.x if size.x > 1.0 else custom_minimum_size.x, 22)
+	_count_label.position = Vector2(0, h - 26)
+	_count_label.size = Vector2(size.x if size.x > 1.0 else custom_minimum_size.x, 26)
 
 func set_icon_texture(tex: Texture2D) -> void:
 	texture = tex

@@ -34,7 +34,7 @@ func _ready() -> void:
 		_label.name = "SummaryLabel"
 		_label.bbcode_enabled = true
 		_label.fit_content = true
-		_label.add_theme_font_size_override("normal_font_size", 30)
+		_label.add_theme_font_size_override("normal_font_size", 34)
 		vbox.add_child(_label, true)
 		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
 		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
