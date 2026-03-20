@@ -4,6 +4,8 @@
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
 
 [node name="UpgradeUI" type="CanvasLayer"]
+process_mode = 3
+layer = 50
 script = ExtResource("1_script")
 
 [node name="Root" type="Control" parent="."]

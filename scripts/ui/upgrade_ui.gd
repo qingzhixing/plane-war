@@ -78,6 +78,11 @@ func show_pick() -> void:
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var pool: Array[Dictionary] = _pick_service.build_pick_candidates(_main, player)
 	var chosen: Array[Dictionary] = _pick_service.choose_upgrades(pool, 3)
+	if chosen.is_empty():
+		push_warning("UpgradeUI: no upgrade candidates; advancing without pick.")
+		if _main != null and _main.has_method("on_upgrade_selected"):
+			_main.on_upgrade_selected()
+		return
 	for i in chosen.size():
 		var u: Dictionary = chosen[i]
 		var card: Dictionary = _cards[i]
