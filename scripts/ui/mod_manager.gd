@@ -55,9 +55,12 @@ func _refresh_mod_list() -> void:
 		var label := Label.new()
 		label.text = mod_id if mod_name.is_empty() else "%s (%s)" % [mod_name, mod_id]
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.add_theme_font_size_override("font_size", 24)
 		row.add_child(label)
 
 		var cb := CheckBox.new()
+		cb.add_theme_font_size_override("font_size", 24)
+		cb.custom_minimum_size = Vector2(44, 44)
 		cb.button_pressed = is_active
 		cb.disabled = is_locked or not is_loadable
 		if is_core:
@@ -100,12 +103,13 @@ func _on_back_pressed() -> void:
 		return
 
 	var dlg := ConfirmationDialog.new()
+	dlg.theme = theme
 	dlg.title = "重启游戏"
 	dlg.dialog_text = "Mod 设置已保存。\n是否立即重启以应用更改？\n\n选择「稍后」将返回主菜单，更改会在下次启动时生效。"
 	dlg.ok_button_text = "立即重启"
 	dlg.cancel_button_text = "稍后"
 	add_child(dlg)
-	dlg.popup_centered(Vector2i(520, 220))
+	dlg.popup_centered(Vector2i(620, 280))
 
 	var guard := { "done": false }
 
