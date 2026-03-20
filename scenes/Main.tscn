@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/ui/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/ui/game_over.gd" id="5_game_over"]
 [ext_resource type="Script" uid="uid://cmpx7cpm1wjx" path="res://scripts/core/main.gd" id="6_main"]
-[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeUI.tscn" id="7_upgrade_ui"]
+[ext_resource type="PackedScene" uid="uid://b63trfu3koj8j" path="res://scenes/ui/UpgradeUI.tscn" id="7_upgrade_ui"]
 [ext_resource type="FontFile" uid="uid://f7l5i1xl7ed6" path="res://assets/font/PixelOperator8-Bold.ttf" id="8_3p2gp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/SettingsPanel.tscn" id="8_settings_ui"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/CoreEnemyElite.tscn" id="9_enemy_elite"]
@@ -55,9 +55,9 @@ anchor_right = 1.0
 offset_left = -320.0
 offset_top = 16.0
 offset_right = -16.0
-offset_bottom = 56.0
+offset_bottom = 62.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "第 1 波"
 horizontal_alignment = 2
 
@@ -72,7 +72,7 @@ offset_top = 317.0
 offset_bottom = -867.0
 grow_horizontal = 0
 theme_override_fonts/font = ExtResource("8_3p2gp")
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 38
 text = "Combo Display Bug"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -102,16 +102,16 @@ theme_override_constants/separation = 8
 
 [node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=484967350]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 64)
+custom_minimum_size = Vector2(176, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "暂停"
 
 [node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=626905230]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 64)
+custom_minimum_size = Vector2(176, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "设置"
 
 [node name="LeftStatsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=2115451006]
@@ -124,7 +124,7 @@ offset_bottom = 339.0
 [node name="ScoreLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=268481878]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 32
 text = "Score: 0"
 horizontal_alignment = 2
 vertical_alignment = 1
@@ -132,7 +132,7 @@ vertical_alignment = 1
 [node name="DpsLabel" type="Label" parent="HUD/Root/LeftStatsVBox" unique_id=1153599571]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "DPS: 0  Max: 0"
 horizontal_alignment = 2
 vertical_alignment = 1
@@ -182,22 +182,22 @@ alignment = 1
 [node name="Label" type="Label" parent="GameOver/Root/Center/VBox" unique_id=121312298]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 54
 text = "结算"
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963160]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 80)
+custom_minimum_size = Vector2(280, 88)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 36
 text = "重新开始"
 
 [node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963161]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 80)
+custom_minimum_size = Vector2(280, 88)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 32
 text = "主菜单"
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("7_upgrade_ui")]

@@ -23,8 +23,8 @@ var _main: Node
 var _upgrade_service: UpgradeService = UpgradeService.new()
 var _pick_service = _UpgradePickServiceClass.new(_upgrade_service)
 
-const CARD_WIDTH: float = 280.0
-const CARD_HEIGHT: float = 140.0
+const CARD_WIDTH: float = 300.0
+const CARD_HEIGHT: float = 168.0
 const CARD_MARGIN: float = 12.0
 
 func _ready() -> void:

@@ -56,13 +56,13 @@ func _setup_debug_combo_buttons() -> void:
 		var b := Button.new()
 		b.text = "+%d" % add_n
 		b.custom_minimum_size = Vector2(72, 40)
-		b.add_theme_font_size_override("font_size", 18)
+		b.add_theme_font_size_override("font_size", 22)
 		b.pressed.connect(_on_debug_combo_add.bind(int(add_n)))
 		_debug_combo_row.add_child(b)
 	var b0 := Button.new()
 	b0.text = "清零"
 	b0.custom_minimum_size = Vector2(72, 40)
-	b0.add_theme_font_size_override("font_size", 18)
+	b0.add_theme_font_size_override("font_size", 22)
 	b0.pressed.connect(_on_debug_combo_clear)
 	_debug_combo_row.add_child(b0)
 

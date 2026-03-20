@@ -42,7 +42,7 @@ theme_override_constants/separation = 24
 [node name="Title" type="Label" parent="Root/Center/VBox" unique_id=1579231305]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 42
 text = "升级！选一个强化"
 horizontal_alignment = 1
 
@@ -52,7 +52,7 @@ theme_override_constants/separation = 16
 
 [node name="Card0" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=959462224]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(300, 168)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -84,16 +84,16 @@ theme_override_constants/separation = 6
 [node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox" unique_id=311465267]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "Card Title"
 horizontal_alignment = 1
 
 [node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card0/Margin/VBox" unique_id=1242195999]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(248, 0)
+custom_minimum_size = Vector2(264, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 text = "Card Description"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -111,7 +111,7 @@ flat = true
 
 [node name="Card1" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=943547070]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(300, 168)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -142,15 +142,15 @@ theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox" unique_id=1723161969]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "Card Title"
 horizontal_alignment = 1
 
 [node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card1/Margin/VBox" unique_id=1238550472]
-custom_minimum_size = Vector2(248, 0)
+custom_minimum_size = Vector2(264, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 text = "Card Description"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -167,7 +167,7 @@ flat = true
 
 [node name="Card2" type="Control" parent="Root/Center/VBox/CardsBox" unique_id=1231043590]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(300, 168)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -198,15 +198,15 @@ theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox" unique_id=4105510]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "Card Title"
 horizontal_alignment = 1
 
 [node name="DescLabel" type="Label" parent="Root/Center/VBox/CardsBox/Card2/Margin/VBox" unique_id=1343061328]
-custom_minimum_size = Vector2(248, 0)
+custom_minimum_size = Vector2(264, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 26
 text = "Card Description"
 horizontal_alignment = 1
 vertical_alignment = 1

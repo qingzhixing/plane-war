@@ -308,7 +308,7 @@ func _ensure_combo_notice_label() -> void:
 	_combo_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_combo_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_combo_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_combo_notice_label.add_theme_font_size_override("font_size", 34)
+	_combo_notice_label.add_theme_font_size_override("font_size", 40)
 	_combo_notice_label.anchor_left = 0.2
 	_combo_notice_label.anchor_right = 0.8
 	_combo_notice_label.anchor_top = 0.20
@@ -669,7 +669,7 @@ func _ensure_spell_vfx_nodes() -> void:
 	_spell_notice_label.text = "符卡发动!"
 	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_spell_notice_label.add_theme_font_size_override("font_size", 44)
+	_spell_notice_label.add_theme_font_size_override("font_size", 50)
 	_spell_notice_label.anchor_left = 0.2
 	_spell_notice_label.anchor_right = 0.8
 	_spell_notice_label.anchor_top = 0.42

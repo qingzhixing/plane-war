@@ -55,11 +55,11 @@ func _refresh_mod_list() -> void:
 		var label := Label.new()
 		label.text = mod_id if mod_name.is_empty() else "%s (%s)" % [mod_name, mod_id]
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_font_size_override("font_size", 24)
+		label.add_theme_font_size_override("font_size", 26)
 		row.add_child(label)
 
 		var cb := CheckBox.new()
-		cb.add_theme_font_size_override("font_size", 24)
+		cb.add_theme_font_size_override("font_size", 26)
 		cb.custom_minimum_size = Vector2(44, 44)
 		cb.button_pressed = is_active
 		cb.disabled = is_locked or not is_loadable

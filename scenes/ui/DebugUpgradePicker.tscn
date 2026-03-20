@@ -49,7 +49,7 @@ theme_override_constants/separation = 10
 [node name="Title" type="Label" parent="Root/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 32
 text = "调试：自选升级（点关闭返回）"
 
 [node name="ButtonRow" type="HBoxContainer" parent="Root/Margin/VBox"]
@@ -59,15 +59,16 @@ theme_override_constants/separation = 12
 
 [node name="CloseButton" type="Button" parent="Root/Margin/VBox/ButtonRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 48)
+custom_minimum_size = Vector2(140, 52)
 layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "关闭"
 
 [node name="Hint" type="Label" parent="Root/Margin/VBox/ButtonRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 22
 text = "点击条目立即生效，可重复叠加"
 
 [node name="Scroll" type="ScrollContainer" parent="Root/Margin/VBox"]

@@ -47,7 +47,8 @@ func _build_upgrade_list() -> void:
 		var b := Button.new()
 		b.text = "%s — %s" % [u["name"], u["desc"]]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(0, 44)
+		b.custom_minimum_size = Vector2(0, 52)
+		b.add_theme_font_size_override("font_size", 20)
 		b.pressed.connect(_on_pick.bind(id))
 		_list.add_child(b)
 

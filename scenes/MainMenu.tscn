@@ -62,7 +62,7 @@ horizontal_alignment = 1
 [node name="SubtitleLabel" type="Label" parent="MainMargin/MainColumn" unique_id=1825869109]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.62, 0.75, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "竖屏弹幕 · 波次升级"
 horizontal_alignment = 1
 
@@ -79,51 +79,51 @@ alignment = 1
 
 [node name="StartButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=903083005]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 80)
+custom_minimum_size = Vector2(300, 88)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 34
 text = "开始游戏"
 
 [node name="RecordsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=1200506814]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "成绩查询"
 
 [node name="SettingsButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=809608158]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "设置"
 
 [node name="ModManagerButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "Mod 管理"
 
 [node name="AboutButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=719437131]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "关于"
 
 [node name="QuitButton" type="Button" parent="MainMargin/MainColumn/ButtonColumn" unique_id=386294911]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(300, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 30
 text = "退出"
 
 [node name="FooterLabel" type="Label" parent="MainMargin/MainColumn" unique_id=135502580]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.45, 0.55, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 22
 text = "触控或鼠标点击按钮"
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -154,7 +154,7 @@ grow_vertical = 2
 theme = ExtResource("4_theme")
 
 [node name="Panel" type="PanelContainer" parent="RecordsQueryUI/Center" unique_id=68687780]
-custom_minimum_size = Vector2(400, 320)
+custom_minimum_size = Vector2(440, 340)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="RecordsQueryUI/Center/Panel" unique_id=275792686]
@@ -170,16 +170,16 @@ theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=132549351]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 34
 text = "历史最佳成绩"
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=438723940]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 20
 text = "数据来自本机存档，完成一局结算后会更新"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -190,14 +190,14 @@ theme_override_constants/separation = 12
 
 [node name="Lbl" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore" unique_id=802426128]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "最高得分"
 
 [node name="ScoreValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowScore" unique_id=348009243]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "0"
 horizontal_alignment = 2
 
@@ -207,14 +207,14 @@ theme_override_constants/separation = 12
 
 [node name="Lbl2" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo" unique_id=1216069737]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "最高连击"
 
 [node name="ComboValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowCombo" unique_id=1482624313]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "0"
 horizontal_alignment = 2
 
@@ -224,23 +224,23 @@ theme_override_constants/separation = 12
 
 [node name="Lbl3" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps" unique_id=977601266]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "最高 DPS"
 
 [node name="DpsValueLabel" type="Label" parent="RecordsQueryUI/Center/Panel/Margin/VBox/RowDps" unique_id=2093095190]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "0"
 horizontal_alignment = 2
 
 [node name="CloseRecordsButton" type="Button" parent="RecordsQueryUI/Center/Panel/Margin/VBox" unique_id=1674496591]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 56)
+custom_minimum_size = Vector2(220, 64)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "返回"
 
 [node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
@@ -266,7 +266,7 @@ grow_vertical = 2
 theme = ExtResource("4_theme")
 
 [node name="AboutPanel" type="PanelContainer" parent="AboutUI/AboutCenter" unique_id=2014823278]
-custom_minimum_size = Vector2(420, 480)
+custom_minimum_size = Vector2(460, 500)
 layout_mode = 2
 
 [node name="AboutMargin" type="MarginContainer" parent="AboutUI/AboutCenter/AboutPanel" unique_id=156674451]
@@ -282,12 +282,12 @@ theme_override_constants/separation = 12
 
 [node name="AboutTitle" type="Label" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=541530285]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 34
 text = "关于 plane-war"
 horizontal_alignment = 1
 
 [node name="AboutScroll" type="ScrollContainer" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=1310741673]
-custom_minimum_size = Vector2(0, 220)
+custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -296,7 +296,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
-theme_override_font_sizes/normal_font_size = 18
+theme_override_font_sizes/normal_font_size = 22
 bbcode_enabled = true
 text = "[b]plane-war 更新日志（节选）[/b]
 [color=#8af]v0.2.4[/color] - 2026-03-19
@@ -318,17 +318,17 @@ scroll_active = false
 
 [node name="GithubButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=1868042632]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 24
 text = "在浏览器打开 GitHub 仓库"
 
 [node name="CloseAboutButton" type="Button" parent="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox" unique_id=233508975]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 48)
+custom_minimum_size = Vector2(220, 56)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 26
 text = "返回"
 
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/StartButton" to="." method="_on_start_pressed"]
