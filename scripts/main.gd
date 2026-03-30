@@ -33,6 +33,8 @@ var _lives_remaining: int = 2
 var _spell_cooldown_scale: float = 1.0
 ## 一次性：自动符卡
 var _spell_auto: bool = false
+## 本局已选升级记录：upgrade_id -> 选取次数
+var _upgrade_counts: Dictionary = {}
 
 # 战斗统计（评分 / 连击 / DPS）
 var score: int = 0
@@ -190,6 +192,7 @@ func _on_level_up() -> void:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
+	_upgrade_counts[upgrade_id] = _upgrade_counts.get(upgrade_id, 0) + 1
 	match upgrade_id:
 		"score_up":
 			_score_multiplier += 0.15
@@ -333,6 +336,10 @@ func get_best_score() -> int:
 
 func get_best_dps() -> float:
 	return best_dps
+
+
+func get_upgrade_counts() -> Dictionary:
+	return _upgrade_counts
 
 
 func finalize_battle_records() -> Dictionary:
