@@ -52,7 +52,7 @@ func _build_ui() -> void:
 	add_child(_root)
 
 	_panel = ColorRect.new()
-	_panel.color = Color(0.1, 0.1, 0.2, 0.85)
+	_panel.color = Color(0.08, 0.09, 0.12, 0.75)
 	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(_panel)
@@ -82,10 +82,22 @@ func _build_ui() -> void:
 		card_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		card_box.add_child(card_root)
 
-		var bg := ColorRect.new()
+		var bg := Panel.new()
 		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 		bg.set_offsets_preset(Control.PRESET_FULL_RECT)
-		bg.color = Color(0.2, 0.2, 0.3, 0.95)
+		var card_style := StyleBoxFlat.new()
+		card_style.bg_color = Color(0.16, 0.17, 0.22, 1.0)
+		card_style.border_width_left = 1
+		card_style.border_width_top = 1
+		card_style.border_color = Color(0.26, 0.28, 0.36, 0.9)
+		card_style.corner_radius_top_left = 16
+		card_style.corner_radius_top_right = 16
+		card_style.corner_radius_bottom_right = 16
+		card_style.corner_radius_bottom_left = 16
+		card_style.shadow_color = Color(0.08, 0.09, 0.12, 0.9)
+		card_style.shadow_size = 5
+		card_style.shadow_offset = Vector2(3, 3)
+		bg.add_theme_stylebox_override("panel", card_style)
 		card_root.add_child(bg)
 
 		var margin := MarginContainer.new()
@@ -118,6 +130,12 @@ func _build_ui() -> void:
 		btn.set_anchors_preset(Control.PRESET_FULL_RECT)
 		btn.set_offsets_preset(Control.PRESET_FULL_RECT)
 		btn.pressed.connect(_on_card_pressed.bind(i))
+		var empty_sb := StyleBoxEmpty.new()
+		btn.add_theme_stylebox_override("normal", empty_sb)
+		btn.add_theme_stylebox_override("hover", empty_sb)
+		btn.add_theme_stylebox_override("pressed", empty_sb)
+		btn.add_theme_stylebox_override("focus", empty_sb)
+		btn.add_theme_stylebox_override("disabled", empty_sb)
 		card_root.add_child(btn)
 
 		_cards.append({"root": card_root, "title_label": title_label, "desc_label": desc_label, "button": btn})

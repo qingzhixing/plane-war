@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "Bash(grep -v \"\\\\.import$\")",
+      "Bash(find /c/Users/qingzhixing/Documents/Project/plane-war -name *hud* -o -name *game_over*)",
+      "Bash(grep -E \"\\\\.\\(tscn|gd\\)$\")"
     ],
     "defaultMode": "bypassPermissions"
   }
