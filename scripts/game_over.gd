@@ -33,7 +33,8 @@ func _ready() -> void:
 		_label.name = "SummaryLabel"
 		_label.bbcode_enabled = true
 		_label.fit_content = true
-		_label.add_theme_font_size_override("normal_font_size", 30)
+		_label.custom_minimum_size = Vector2(460.0, 0.0)
+		_label.add_theme_font_size_override("normal_font_size", 28)
 		vbox.add_child(_label, true)
 		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
 		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
@@ -59,35 +60,62 @@ func show_game_over() -> void:
 		if _main.has_method("finalize_battle_records"):
 			diff = _main.finalize_battle_records()
 		var lines: Array[String] = []
-		# 若因生命归零触发结算，在顶部显示明显的死亡提示
-		var is_dead := false
-		if _main.has_method("get_lives_remaining"):
-			is_dead = _main.get_lives_remaining() <= 0
-		if is_dead:
-			lines.append("[color=#ff5555]You Dead![/color]")
+
+		# 死亡提示
+		if _main.has_method("get_lives_remaining") and _main.get_lives_remaining() <= 0:
+			lines.append("[center][color=#ff5555]— You Dead —[/color][/center]")
+
+		# 分数
 		if _main.has_method("get_score"):
 			var s: int = _main.get_score()
 			var best_s: int = _main.get_best_score() if _main.has_method("get_best_score") else s
-			var score_line := "Score %d(%d)" % [s, best_s]
+			var score_line := "[center]Score  %d  [color=#666688](历史 %d)[/color][/center]" % [s, best_s]
 			if "score" in diff and diff["score"].get("is_new", false):
-				score_line = "[color=#ffd700]" + score_line + "[/color]"
+				score_line = "[center][color=#ffd700]Score  %d  (历史 %d)[/color][/center]" % [s, best_s]
 			lines.append(score_line)
+
+		# 最高连击
 		if _main.has_method("get_max_combo"):
 			var mc: int = _main.get_max_combo()
 			var best_c: int = _main.get_best_combo() if _main.has_method("get_best_combo") else mc
-			var combo_line := "Max Combo %d(%d)" % [mc, best_c]
+			var combo_line := "[center]连击  %d  [color=#666688](历史 %d)[/color][/center]" % [mc, best_c]
 			if "combo" in diff and diff["combo"].get("is_new", false):
-				combo_line = "[color=#ffd700]" + combo_line + "[/color]"
+				combo_line = "[center][color=#ffd700]连击  %d  (历史 %d)[/color][/center]" % [mc, best_c]
 			lines.append(combo_line)
+
+		# 最高 DPS
 		if _main.has_method("get_max_dps"):
 			var md: float = _main.get_max_dps()
 			var best_d: float = _main.get_best_dps() if _main.has_method("get_best_dps") else md
-			var dps_line := "Max DPS %.0f(%.0f)" % [md, best_d]
+			var dps_line := "[center]DPS  %.0f  [color=#666688](历史 %.0f)[/color][/center]" % [md, best_d]
 			if "dps" in diff and diff["dps"].get("is_new", false):
-				dps_line = "[color=#ffd700]" + dps_line + "[/color]"
+				dps_line = "[center][color=#ffd700]DPS  %.0f  (历史 %.0f)[/color][/center]" % [md, best_d]
 			lines.append(dps_line)
+
+		# 构筑回顾
+		if _main.has_method("get_upgrade_counts"):
+			var counts: Dictionary = _main.get_upgrade_counts()
+			if not counts.is_empty():
+				var upgrade_ui := _main.get_node_or_null("UpgradeUI")
+				var name_map: Dictionary = {}
+				if upgrade_ui != null and "UPGRADES" in upgrade_ui:
+					for entry: Dictionary in upgrade_ui.UPGRADES:
+						name_map[entry["id"]] = entry["name"]
+				var parts: Array[String] = []
+				for uid: String in counts:
+					var cnt: int = counts[uid]
+					var lbl: String = name_map.get(uid, uid)
+					parts.append("%s [color=#aaaacc]×%d[/color]" % [lbl, cnt] if cnt > 1 else lbl)
+				lines.append("[center][color=#334455]─────────────────[/color][/center]")
+				lines.append("[center][color=#7788aa][font_size=22]本局构筑[/font_size][/color][/center]")
+				var row_i: int = 0
+				while row_i < parts.size():
+					var row_slice := parts.slice(row_i, mini(row_i + 4, parts.size()))
+					lines.append("[center][font_size=22][color=#bbccee]%s[/color][/font_size][/center]" % "   ".join(row_slice))
+					row_i += 4
+
 		if lines.is_empty():
-			lines.append("Battle Summary")
+			lines.append("[center]Battle Summary[/center]")
 		_label.bbcode_enabled = true
 		_label.bbcode_text = "\n".join(lines)
 	# 新规则下不再提供“继续游玩”
