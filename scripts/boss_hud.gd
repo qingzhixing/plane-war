@@ -18,7 +18,7 @@ func _ready() -> void:
 	add_child(_root)
 
 	var panel := ColorRect.new()
-	panel.color = Color(0, 0, 0, 0.4)
+	panel.color = Color(0.12, 0.13, 0.17, 0.92)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.custom_minimum_size = Vector2(0, 40)
 	panel.anchor_left = 0.0

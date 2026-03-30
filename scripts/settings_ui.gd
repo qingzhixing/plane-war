@@ -3,7 +3,7 @@ extends CanvasLayer
 const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 
 var _root: Control
-var _panel: Panel
+var _panel: PanelContainer
 var _bgm_slider: HSlider
 var _sfx_slider: HSlider
 var _bgm_mute_check: CheckBox
@@ -33,7 +33,7 @@ func _ready() -> void:
 	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
 
 	var dimmer := ColorRect.new()
-	dimmer.color = Color(0, 0, 0, 0.5)
+	dimmer.color = Color(0.05, 0.06, 0.09, 0.75)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(dimmer)
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -45,17 +45,32 @@ func _ready() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.set_offsets_preset(Control.PRESET_FULL_RECT)
 
-	_panel = Panel.new()
-	_panel.custom_minimum_size = Vector2(480, 500)
+	_panel = PanelContainer.new()
+	_panel.custom_minimum_size = Vector2(480, 0)
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.16, 0.17, 0.22, 1.0)
+	panel_style.border_width_left = 1
+	panel_style.border_width_top = 1
+	panel_style.border_color = Color(0.26, 0.28, 0.36, 0.9)
+	panel_style.corner_radius_top_left = 20
+	panel_style.corner_radius_top_right = 20
+	panel_style.corner_radius_bottom_right = 20
+	panel_style.corner_radius_bottom_left = 20
+	panel_style.shadow_color = Color(0.08, 0.09, 0.12, 0.9)
+	panel_style.shadow_size = 6
+	panel_style.shadow_offset = Vector2(4, 4)
+	panel_style.content_margin_left = 24.0
+	panel_style.content_margin_top = 20.0
+	panel_style.content_margin_right = 24.0
+	panel_style.content_margin_bottom = 20.0
+	_panel.add_theme_stylebox_override("panel", panel_style)
 	center.add_child(_panel)
 
 	var vbox := VBoxContainer.new()
 	vbox.mouse_filter = Control.MOUSE_FILTER_STOP
 	vbox.add_theme_constant_override("separation", 16)
 	_panel.add_child(vbox)
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.set_offsets_preset(Control.PRESET_FULL_RECT)
 
 	var title := Label.new()
 	title.text = "设置"
