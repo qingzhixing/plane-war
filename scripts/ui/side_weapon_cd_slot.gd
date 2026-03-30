@@ -54,9 +54,9 @@ func _notification(what: int) -> void:
 
 func _draw() -> void:
 	var center := Vector2(size.x * 0.5, 28.0)
-	# 正方形图标底
+	# 正方形图标底（拟态色）
 	var icon_rect := Rect2(center.x - ICON_SIZE * 0.5, center.y - ICON_SIZE * 0.5, ICON_SIZE, ICON_SIZE)
-	draw_rect(icon_rect, Color(0.15, 0.18, 0.22, 0.95))
+	draw_rect(icon_rect, Color(0.16, 0.17, 0.22, 0.95))
 	if texture != null:
 		var tw: float = float(texture.get_width())
 		var th: float = float(texture.get_height())
@@ -72,8 +72,8 @@ func _draw() -> void:
 			)
 			draw_texture_rect(texture, tex_rect, false)
 	# 外圈进度条：先画整圈轨道，再画当前比例弧
-	var track_color := Color(0.25, 0.28, 0.35, 0.9)
-	var fill_color := Color(0.4, 0.75, 0.5, 0.95)
+	var track_color := Color(0.12, 0.13, 0.17, 0.9)
+	var fill_color := Color(0.35, 0.60, 0.85, 0.95)
 	_draw_ring(center, RING_OUTER, RING_INNER, 1.0, track_color)
 	if ratio > 0.001:
 		_draw_ring(center, RING_OUTER, RING_INNER, ratio, fill_color)

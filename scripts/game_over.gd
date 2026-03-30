@@ -25,8 +25,32 @@ func _ready() -> void:
 		root.mouse_filter = Control.MOUSE_FILTER_STOP
 		root.visible = false
 		_panel = root.get_node_or_null("Panel") as ColorRect
+		if _panel != null:
+			_panel.color = Color(0.05, 0.06, 0.09, 0.82)
 		var center := root.get_node_or_null("Center") as CenterContainer
 		var vbox := center.get_node_or_null("VBox") as VBoxContainer
+
+		# 拟态卡片容器（PanelContainer 自动适配内容高度）
+		var card_style := StyleBoxFlat.new()
+		card_style.bg_color = Color(0.16, 0.17, 0.22, 1.0)
+		card_style.border_width_left = 1
+		card_style.border_width_top = 1
+		card_style.border_color = Color(0.26, 0.28, 0.36, 0.9)
+		card_style.corner_radius_top_left = 18
+		card_style.corner_radius_top_right = 18
+		card_style.corner_radius_bottom_right = 18
+		card_style.corner_radius_bottom_left = 18
+		card_style.shadow_color = Color(0.08, 0.09, 0.12, 0.9)
+		card_style.shadow_size = 6
+		card_style.shadow_offset = Vector2(4, 4)
+		card_style.content_margin_left = 28.0
+		card_style.content_margin_top = 24.0
+		card_style.content_margin_right = 28.0
+		card_style.content_margin_bottom = 24.0
+		var card_container := PanelContainer.new()
+		card_container.add_theme_stylebox_override("panel", card_style)
+		center.add_child(card_container)
+		vbox.reparent(card_container, false)
 
 		# 在标题 Label 下方创建一个 RichTextLabel，用于展示结算详情
 		_label = RichTextLabel.new()
