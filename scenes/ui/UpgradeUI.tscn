@@ -51,7 +51,7 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="Card0" type="Control" parent="Root/Center/VBox/CardBox" unique_id=1050018778]
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(208, 140)
 layout_mode = 2
 size_flags_horizontal = 4
 
@@ -106,7 +106,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
 flat = true
 
 [node name="Card1" type="Control" parent="Root/Center/VBox/CardBox" unique_id=368523698]
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(208, 140)
 layout_mode = 2
 size_flags_horizontal = 4
 
@@ -161,7 +161,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
 flat = true
 
 [node name="Card2" type="Control" parent="Root/Center/VBox/CardBox" unique_id=618288985]
-custom_minimum_size = Vector2(280, 140)
+custom_minimum_size = Vector2(208, 140)
 layout_mode = 2
 size_flags_horizontal = 4
 

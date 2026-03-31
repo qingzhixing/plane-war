@@ -18,7 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://ccx7772swoiwh" path="res://assets/ui/bomb.png" id="21_tex_bomb"]
 [ext_resource type="Texture2D" uid="uid://cyw4slfnau0mf" path="res://assets/sprites/bullets/Sickle.png" id="22_tex_boomerang"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BossHUD.tscn" id="23_boss_hud_scene"]
-[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeUI.tscn" id="24_upgrade_ui_scene"]
+[ext_resource type="PackedScene" uid="uid://baihdbmy4gb50" path="res://scenes/ui/UpgradeUI.tscn" id="24_upgrade_ui_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/SettingsUI.tscn" id="25_settings_ui_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PostBossChoice.tscn" id="26_post_boss_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DebugUpgradePicker.tscn" id="27_debug_picker_scene"]
@@ -212,6 +212,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 16.0
+grow_horizontal = 2
 mouse_filter = 2
 
 [node name="ComboEdgeBottom" type="ColorRect" parent="HUD/Root" unique_id=100000012]
@@ -222,6 +223,8 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -16.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
 
 [node name="ComboEdgeLeft" type="ColorRect" parent="HUD/Root" unique_id=100000013]
@@ -230,6 +233,7 @@ layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 16.0
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="ComboEdgeRight" type="ColorRect" parent="HUD/Root" unique_id=100000014]
@@ -240,6 +244,8 @@ anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -16.0
+grow_horizontal = 0
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="ComboFullTint" type="ColorRect" parent="HUD/Root" unique_id=100000015]
@@ -294,6 +300,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
+theme = ExtResource("11_ui_theme")
 
 [node name="Panel" type="ColorRect" parent="GameOver/Root" unique_id=2095839253]
 layout_mode = 1
@@ -302,7 +309,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.6)
+mouse_filter = 1
+color = Color(0.05, 0.06, 0.09, 0.82)
 
 [node name="Center" type="CenterContainer" parent="GameOver/Root" unique_id=2119442220]
 layout_mode = 1
