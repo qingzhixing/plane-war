@@ -1,15 +1,18 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bwh6830w5vlxv"]
 
-[ext_resource type="Script" path="res://scripts/ui/side_weapon_cd_slot.gd" id="1"]
+[ext_resource type="Script" uid="uid://b8ek411bcxo72" path="res://scripts/ui/side_weapon_cd_slot.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cjrgawlq18lna" path="res://assets/ui/Shield.svg" id="2_fl0c1"]
 
-[node name="StatusSlot" type="Control"]
+[node name="StatusSlot" type="Control" unique_id=1670669986]
 custom_minimum_size = Vector2(56, 72)
+layout_mode = 3
+anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1")
+texture = ExtResource("2_fl0c1")
 
-[node name="CountLabel" type="Label" parent="."]
+[node name="CountLabel" type="Label" parent="." unique_id=1509479946]
 layout_mode = 0
-mouse_filter = 2
+text = "x1"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "x1"

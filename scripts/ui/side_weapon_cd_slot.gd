@@ -1,3 +1,4 @@
+@tool
 class_name SideWeaponCdSlot
 extends Control
 
@@ -9,7 +10,10 @@ const RING_OUTER := 26.0
 const RING_WIDTH := 5.0
 const RING_INNER := RING_OUTER - RING_WIDTH
 
-var texture: Texture2D
+@export var texture: Texture2D:
+	set(v):
+		texture = v
+		queue_redraw()
 var ratio: float = 1.0  # 剩余 CD 比例或就绪度
 var count: int = 1
 
@@ -22,6 +26,7 @@ func _init() -> void:
 func _ready() -> void:
 	_update_count_text()
 	_fit_count_label()
+	queue_redraw()
 
 func _fit_count_label() -> void:
 	if _count_label == null:

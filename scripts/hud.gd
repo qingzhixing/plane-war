@@ -29,12 +29,12 @@ var _spell_notice_label: Label = null
 @onready var _spell_button: TextureButton = %SpellStarButton
 
 # 左侧主炮/护盾槽位：与右侧副武器相同展示方式（方形图标 + 外圈进度 + x N）
-var _left_slots_vbox: VBoxContainer = null
+@onready var _left_slots_vbox: VBoxContainer = $Root/LeftSlotsVBox
 var _main_gun_slot: Control = null
 var _shield_slot: Control = null
 
 # 右侧副武器 CD 条：每解锁一种副武器添加一个槽位（方形图标 + 外圈进度 + x N）
-var _side_weapon_cd_vbox: VBoxContainer = null
+@onready var _side_weapon_cd_vbox: VBoxContainer = $Root/SideWeaponCdVBox
 var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
 var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
 var _spell_cd_slot: Control = null
@@ -394,22 +394,11 @@ func _ensure_side_weapon_textures() -> void:
 
 
 func _ensure_left_slots_panel() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null or _left_slots_vbox != null:
+	if _left_slots_vbox == null:
 		return
-	_left_slots_vbox = VBoxContainer.new()
-	_left_slots_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_left_slots_vbox.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_left_slots_vbox.anchor_left = 0.0
-	_left_slots_vbox.anchor_right = 0.0
-	_left_slots_vbox.anchor_top = 0.0
-	_left_slots_vbox.anchor_bottom = 0.0
-	_left_slots_vbox.offset_left = 16.0
-	_left_slots_vbox.offset_top = 156.0
-	_left_slots_vbox.offset_right = 88.0
-	_left_slots_vbox.offset_bottom = 308.0
-	_left_slots_vbox.add_theme_constant_override("separation", 12)
-	root.add_child(_left_slots_vbox)
+	for child in _left_slots_vbox.get_children():
+		_left_slots_vbox.remove_child(child)
+		child.queue_free()
 	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
 	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
 	var tex_life: Texture2D = LIFE_ICON
@@ -456,22 +445,11 @@ func _update_left_slots() -> void:
 
 
 func _ensure_side_weapon_cd_panel() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null or _side_weapon_cd_vbox != null:
+	if _side_weapon_cd_vbox == null:
 		return
-	_side_weapon_cd_vbox = VBoxContainer.new()
-	_side_weapon_cd_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_side_weapon_cd_vbox.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_side_weapon_cd_vbox.anchor_left = 1.0
-	_side_weapon_cd_vbox.anchor_right = 1.0
-	_side_weapon_cd_vbox.anchor_top = 0.0
-	_side_weapon_cd_vbox.anchor_bottom = 0.0
-	_side_weapon_cd_vbox.offset_left = -80.0
-	_side_weapon_cd_vbox.offset_top = 180.0
-	_side_weapon_cd_vbox.offset_right = -16.0
-	_side_weapon_cd_vbox.offset_bottom = 400.0
-	_side_weapon_cd_vbox.add_theme_constant_override("separation", 12)
-	root.add_child(_side_weapon_cd_vbox)
+	for child in _side_weapon_cd_vbox.get_children():
+		_side_weapon_cd_vbox.remove_child(child)
+		child.queue_free()
 	# 符卡冷却槽：固定放在右侧顶部，图标使用星形
 	_spell_cd_slot = STATUS_SLOT_SCENE.instantiate()
 	if _spell_cd_slot.has_method("set_icon_texture"):
