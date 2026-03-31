@@ -15,6 +15,13 @@
 [ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
 [ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
 [ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
+[ext_resource type="PackedScene" uid="uid://bwh6830w5vlxv" path="res://scenes/ui/StatusSlot.tscn" id="15_status_slot"]
+[ext_resource type="Texture2D" uid="uid://w478a7uockj4" path="res://assets/sprites/bullets/bullet_player_basic.png" id="16_tex_gun"]
+[ext_resource type="Texture2D" uid="uid://bwmh6snhuyc61" path="res://assets/ui/heart.svg" id="18_tex_life"]
+[ext_resource type="Texture2D" uid="uid://rayda7qtyusb" path="res://assets/ui/star/star4.png" id="19_tex_spell"]
+[ext_resource type="Texture2D" uid="uid://dfk08r28unnt8" path="res://assets/sprites/bullets/Arrow.png" id="20_tex_arrow"]
+[ext_resource type="Texture2D" uid="uid://ccx7772swoiwh" path="res://assets/ui/bomb.png" id="21_tex_bomb"]
+[ext_resource type="Texture2D" uid="uid://cyw4slfnau0mf" path="res://assets/sprites/bullets/Sickle.png" id="22_tex_boomerang"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -137,17 +144,67 @@ text = "DPS: 0  Max: 0"
 horizontal_alignment = 2
 vertical_alignment = 1
 
+[node name="LeftSlotsVBox" type="VBoxContainer" parent="HUD/Root" unique_id=100000001]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 192.0
+offset_right = 84.0
+offset_bottom = 432.0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="SlotGun" parent="HUD/Root/LeftSlotsVBox" unique_id=100000002 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("16_tex_gun")
+
+[node name="SlotShield" parent="HUD/Root/LeftSlotsVBox" unique_id=100000003 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+
+[node name="SlotLife" parent="HUD/Root/LeftSlotsVBox" unique_id=100000004 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("18_tex_life")
+
+[node name="SideWeaponCdVBox" type="VBoxContainer" parent="HUD/Root" unique_id=100000005]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 180.0
+offset_right = -16.0
+offset_bottom = 400.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="SlotSpell" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000006 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("19_tex_spell")
+
+[node name="SlotArrow" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000007 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("20_tex_arrow")
+
+[node name="SlotBomb" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000008 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("21_tex_bomb")
+
+[node name="SlotBoomerang" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000009 instance=ExtResource("15_status_slot")]
+layout_mode = 2
+texture = ExtResource("22_tex_boomerang")
+
 [node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
 process_mode = 3
 script = ExtResource("13_post_boss")
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
+visible = false
 script = ExtResource("5_game_over")
 
 [node name="Root" type="Control" parent="GameOver" unique_id=222543225]
 unique_name_in_owner = true
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
