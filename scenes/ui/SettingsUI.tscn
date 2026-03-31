@@ -1,0 +1,199 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="1_script"]
+[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
+
+[node name="SettingsUI" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("2_theme")
+
+[node name="Dimmer" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.05, 0.06, 0.09, 0.75)
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Panel" type="PanelContainer" parent="Root/Center"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center/Panel"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+text = "设置"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="BgmRow" type="HBoxContainer" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 12
+
+[node name="BgmLabel" type="Label" parent="Root/Center/Panel/VBox/BgmRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "BGM 音量"
+
+[node name="BgmSlider" type="HSlider" parent="Root/Center/Panel/VBox/BgmRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+value = 80.0
+
+[node name="BgmMuteCheck" type="CheckBox" parent="Root/Center/Panel/VBox/BgmRow"]
+layout_mode = 2
+text = "静音"
+
+[node name="SfxRow" type="HBoxContainer" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 12
+
+[node name="SfxLabel" type="Label" parent="Root/Center/Panel/VBox/SfxRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "SFX 音量"
+
+[node name="SfxSlider" type="HSlider" parent="Root/Center/Panel/VBox/SfxRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="SfxMuteCheck" type="CheckBox" parent="Root/Center/Panel/VBox/SfxRow"]
+layout_mode = 2
+text = "静音"
+
+[node name="VibrationCheck" type="CheckBox" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+button_pressed = true
+text = "震动"
+
+[node name="ScaleRow" type="HBoxContainer" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 12
+
+[node name="ScaleLabel" type="Label" parent="Root/Center/Panel/VBox/ScaleRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "画面缩放"
+
+[node name="ScaleOption" type="OptionButton" parent="Root/Center/Panel/VBox/ScaleRow"]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="Root/Center/Panel/VBox"]
+custom_minimum_size = Vector2(200, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "返回"
+theme_override_font_sizes/font_size = 24
+
+[node name="EndRunButton" type="Button" parent="Root/Center/Panel/VBox"]
+custom_minimum_size = Vector2(200, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "提前结算"
+theme_override_font_sizes/font_size = 24
+
+[node name="SkipBossButton" type="Button" parent="Root/Center/Panel/VBox"]
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "跳到 Boss（调试）"
+theme_override_font_sizes/font_size = 24
+
+[node name="DebugUpgradesButton" type="Button" parent="Root/Center/Panel/VBox"]
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "自选升级（调试）"
+theme_override_font_sizes/font_size = 24
+
+[node name="DebugComboRow" type="HBoxContainer" parent="Root/Center/Panel/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="ComboLabel" type="Label" parent="Root/Center/Panel/VBox/DebugComboRow"]
+layout_mode = 2
+text = "连击+（调试）"
+theme_override_font_sizes/font_size = 18
+
+[node name="Add10" type="Button" parent="Root/Center/Panel/VBox/DebugComboRow"]
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+text = "+10"
+theme_override_font_sizes/font_size = 18
+
+[node name="Add50" type="Button" parent="Root/Center/Panel/VBox/DebugComboRow"]
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+text = "+50"
+theme_override_font_sizes/font_size = 18
+
+[node name="Add100" type="Button" parent="Root/Center/Panel/VBox/DebugComboRow"]
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+text = "+100"
+theme_override_font_sizes/font_size = 18
+
+[node name="Add500" type="Button" parent="Root/Center/Panel/VBox/DebugComboRow"]
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+text = "+500"
+theme_override_font_sizes/font_size = 18
+
+[node name="ComboClear" type="Button" parent="Root/Center/Panel/VBox/DebugComboRow"]
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+text = "清零"
+theme_override_font_sizes/font_size = 18
+
+[connection signal="value_changed" from="Root/Center/Panel/VBox/BgmRow/BgmSlider" to="." method="_on_bgm_slider_changed"]
+[connection signal="value_changed" from="Root/Center/Panel/VBox/SfxRow/SfxSlider" to="." method="_on_sfx_slider_changed"]
+[connection signal="toggled" from="Root/Center/Panel/VBox/BgmRow/BgmMuteCheck" to="." method="_on_bgm_mute_toggled"]
+[connection signal="toggled" from="Root/Center/Panel/VBox/SfxRow/SfxMuteCheck" to="." method="_on_sfx_mute_toggled"]
+[connection signal="toggled" from="Root/Center/Panel/VBox/VibrationCheck" to="." method="_on_vibration_toggled"]
+[connection signal="item_selected" from="Root/Center/Panel/VBox/ScaleRow/ScaleOption" to="." method="_on_scale_selected"]
+[connection signal="pressed" from="Root/Center/Panel/VBox/CloseButton" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="Root/Center/Panel/VBox/EndRunButton" to="." method="_on_end_run_pressed"]
+[connection signal="pressed" from="Root/Center/Panel/VBox/SkipBossButton" to="." method="_on_skip_to_boss_pressed"]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugUpgradesButton" to="." method="_on_debug_upgrades_pressed"]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugComboRow/Add10" to="." method="_on_debug_combo_add" binds=[10]]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugComboRow/Add50" to="." method="_on_debug_combo_add" binds=[50]]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugComboRow/Add100" to="." method="_on_debug_combo_add" binds=[100]]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugComboRow/Add500" to="." method="_on_debug_combo_add" binds=[500]]
+[connection signal="pressed" from="Root/Center/Panel/VBox/DebugComboRow/ComboClear" to="." method="_on_debug_combo_clear"]

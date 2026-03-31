@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
-
 const UPGRADES: Array[Dictionary] = [
 	# 主武器：基础子弹
 	{"id": "fire_rate", "name": "速射机炮", "desc": "主武器间隔 -15%；超 75发/秒 的攻速按%转攻击力"},
@@ -29,117 +27,38 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-var _root: Control
-var _panel: ColorRect
-var _title: Label
-var _cards: Array[Dictionary] = []  # [{ "root": Control, "title_label": Label, "desc_label": Label, "button": Button }]
+const CARD_HEIGHT: float = 140.0
+
 var _main: Node
 
-const CARD_WIDTH: float = 280.0
-const CARD_HEIGHT: float = 140.0
-const CARD_MARGIN: float = 12.0
+# 每张卡的节点引用：[{ root, title_label, desc_label, button }]
+var _cards: Array[Dictionary] = []
+
+@onready var _card0_root: Control = $Root/Center/VBox/CardBox/Card0
+@onready var _card1_root: Control = $Root/Center/VBox/CardBox/Card1
+@onready var _card2_root: Control = $Root/Center/VBox/CardBox/Card2
+
+@onready var _card0_title: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
+@onready var _card0_desc: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
+@onready var _card0_btn: Button = $Root/Center/VBox/CardBox/Card0/CardBtn0
+
+@onready var _card1_title: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
+@onready var _card1_desc: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
+@onready var _card1_btn: Button = $Root/Center/VBox/CardBox/Card1/CardBtn1
+
+@onready var _card2_title: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
+@onready var _card2_desc: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
+@onready var _card2_btn: Button = $Root/Center/VBox/CardBox/Card2/CardBtn2
+
 
 func _ready() -> void:
 	_main = get_parent()
 	visible = false
-	_build_ui()
-
-func _build_ui() -> void:
-	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.theme = _DEFAULT_UI_THEME
-	add_child(_root)
-
-	_panel = ColorRect.new()
-	_panel.color = Color(0.08, 0.09, 0.12, 0.75)
-	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_panel.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(_panel)
-
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(center)
-
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 24)
-	center.add_child(vbox)
-
-	_title = Label.new()
-	_title.text = "升级！选一个强化"
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override("font_size", 36)
-	vbox.add_child(_title)
-
-	var card_box := HBoxContainer.new()
-	card_box.add_theme_constant_override("separation", 16)
-	vbox.add_child(card_box)
-
-	for i in 3:
-		var card_root := Control.new()
-		card_root.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
-		card_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		card_box.add_child(card_root)
-
-		var bg := Panel.new()
-		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-		bg.set_offsets_preset(Control.PRESET_FULL_RECT)
-		var card_style := StyleBoxFlat.new()
-		card_style.bg_color = Color(0.16, 0.17, 0.22, 1.0)
-		card_style.border_width_left = 1
-		card_style.border_width_top = 1
-		card_style.border_color = Color(0.26, 0.28, 0.36, 0.9)
-		card_style.corner_radius_top_left = 16
-		card_style.corner_radius_top_right = 16
-		card_style.corner_radius_bottom_right = 16
-		card_style.corner_radius_bottom_left = 16
-		card_style.shadow_color = Color(0.08, 0.09, 0.12, 0.9)
-		card_style.shadow_size = 5
-		card_style.shadow_offset = Vector2(3, 3)
-		bg.add_theme_stylebox_override("panel", card_style)
-		card_root.add_child(bg)
-
-		var margin := MarginContainer.new()
-		margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-		margin.set_offsets_preset(Control.PRESET_FULL_RECT)
-		margin.add_theme_constant_override("margin_left", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_right", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_top", int(CARD_MARGIN))
-		margin.add_theme_constant_override("margin_bottom", int(CARD_MARGIN))
-		card_root.add_child(margin)
-
-		var card_vbox := VBoxContainer.new()
-		card_vbox.add_theme_constant_override("separation", 6)
-		margin.add_child(card_vbox)
-
-		var title_label := Label.new()
-		title_label.add_theme_font_size_override("font_size", 22)
-		title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card_vbox.add_child(title_label)
-
-		var desc_label := Label.new()
-		desc_label.add_theme_font_size_override("font_size", 18)
-		desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		desc_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		card_vbox.add_child(desc_label)
-
-		var btn := Button.new()
-		btn.flat = true
-		btn.set_anchors_preset(Control.PRESET_FULL_RECT)
-		btn.set_offsets_preset(Control.PRESET_FULL_RECT)
-		btn.pressed.connect(_on_card_pressed.bind(i))
-		var empty_sb := StyleBoxEmpty.new()
-		btn.add_theme_stylebox_override("normal", empty_sb)
-		btn.add_theme_stylebox_override("hover", empty_sb)
-		btn.add_theme_stylebox_override("pressed", empty_sb)
-		btn.add_theme_stylebox_override("focus", empty_sb)
-		btn.add_theme_stylebox_override("disabled", empty_sb)
-		card_root.add_child(btn)
-
-		_cards.append({"root": card_root, "title_label": title_label, "desc_label": desc_label, "button": btn})
-
+	_cards = [
+		{"root": _card0_root, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_btn},
+		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
+		{"root": _card2_root, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_btn},
+	]
 	_update_card_sizes()
 
 
@@ -147,16 +66,13 @@ func _update_card_sizes() -> void:
 	var vpr: Rect2 = get_viewport().get_visible_rect()
 	var margin: float = 32.0
 	var gap: float = 16.0
-	# 动态计算宽度，保证三张卡在不同分辨率下都能完整显示
 	var available_w: float = max(0.0, vpr.size.x - margin * 2.0 - gap * 2.0)
 	var card_w: float = max(140.0, available_w / 3.0)
 	for card in _cards:
 		var root := card["root"] as Control
 		if root != null:
-			var size := root.custom_minimum_size
-			size.x = card_w
-			size.y = CARD_HEIGHT
-			root.custom_minimum_size = size
+			root.custom_minimum_size = Vector2(card_w, CARD_HEIGHT)
+
 
 func show_pick() -> void:
 	_update_card_sizes()
@@ -226,6 +142,7 @@ func show_pick() -> void:
 			root_hidden.visible = false
 	visible = true
 	get_tree().paused = true
+
 
 func _on_card_pressed(card_index: int) -> void:
 	if card_index < 0 or card_index >= _cards.size():
