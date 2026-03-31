@@ -1,0 +1,220 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_ui.gd" id="1_script"]
+[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_btn"]
+
+[node name="UpgradeUI" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Panel" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.09, 0.12, 0.75)
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Root/Center/VBox"]
+layout_mode = 2
+text = "升级！选一个强化"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+[node name="CardBox" type="HBoxContainer" parent="Root/Center/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Card0" type="Control" parent="Root/Center/VBox/CardBox"]
+custom_minimum_size = Vector2(280, 140)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CardBg0" type="Panel" parent="Root/Center/VBox/CardBox/Card0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardMargin0" type="MarginContainer" parent="Root/Center/VBox/CardBox/Card0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardVBox0" type="VBoxContainer" parent="Root/Center/VBox/CardBox/Card0/CardMargin0"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CardTitle0" type="Label" parent="Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="CardDesc0" type="Label" parent="Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="CardBtn0" type="Button" parent="Root/Center/VBox/CardBox/Card0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_btn")
+
+[node name="Card1" type="Control" parent="Root/Center/VBox/CardBox"]
+custom_minimum_size = Vector2(280, 140)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CardBg1" type="Panel" parent="Root/Center/VBox/CardBox/Card1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardMargin1" type="MarginContainer" parent="Root/Center/VBox/CardBox/Card1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardVBox1" type="VBoxContainer" parent="Root/Center/VBox/CardBox/Card1/CardMargin1"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CardTitle1" type="Label" parent="Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="CardDesc1" type="Label" parent="Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="CardBtn1" type="Button" parent="Root/Center/VBox/CardBox/Card1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_btn")
+
+[node name="Card2" type="Control" parent="Root/Center/VBox/CardBox"]
+custom_minimum_size = Vector2(280, 140)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="CardBg2" type="Panel" parent="Root/Center/VBox/CardBox/Card2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardMargin2" type="MarginContainer" parent="Root/Center/VBox/CardBox/Card2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CardVBox2" type="VBoxContainer" parent="Root/Center/VBox/CardBox/Card2/CardMargin2"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CardTitle2" type="Label" parent="Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="CardDesc2" type="Label" parent="Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+
+[node name="CardBtn2" type="Button" parent="Root/Center/VBox/CardBox/Card2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_btn")
+
+[connection signal="pressed" from="Root/Center/VBox/CardBox/Card0/CardBtn0" to="." method="_on_card_pressed" binds=[0]]
+[connection signal="pressed" from="Root/Center/VBox/CardBox/Card1/CardBtn1" to="." method="_on_card_pressed" binds=[1]]
+[connection signal="pressed" from="Root/Center/VBox/CardBox/Card2/CardBtn2" to="." method="_on_card_pressed" binds=[2]]
