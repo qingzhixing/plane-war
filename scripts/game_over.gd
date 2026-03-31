@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
-
 @export var main_path: NodePath = NodePath("..")
 
 var _main: Node = null
@@ -15,14 +13,6 @@ func _ready() -> void:
 	add_to_group("game_over_ui")
 	if main_path != NodePath(""):
 		_main = get_node(main_path)
-	visible = false
-	var root := get_node_or_null("Root") as Control
-	if root != null:
-		root.theme = _DEFAULT_UI_THEME
-	var panel := get_node_or_null("Root/Panel") as ColorRect
-	if panel != null:
-		panel.color = Color(0.05, 0.06, 0.09, 0.82)
-		panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _restart_btn != null:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 	if _main_menu_btn != null:
