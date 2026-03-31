@@ -11,14 +11,6 @@ var _last_combo_value: int = 0
 var _last_combo_feedback_value: int = 0
 var _combo_notice_timer: float = 0.0
 var _combo_break_timer: float = 0.0
-var _combo_notice_label: Label = null
-var _combo_edge_top: ColorRect = null
-var _combo_edge_bottom: ColorRect = null
-var _combo_edge_left: ColorRect = null
-var _combo_edge_right: ColorRect = null
-var _combo_full_tint: ColorRect = null
-var _spell_flash_rect: ColorRect = null
-var _spell_notice_label: Label = null
 
 @onready var _wave_label: Label = %WaveLabel
 @onready var _pause_button: Button = %PauseButton
@@ -28,22 +20,23 @@ var _spell_notice_label: Label = null
 @onready var _dps_label: Label = %DpsLabel
 @onready var _spell_button: TextureButton = %SpellStarButton
 
-# 左侧主炮/护盾槽位：与右侧副武器相同展示方式（方形图标 + 外圈进度 + x N）
-@onready var _left_slots_vbox: VBoxContainer = $Root/LeftSlotsVBox
-var _main_gun_slot: Control = null
-var _shield_slot: Control = null
+@onready var _main_gun_slot: Control = $Root/LeftSlotsVBox/SlotGun
+@onready var _shield_slot: Control = $Root/LeftSlotsVBox/SlotShield
+@onready var _life_slot: Control = $Root/LeftSlotsVBox/SlotLife
 
-# 右侧副武器 CD 条：每解锁一种副武器添加一个槽位（方形图标 + 外圈进度 + x N）
-@onready var _side_weapon_cd_vbox: VBoxContainer = $Root/SideWeaponCdVBox
-var _side_weapon_slots: Dictionary = {}  # weapon_id String -> SideWeaponCdSlot
-var _side_weapon_textures: Dictionary = {}  # weapon_id -> Texture2D
-var _spell_cd_slot: Control = null
+@onready var _spell_cd_slot: Control = $Root/SideWeaponCdVBox/SlotSpell
+@onready var _slot_arrow: Control = $Root/SideWeaponCdVBox/SlotArrow
+@onready var _slot_bomb: Control = $Root/SideWeaponCdVBox/SlotBomb
+@onready var _slot_boomerang: Control = $Root/SideWeaponCdVBox/SlotBoomerang
 
-# 生命展示：左侧 Life 槽位（与护盾/主炮同款）
-var _life_slot: Control = null
-
-const STATUS_SLOT_SCENE: PackedScene = preload("res://scenes/ui/StatusSlot.tscn")
-const LIFE_ICON: Texture2D = preload("res://assets/ui/heart.svg")
+@onready var _combo_notice_label: Label = $Root/ComboNoticeLabel
+@onready var _combo_edge_top: ColorRect = $Root/ComboEdgeTop
+@onready var _combo_edge_bottom: ColorRect = $Root/ComboEdgeBottom
+@onready var _combo_edge_left: ColorRect = $Root/ComboEdgeLeft
+@onready var _combo_edge_right: ColorRect = $Root/ComboEdgeRight
+@onready var _combo_full_tint: ColorRect = $Root/ComboFullTint
+@onready var _spell_flash_rect: ColorRect = $Root/SpellFlashRect
+@onready var _spell_notice_label: Label = $Root/SpellNoticeLabel
 
 
 func _ready() -> void:
@@ -52,8 +45,7 @@ func _ready() -> void:
 	_main = get_parent()
 	if is_instance_valid(_main) and _main.has_signal("spell_used"):
 		_main.spell_used.connect(_on_spell_used)
-	
-	# HUD 文本仅展示信息，不拦截输入
+
 	if _score_label != null:
 		_score_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _combo_label != null:
@@ -61,26 +53,23 @@ func _ready() -> void:
 		_combo_base_color = _combo_label.modulate
 		_combo_base_scale = _combo_label.scale
 		call_deferred("_refresh_combo_label_pivot")
-	_ensure_combo_notice_label()
-	_ensure_combo_screen_vfx_nodes()
 	if _dps_label != null:
 		_dps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _wave_label != null:
 		_wave_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	# 暂停按钮：始终可点，用于切换树的暂停状态
+
 	if _pause_button != null:
 		_pause_button.pressed.connect(_on_pause_button_pressed)
 		_update_pause_button_text()
-	
-	# 设置按钮：打开设置界面，但不改变当前暂停状态
+
 	if _settings_button != null:
 		_settings_button.pressed.connect(_on_settings_button_pressed)
-	
-	_ensure_spell_vfx_nodes()
-	_ensure_side_weapon_textures()
-	_ensure_side_weapon_cd_panel()
-	_ensure_left_slots_panel()
+
+	# 副武器槽位初始隐藏，解锁后才显示
+	_slot_arrow.visible = false
+	_slot_bomb.visible = false
+	_slot_boomerang.visible = false
+
 
 func _process(delta: float) -> void:
 	if is_instance_valid(_main) and _main.has_method("get_wave"):
@@ -99,7 +88,6 @@ func _process(delta: float) -> void:
 			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		_wave_label.text = wave_text
-	# 分数 / 连击 / DPS HUD
 	if is_instance_valid(_main):
 		var s: int = 0
 		var c: int = 0
@@ -190,18 +178,16 @@ func _update_combo_visual(combo: int) -> void:
 
 	var color := _combo_base_color
 	if combo >= 100:
-		# 极高连击：彩色变换效果（随时间循环 Hue）
 		var t := float(Time.get_ticks_msec()) / 1000.0
 		var hue := fmod(t * 0.6, 1.0)
 		color = Color.from_hsv(hue, 0.9, 1.0)
 	elif combo >= 50:
-		color = Color(1.0, 0.35, 0.2) # 高连击：偏红橙
+		color = Color(1.0, 0.35, 0.2)
 	elif combo >= 10:
-		color = Color(1.0, 0.85, 0.3) # 中连击：偏亮黄
+		color = Color(1.0, 0.85, 0.3)
 
 	_combo_label.modulate = color
 
-	# Combo +1：以右上角为轴心微缩放，避免贴边控件 scale 后溢出屏外
 	if combo > _last_combo_value:
 		_refresh_combo_label_pivot()
 		var tween := create_tween()
@@ -249,86 +235,13 @@ func _show_combo_notice(text: String) -> void:
 	tween.tween_property(_combo_notice_label, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
-func _ensure_combo_notice_label() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null:
-		return
-	_combo_notice_label = Label.new()
-	_combo_notice_label.text = ""
-	_combo_notice_label.visible = false
-	_combo_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_combo_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_combo_notice_label.add_theme_font_size_override("font_size", 34)
-	_combo_notice_label.anchor_left = 0.2
-	_combo_notice_label.anchor_right = 0.8
-	_combo_notice_label.anchor_top = 0.20
-	_combo_notice_label.anchor_bottom = 0.26
-	root.add_child(_combo_notice_label)
-
-
 func _refresh_combo_label_pivot() -> void:
 	if _combo_label == null or not is_instance_valid(_combo_label):
 		return
-	# 轴心在控件右上角附近：放大时主要往左下长，不挤出屏幕右缘
 	var sz := _combo_label.size
 	if sz.x < 1.0 or sz.y < 1.0:
 		sz = Vector2(maxf(120.0, _combo_label.get_rect().size.x), maxf(20.0, _combo_label.get_rect().size.y))
 	_combo_label.pivot_offset = Vector2(sz.x, sz.y * 0.5)
-
-
-func _ensure_combo_screen_vfx_nodes() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null:
-		return
-	# 边缘流光层：用于高 combo 的全屏氛围反馈
-	_combo_edge_top = ColorRect.new()
-	_combo_edge_top.visible = false
-	_combo_edge_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_edge_top.anchor_left = 0.0
-	_combo_edge_top.anchor_right = 1.0
-	_combo_edge_top.anchor_top = 0.0
-	_combo_edge_top.anchor_bottom = 0.0
-	_combo_edge_top.offset_bottom = 16.0
-	root.add_child(_combo_edge_top)
-
-	_combo_edge_bottom = ColorRect.new()
-	_combo_edge_bottom.visible = false
-	_combo_edge_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_edge_bottom.anchor_left = 0.0
-	_combo_edge_bottom.anchor_right = 1.0
-	_combo_edge_bottom.anchor_top = 1.0
-	_combo_edge_bottom.anchor_bottom = 1.0
-	_combo_edge_bottom.offset_top = -16.0
-	root.add_child(_combo_edge_bottom)
-
-	_combo_edge_left = ColorRect.new()
-	_combo_edge_left.visible = false
-	_combo_edge_left.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_edge_left.anchor_left = 0.0
-	_combo_edge_left.anchor_right = 0.0
-	_combo_edge_left.anchor_top = 0.0
-	_combo_edge_left.anchor_bottom = 1.0
-	_combo_edge_left.offset_right = 16.0
-	root.add_child(_combo_edge_left)
-
-	_combo_edge_right = ColorRect.new()
-	_combo_edge_right.visible = false
-	_combo_edge_right.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_edge_right.anchor_left = 1.0
-	_combo_edge_right.anchor_right = 1.0
-	_combo_edge_right.anchor_top = 0.0
-	_combo_edge_right.anchor_bottom = 1.0
-	_combo_edge_right.offset_left = -16.0
-	root.add_child(_combo_edge_right)
-
-	_combo_full_tint = ColorRect.new()
-	_combo_full_tint.visible = false
-	_combo_full_tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_combo_full_tint.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_combo_full_tint.set_offsets_preset(Control.PRESET_FULL_RECT)
-	_combo_full_tint.color = Color(1, 1, 1, 0.0)
-	root.add_child(_combo_full_tint)
 
 
 func _update_combo_screen_vfx(combo: int) -> void:
@@ -385,39 +298,9 @@ func _play_combo_break_sfx() -> void:
 		audio.play_player_hurt()
 
 
-func _ensure_side_weapon_textures() -> void:
-	if _side_weapon_textures.size() > 0:
-		return
-	_side_weapon_textures["arrow"] = preload("res://assets/sprites/bullets/Arrow.png") as Texture2D
-	_side_weapon_textures["bomb"] = preload("res://assets/ui/bomb.png") as Texture2D
-	_side_weapon_textures["boomerang"] = preload("res://assets/sprites/bullets/Sickle.png") as Texture2D
-
-
-func _ensure_left_slots_panel() -> void:
-	if _left_slots_vbox == null:
-		return
-	for child in _left_slots_vbox.get_children():
-		_left_slots_vbox.remove_child(child)
-		child.queue_free()
-	var tex_gun: Texture2D = preload("res://assets/sprites/bullets/bullet_player_basic.png") as Texture2D
-	var tex_shield: Texture2D = preload("res://assets/ui/Shield.svg") as Texture2D
-	var tex_life: Texture2D = LIFE_ICON
-	_main_gun_slot = STATUS_SLOT_SCENE.instantiate()
-	_main_gun_slot.set_icon_texture(tex_gun)
-	_left_slots_vbox.add_child(_main_gun_slot)
-	_shield_slot = STATUS_SLOT_SCENE.instantiate()
-	_shield_slot.set_icon_texture(tex_shield)
-	_left_slots_vbox.add_child(_shield_slot)
-	_life_slot = STATUS_SLOT_SCENE.instantiate()
-	if tex_life != null:
-		_life_slot.set_icon_texture(tex_life)
-	_left_slots_vbox.add_child(_life_slot)
-
-
 func _update_left_slots() -> void:
 	if _main_gun_slot == null or _shield_slot == null or _life_slot == null:
 		return
-	# 主炮：外圈 = 下次开火剩余时间/间隔，x N = 齐射弹数
 	if is_instance_valid(_player) and _player.has_method("get_main_fire_cd_remaining"):
 		var eff_iv: float = _player.get_effective_fire_interval() if _player.has_method("get_effective_fire_interval") else 0.2
 		var rem: float = _player.get_main_fire_cd_remaining()
@@ -428,88 +311,52 @@ func _update_left_slots() -> void:
 	else:
 		_main_gun_slot.set_ratio(1.0)
 		_main_gun_slot.set_count(1)
-	# 护盾：外圈 = 有层数时满、无层数时空，x N = 护盾层数
 	var guard_n: int = 0
 	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
 		guard_n = _main.get_combo_guard_charges()
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
 
-	# 生命：外圈 = 有生命时满、无生命时空，x N = 剩余命数
 	var lives: int = 0
 	if is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
 		lives = _main.get_lives_remaining()
-	# 生命不展示冷却环，仅用图标 + xN 表示剩余命数
 	_life_slot.set_ratio(0.0)
 	_life_slot.set_count(maxi(0, lives))
 
 
-func _ensure_side_weapon_cd_panel() -> void:
-	if _side_weapon_cd_vbox == null:
-		return
-	for child in _side_weapon_cd_vbox.get_children():
-		_side_weapon_cd_vbox.remove_child(child)
-		child.queue_free()
-	# 符卡冷却槽：固定放在右侧顶部，图标使用星形
-	_spell_cd_slot = STATUS_SLOT_SCENE.instantiate()
-	if _spell_cd_slot.has_method("set_icon_texture"):
-		_spell_cd_slot.set_icon_texture(preload("res://assets/ui/star/star4.png"))
-	_side_weapon_cd_vbox.add_child(_spell_cd_slot)
-
-
 func _update_side_weapon_cd_slots() -> void:
-	if _side_weapon_cd_vbox == null or not is_instance_valid(_player):
+	if not is_instance_valid(_player):
 		return
 	_update_spell_cd_slot()
-	var order: Array[String] = ["arrow", "bomb", "boomerang"]
-	for weapon_id in order:
-		var unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked(weapon_id)
-		if not unlocked:
-			if weapon_id in _side_weapon_slots:
-				var slot: Control = _side_weapon_slots[weapon_id]
-				_side_weapon_cd_vbox.remove_child(slot)
-				slot.queue_free()
-				_side_weapon_slots.erase(weapon_id)
-			continue
-		if weapon_id not in _side_weapon_slots:
-			var slot: Control = STATUS_SLOT_SCENE.instantiate()
-			var tex: Texture2D = _side_weapon_textures.get(weapon_id, null)
-			if slot.has_method("set_icon_texture") and tex != null:
-				slot.set_icon_texture(tex)
-			_side_weapon_cd_vbox.add_child(slot)
-			_side_weapon_slots[weapon_id] = slot
-			var idx := order.find(weapon_id)
-			if idx >= 0:
-				_side_weapon_cd_vbox.move_child(slot, mini(idx, _side_weapon_cd_vbox.get_child_count() - 1))
-		var slot_node: Control = _side_weapon_slots[weapon_id]
-		if not is_instance_valid(slot_node) or not slot_node.has_method("set_ratio"):
-			continue
-		var r: float = 1.0
-		var n: int = 1
-		if weapon_id == "arrow":
-			var total: float = _player.arrow_auto_interval if "arrow_auto_interval" in _player else 1.4
-			var rem: float = _player.get_arrow_cd_remaining() if _player.has_method("get_arrow_cd_remaining") else 0.0
-			r = rem / total if total > 0.0 else 1.0
-			n = _player.get_arrow_shot_count() if _player.has_method("get_arrow_shot_count") else 1
-		elif weapon_id == "bomb":
-			var total: float = _player.bomb_auto_interval if "bomb_auto_interval" in _player else 2.5
-			var rem: float = _player.get_bomb_cd_remaining() if _player.has_method("get_bomb_cd_remaining") else 0.0
-			r = rem / total if total > 0.0 else 1.0
-			n = _player.get_bomb_shot_count() if _player.has_method("get_bomb_shot_count") else 1
-		elif weapon_id == "boomerang":
-			var _air_unused: int = _player.get_boomerang_airborne() if _player.has_method("get_boomerang_airborne") else 0
-			var vol: int = _player.get_boomerang_shot_count() if _player.has_method("get_boomerang_shot_count") else 1
-			r = 0.0
-			n = vol
-		slot_node.set_ratio(r)
-		slot_node.set_count(n)
+
+	var arrow_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow")
+	_slot_arrow.visible = arrow_unlocked
+	if arrow_unlocked:
+		var total: float = _player.arrow_auto_interval if "arrow_auto_interval" in _player else 1.4
+		var rem: float = _player.get_arrow_cd_remaining() if _player.has_method("get_arrow_cd_remaining") else 0.0
+		_slot_arrow.set_ratio(rem / total if total > 0.0 else 1.0)
+		_slot_arrow.set_count(_player.get_arrow_shot_count() if _player.has_method("get_arrow_shot_count") else 1)
+
+	var bomb_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb")
+	_slot_bomb.visible = bomb_unlocked
+	if bomb_unlocked:
+		var total: float = _player.bomb_auto_interval if "bomb_auto_interval" in _player else 2.5
+		var rem: float = _player.get_bomb_cd_remaining() if _player.has_method("get_bomb_cd_remaining") else 0.0
+		_slot_bomb.set_ratio(rem / total if total > 0.0 else 1.0)
+		_slot_bomb.set_count(_player.get_bomb_shot_count() if _player.has_method("get_bomb_shot_count") else 1)
+
+	var boomerang_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang")
+	_slot_boomerang.visible = boomerang_unlocked
+	if boomerang_unlocked:
+		var vol: int = _player.get_boomerang_shot_count() if _player.has_method("get_boomerang_shot_count") else 1
+		_slot_boomerang.set_ratio(0.0)
+		_slot_boomerang.set_count(vol)
 
 
 func _update_spell_cd_slot() -> void:
 	if _spell_cd_slot == null or not is_instance_valid(_main):
 		return
 	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
-	# 未自动符卡时不展示右侧符卡槽
 	if not has_auto:
 		_spell_cd_slot.visible = false
 		_spell_cd_slot.set_ratio(0.0)
@@ -558,7 +405,6 @@ func _update_spell_button() -> void:
 		progress = clampf(1.0 - cd / total, 0.0, 1.0)
 	if _spell_button.has_method("set_progress"):
 		_spell_button.set_progress(progress)
-	# 未自动符卡时按钮始终可见，仅冷却完成后由星星显示“就绪感”
 	if has_auto:
 		_spell_button.visible = false
 	else:
@@ -570,33 +416,6 @@ func _on_spell_button_pressed() -> void:
 		return
 	if _main.has_method("try_use_spell"):
 		_main.try_use_spell()
-
-
-func _ensure_spell_vfx_nodes() -> void:
-	var root := get_node_or_null("Root") as Control
-	if root == null:
-		return
-
-	_spell_flash_rect = ColorRect.new()
-	_spell_flash_rect.visible = false
-	_spell_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_spell_flash_rect.color = Color(0.65, 0.9, 1.0, 0.0)
-	_spell_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_spell_flash_rect.set_offsets_preset(Control.PRESET_FULL_RECT)
-	root.add_child(_spell_flash_rect)
-
-	_spell_notice_label = Label.new()
-	_spell_notice_label.visible = false
-	_spell_notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_spell_notice_label.text = "符卡发动!"
-	_spell_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_spell_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_spell_notice_label.add_theme_font_size_override("font_size", 44)
-	_spell_notice_label.anchor_left = 0.2
-	_spell_notice_label.anchor_right = 0.8
-	_spell_notice_label.anchor_top = 0.42
-	_spell_notice_label.anchor_bottom = 0.52
-	root.add_child(_spell_notice_label)
 
 
 func _on_spell_used() -> void:

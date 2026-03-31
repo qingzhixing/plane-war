@@ -5,91 +5,40 @@ const _DEFAULT_UI_THEME: Theme = preload("res://assets/theme/default_ui_theme.tr
 @export var main_path: NodePath = NodePath("..")
 
 var _main: Node = null
-var _panel: ColorRect
-var _label: RichTextLabel
-var _continue_btn: Button
-var _restart_btn: Button
-var _main_menu_btn: Button
+
+@onready var _label: RichTextLabel = $Root/Center/SummaryCard/VBox/SummaryLabel
+@onready var _restart_btn: Button = $Root/Center/SummaryCard/VBox/RestartButton
+@onready var _main_menu_btn: Button = $Root/Center/SummaryCard/VBox/MainMenuButton
+
 
 func _ready() -> void:
-	add_to_group("game_over_ui") 
+	add_to_group("game_over_ui")
 	if main_path != NodePath(""):
 		_main = get_node(main_path)
-
 	visible = false
-
-	# 复用场景中已有的 GameOver UI 结构：GameOver/Root/... 节点
-	var root := get_node_or_null("Root")
-	if root is Control:
-		(root as Control).theme = _DEFAULT_UI_THEME
-		root.mouse_filter = Control.MOUSE_FILTER_STOP
-		root.visible = false
-		_panel = root.get_node_or_null("Panel") as ColorRect
-		if _panel != null:
-			_panel.color = Color(0.05, 0.06, 0.09, 0.82)
-		var center := root.get_node_or_null("Center") as CenterContainer
-		var vbox := center.get_node_or_null("VBox") as VBoxContainer
-
-		# 拟态卡片容器（PanelContainer 自动适配内容高度）
-		var card_style := StyleBoxFlat.new()
-		card_style.bg_color = Color(0.16, 0.17, 0.22, 1.0)
-		card_style.border_width_left = 1
-		card_style.border_width_top = 1
-		card_style.border_color = Color(0.26, 0.28, 0.36, 0.9)
-		card_style.corner_radius_top_left = 18
-		card_style.corner_radius_top_right = 18
-		card_style.corner_radius_bottom_right = 18
-		card_style.corner_radius_bottom_left = 18
-		card_style.shadow_color = Color(0.08, 0.09, 0.12, 0.9)
-		card_style.shadow_size = 6
-		card_style.shadow_offset = Vector2(4, 4)
-		card_style.content_margin_left = 28.0
-		card_style.content_margin_top = 24.0
-		card_style.content_margin_right = 28.0
-		card_style.content_margin_bottom = 24.0
-		var card_container := PanelContainer.new()
-		card_container.add_theme_stylebox_override("panel", card_style)
-		center.add_child(card_container)
-		vbox.reparent(card_container, false)
-
-		# 在标题 Label 下方创建一个 RichTextLabel，用于展示结算详情
-		_label = RichTextLabel.new()
-		_label.name = "SummaryLabel"
-		_label.bbcode_enabled = true
-		_label.fit_content = true
-		_label.custom_minimum_size = Vector2(460.0, 0.0)
-		_label.add_theme_font_size_override("normal_font_size", 28)
-		vbox.add_child(_label, true)
-		_continue_btn = vbox.get_node_or_null("ContinueButton") as Button
-		_restart_btn = vbox.get_node_or_null("RestartButton") as Button
-		_main_menu_btn = vbox.get_node_or_null("MainMenuButton") as Button
-	else:
-		return
-
-	if _panel != null:
-		_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-
-	if _continue_btn != null:
-		_continue_btn.pressed.connect(_on_continue_pressed)
-
+	var root := get_node_or_null("Root") as Control
+	if root != null:
+		root.theme = _DEFAULT_UI_THEME
+	var panel := get_node_or_null("Root/Panel") as ColorRect
+	if panel != null:
+		panel.color = Color(0.05, 0.06, 0.09, 0.82)
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _restart_btn != null:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 	if _main_menu_btn != null:
 		_main_menu_btn.pressed.connect(_on_main_menu_pressed)
 
+
 func show_game_over() -> void:
-	# 更新结算信息：以评分与表现为核心
 	if _label != null and _main != null:
 		var diff := {}
 		if _main.has_method("finalize_battle_records"):
 			diff = _main.finalize_battle_records()
 		var lines: Array[String] = []
 
-		# 死亡提示
 		if _main.has_method("get_lives_remaining") and _main.get_lives_remaining() <= 0:
 			lines.append("[center][color=#ff5555]— You Dead —[/color][/center]")
 
-		# 分数
 		if _main.has_method("get_score"):
 			var s: int = _main.get_score()
 			var best_s: int = _main.get_best_score() if _main.has_method("get_best_score") else s
@@ -98,7 +47,6 @@ func show_game_over() -> void:
 				score_line = "[center][color=#ffd700]Score  %d  (历史 %d)[/color][/center]" % [s, best_s]
 			lines.append(score_line)
 
-		# 最高连击
 		if _main.has_method("get_max_combo"):
 			var mc: int = _main.get_max_combo()
 			var best_c: int = _main.get_best_combo() if _main.has_method("get_best_combo") else mc
@@ -107,7 +55,6 @@ func show_game_over() -> void:
 				combo_line = "[center][color=#ffd700]连击  %d  (历史 %d)[/color][/center]" % [mc, best_c]
 			lines.append(combo_line)
 
-		# 最高 DPS
 		if _main.has_method("get_max_dps"):
 			var md: float = _main.get_max_dps()
 			var best_d: float = _main.get_best_dps() if _main.has_method("get_best_dps") else md
@@ -116,7 +63,6 @@ func show_game_over() -> void:
 				dps_line = "[center][color=#ffd700]DPS  %.0f  (历史 %.0f)[/color][/center]" % [md, best_d]
 			lines.append(dps_line)
 
-		# 构筑回顾
 		if _main.has_method("get_upgrade_counts"):
 			var counts: Dictionary = _main.get_upgrade_counts()
 			if not counts.is_empty():
@@ -142,18 +88,13 @@ func show_game_over() -> void:
 			lines.append("[center]Battle Summary[/center]")
 		_label.bbcode_enabled = true
 		_label.bbcode_text = "\n".join(lines)
-	# 新规则下不再提供“继续游玩”
-	if _continue_btn != null:
-		_continue_btn.visible = false
+
 	var root := get_node_or_null("Root")
 	if root is Control:
 		root.visible = true
 	visible = true
 	get_tree().paused = true
 
-func _on_continue_pressed() -> void:
-	# 旧的“继续游玩 + 回复 HP + 无敌”机制已移除，本函数保留占位以兼容旧场景结构，不再执行任何逻辑。
-	pass
 
 func _on_restart_pressed() -> void:
 	get_tree().paused = false
@@ -167,5 +108,4 @@ func _on_main_menu_pressed() -> void:
 		return
 	var err := tree.change_scene_to_file("res://scenes/MainMenu.tscn")
 	if err != OK:
-		# 如果主菜单场景路径不同，保底行为为重新加载当前场景
 		tree.reload_current_scene()
