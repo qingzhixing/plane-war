@@ -1,0 +1,181 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/debug_upgrade_picker.gd" id="1_script"]
+[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
+
+[node name="DebugUpgradePicker" type="CanvasLayer"]
+layer = 120
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.05, 0.05, 0.12, 0.92)
+
+[node name="Margin" type="MarginContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Root/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Root/Margin/VBox"]
+layout_mode = 2
+text = "调试：自选升级（点关闭返回）"
+theme_override_font_sizes/font_size = 28
+
+[node name="TitleRow" type="HBoxContainer" parent="Root/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CloseButton" type="Button" parent="Root/Margin/VBox/TitleRow"]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "关闭"
+
+[node name="Hint" type="Label" parent="Root/Margin/VBox/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "点击条目立即生效，可重复叠加"
+theme_override_font_sizes/font_size = 18
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Margin/VBox"]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="List" type="VBoxContainer" parent="Root/Margin/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Btn_fire_rate" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "速射机炮 — 间隔×0.85；溢出攻速%转伤"
+
+[node name="Btn_damage_percent" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "高爆弹头 — 主武器伤害 +20%"
+
+[node name="Btn_multi_shot" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "双联机炮 — 主武器弹数 +1"
+
+[node name="Btn_bullet_speed" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "高初速弹体 — 主武器弹速 +12%"
+
+[node name="Btn_spread_focus" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "火力收束 — 主武器弹道更集中"
+
+[node name="Btn_arrow_cooldown" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "轻量箭袋 — 弓箭冷却 -20%"
+
+[node name="Btn_arrow_multi" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "齐射箭矢 — 弓箭齐射 +1 / 解锁"
+
+[node name="Btn_boomerang_multi" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "双刃回旋 — 解锁回旋镖 / 齐射 +1"
+
+[node name="Btn_combo_boost" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "节奏推进 — 每次命中连击 +1"
+
+[node name="Btn_combo_guard" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "稳态护盾 — 连击保护 +1 层"
+
+[node name="Btn_spell_cooldown" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "符卡充能 — 符卡冷却 -15%"
+
+[node name="Btn_spell_auto" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "自动符卡 — 一次性 冷却-50% 自动放"
+
+[node name="Btn_bomb_multi" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "挂载炸弹 — 解锁炸弹副武器 / 齐射 +1"
+
+[node name="Btn_bomb_side_cooldown" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "炸弹装填 — 炸弹副武器冷却 -20%"
+
+[node name="Btn_score_up" type="Button" parent="Root/Margin/VBox/Scroll/List"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+alignment = 0
+text = "评分增幅 — 评分乘区 +15%"
+
+[connection signal="pressed" from="Root/Margin/VBox/TitleRow/CloseButton" to="." method="_close"]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_fire_rate" to="." method="_on_pick" binds=["fire_rate"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_damage_percent" to="." method="_on_pick" binds=["damage_percent"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_multi_shot" to="." method="_on_pick" binds=["multi_shot"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_bullet_speed" to="." method="_on_pick" binds=["bullet_speed"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_spread_focus" to="." method="_on_pick" binds=["spread_focus"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_arrow_cooldown" to="." method="_on_pick" binds=["arrow_cooldown"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_arrow_multi" to="." method="_on_pick" binds=["arrow_multi"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_boomerang_multi" to="." method="_on_pick" binds=["boomerang_multi"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_combo_boost" to="." method="_on_pick" binds=["combo_boost"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_combo_guard" to="." method="_on_pick" binds=["combo_guard"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_spell_cooldown" to="." method="_on_pick" binds=["spell_cooldown"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_spell_auto" to="." method="_on_pick" binds=["spell_auto"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_bomb_multi" to="." method="_on_pick" binds=["bomb_multi"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_bomb_side_cooldown" to="." method="_on_pick" binds=["bomb_side_cooldown"]]
+[connection signal="pressed" from="Root/Margin/VBox/Scroll/List/Btn_score_up" to="." method="_on_pick" binds=["score_up"]]

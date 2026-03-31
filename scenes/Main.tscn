@@ -6,14 +6,9 @@
 [ext_resource type="Script" uid="uid://b2ygwl66w70j6" path="res://scripts/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://cpnvoqjfanb0s" path="res://scripts/game_over.gd" id="5_game_over"]
 [ext_resource type="Script" uid="uid://cmpx7cpm1wjx" path="res://scripts/main.gd" id="6_main"]
-[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/upgrade_ui.gd" id="7_upgrade_ui"]
 [ext_resource type="FontFile" uid="uid://f7l5i1xl7ed6" path="res://assets/font/PixelOperator8-Bold.ttf" id="8_3p2gp"]
-[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/settings_ui.gd" id="8_settings_ui"]
 [ext_resource type="PackedScene" uid="uid://enemyelite01" path="res://scenes/enemies/EnemyElite01.tscn" id="9_enemy_elite"]
-[ext_resource type="Script" uid="uid://blvlemxi3ji3w" path="res://scripts/boss_hud.gd" id="10_boss_hud"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
-[ext_resource type="Script" uid="uid://ctbb6pe828cj5" path="res://scripts/debug_upgrade_picker.gd" id="12_debug_upgrades"]
-[ext_resource type="Script" uid="uid://dij4saeis6s13" path="res://scripts/post_boss_choice.gd" id="13_post_boss"]
 [ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
 [ext_resource type="PackedScene" uid="uid://bwh6830w5vlxv" path="res://scenes/ui/StatusSlot.tscn" id="15_status_slot"]
 [ext_resource type="Texture2D" uid="uid://w478a7uockj4" path="res://assets/sprites/bullets/bullet_player_basic.png" id="16_tex_gun"]
@@ -22,6 +17,11 @@
 [ext_resource type="Texture2D" uid="uid://dfk08r28unnt8" path="res://assets/sprites/bullets/Arrow.png" id="20_tex_arrow"]
 [ext_resource type="Texture2D" uid="uid://ccx7772swoiwh" path="res://assets/ui/bomb.png" id="21_tex_bomb"]
 [ext_resource type="Texture2D" uid="uid://cyw4slfnau0mf" path="res://assets/sprites/bullets/Sickle.png" id="22_tex_boomerang"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossHUD.tscn" id="23_boss_hud_scene"]
+[ext_resource type="PackedScene" path="res://scenes/ui/UpgradeUI.tscn" id="24_upgrade_ui_scene"]
+[ext_resource type="PackedScene" path="res://scenes/ui/SettingsUI.tscn" id="25_settings_ui_scene"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PostBossChoice.tscn" id="26_post_boss_scene"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DebugUpgradePicker.tscn" id="27_debug_picker_scene"]
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
@@ -194,9 +194,91 @@ texture = ExtResource("21_tex_bomb")
 layout_mode = 2
 texture = ExtResource("22_tex_boomerang")
 
-[node name="PostBossChoice" type="CanvasLayer" parent="." unique_id=1999888771]
-process_mode = 3
-script = ExtResource("13_post_boss")
+[node name="ComboNoticeLabel" type="Label" parent="HUD/Root" unique_id=100000010]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.2
+anchor_right = 0.8
+anchor_bottom = 0.26
+theme_override_font_sizes/font_size = 34
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ComboEdgeTop" type="ColorRect" parent="HUD/Root" unique_id=100000011]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 16.0
+mouse_filter = 2
+
+[node name="ComboEdgeBottom" type="ColorRect" parent="HUD/Root" unique_id=100000012]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+mouse_filter = 2
+
+[node name="ComboEdgeLeft" type="ColorRect" parent="HUD/Root" unique_id=100000013]
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 16.0
+mouse_filter = 2
+
+[node name="ComboEdgeRight" type="ColorRect" parent="HUD/Root" unique_id=100000014]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+mouse_filter = 2
+
+[node name="ComboFullTint" type="ColorRect" parent="HUD/Root" unique_id=100000015]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="SpellFlashRect" type="ColorRect" parent="HUD/Root" unique_id=100000016]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.65, 0.9, 1, 0)
+
+[node name="SpellNoticeLabel" type="Label" parent="HUD/Root" unique_id=100000017]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.42
+anchor_right = 0.8
+anchor_bottom = 0.52
+theme_override_font_sizes/font_size = 44
+text = "符卡爆发!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PostBossChoice" parent="." unique_id=1999888771 instance=ExtResource("26_post_boss_scene")]
+visible = false
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
@@ -211,7 +293,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+mouse_filter = 1
 
 [node name="Panel" type="ColorRect" parent="GameOver/Root" unique_id=2095839253]
 layout_mode = 1
@@ -230,47 +312,53 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="GameOver/Root/Center" unique_id=646404208]
+[node name="SummaryCard" type="PanelContainer" parent="GameOver/Root/Center" unique_id=100000021]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="GameOver/Root/Center/SummaryCard" unique_id=646404208]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="GameOver/Root/Center/VBox" unique_id=121312298]
+[node name="Label" type="Label" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=121312298]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "结算"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963160]
+[node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=676963160]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "重新开始"
 
-[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/VBox" unique_id=676963161]
+[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=676963161]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
-[node name="UpgradeUI" type="CanvasLayer" parent="." unique_id=1043995664]
-process_mode = 3
-script = ExtResource("7_upgrade_ui")
+[node name="SummaryLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000022]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 28
+bbcode_enabled = true
+fit_content = true
 
-[node name="SettingsUI" type="CanvasLayer" parent="." unique_id=317848371]
-process_mode = 3
-script = ExtResource("8_settings_ui")
+[node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
+visible = false
 
-[node name="BossHUD" type="CanvasLayer" parent="." unique_id=426736218]
-process_mode = 3
-script = ExtResource("10_boss_hud")
+[node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("25_settings_ui_scene")]
+visible = false
 
-[node name="DebugUpgradePicker" type="CanvasLayer" parent="." unique_id=1720892747]
-process_mode = 4
-script = ExtResource("12_debug_upgrades")
+[node name="BossHUD" parent="." unique_id=426736218 instance=ExtResource("23_boss_hud_scene")]
+visible = false
+
+[node name="DebugUpgradePicker" parent="." unique_id=1720892747 instance=ExtResource("27_debug_picker_scene")]
+visible = false
 
 [connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="_on_spawn_timeout"]
