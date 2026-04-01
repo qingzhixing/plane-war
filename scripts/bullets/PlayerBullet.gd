@@ -9,6 +9,8 @@ func _ready() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
 		sprite.texture = preload("res://assets/sprites/bullets/bullet_player_basic.png")
+	if homing_strength > 0.0:
+		modulate = Color(0.88, 0.72, 1.0)
 
 
 func _process(delta: float) -> void:
