@@ -68,10 +68,9 @@ func _update_card_sizes() -> void:
 	if vp == null:
 		return
 	var vpr: Rect2 = vp.get_visible_rect()
-	var margin: float = 32.0
 	var gap: float = 16.0
-	var available_w: float = max(0.0, vpr.size.x - margin * 2.0 - gap * 2.0)
-	var card_w: float = max(120.0, available_w / 3.0)
+	var panel_w: float = min(vpr.size.x * 0.72, 900.0)
+	var card_w: float = max(120.0, (panel_w - gap * 2.0) / 3.0)
 	var card_h: float = max(100.0, vpr.size.y * 0.18)
 	for card in _cards:
 		var root := card["root"] as Control

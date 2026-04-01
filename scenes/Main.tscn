@@ -327,7 +327,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-alignment = 1
+theme_override_constants/separation = 12
 
 [node name="Label" type="Label" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=121312298]
 unique_name_in_owner = true
@@ -335,6 +335,45 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "结算"
 horizontal_alignment = 1
+
+[node name="DeathLabel" type="Label" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000023]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.33, 0.33, 1)
+theme_override_font_sizes/font_size = 28
+text = "— You Dead —"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000024]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 26
+bbcode_enabled = true
+text = "[center]Score  9999  [color=#666688](历史 12345)[/color][/center]
+[center]连击  128  [color=#666688](历史 256)[/color][/center]
+[center]DPS  999  [color=#666688](历史 1234)[/color][/center]"
+fit_content = true
+
+[node name="Divider" type="ColorRect" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000025]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.2, 0.22, 0.3, 1)
+
+[node name="BuildTitle" type="Label" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000026]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47, 0.53, 0.67, 1)
+theme_override_font_sizes/font_size = 22
+text = "本局构筑"
+horizontal_alignment = 1
+
+[node name="BuildLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000027]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 22
+bbcode_enabled = true
+text = "[center][color=#bbccee]速射机炮   高爆弹头   双联机炮[/color][/center]"
+fit_content = true
 
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=676963160]
 unique_name_in_owner = true
@@ -350,15 +389,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
-[node name="SummaryLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000022]
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 28
-bbcode_enabled = true
-text = "[center][color=#ff5555]— You Dead —[/color][/center]\n[center]Score  9999  [color=#666688](历史 12345)[/color][/center]\n[center]连击  128  [color=#666688](历史 256)[/color][/center]\n[center]DPS  999  [color=#666688](历史 1234)[/color][/center]\n[center][color=#334455]─────────────────[/color][/center]\n[center][color=#7788aa][font_size=22]本局构筑[/font_size][/color][/center]\n[center][font_size=22][color=#bbccee]速射机炮   高爆弹头   双联机炮[/color][/font_size][/center]"
-fit_content = true
-
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
-visible = false
 
 [node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("25_settings_ui_scene")]
 visible = false
