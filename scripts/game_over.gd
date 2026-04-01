@@ -17,6 +17,14 @@ func _ready() -> void:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 	if _main_menu_btn != null:
 		_main_menu_btn.pressed.connect(_on_main_menu_pressed)
+	_update_label_size()
+	get_viewport().size_changed.connect(_update_label_size)
+
+
+func _update_label_size() -> void:
+	if _label == null:
+		return
+	_label.custom_minimum_size.x = max(300.0, get_viewport().get_visible_rect().size.x * 0.42)
 
 
 func show_game_over() -> void:

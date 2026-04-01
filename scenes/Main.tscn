@@ -351,10 +351,10 @@ theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
 [node name="SummaryLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000022]
-custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
+text = "[center][color=#ff5555]— You Dead —[/color][/center]\n[center]Score  9999  [color=#666688](历史 12345)[/color][/center]\n[center]连击  128  [color=#666688](历史 256)[/color][/center]\n[center]DPS  999  [color=#666688](历史 1234)[/color][/center]\n[center][color=#334455]─────────────────[/color][/center]\n[center][color=#7788aa][font_size=22]本局构筑[/font_size][/color][/center]\n[center][font_size=22][color=#bbccee]速射机炮   高爆弹头   双联机炮[/color][/font_size][/center]"
 fit_content = true
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
