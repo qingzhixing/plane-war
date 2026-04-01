@@ -321,6 +321,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SummaryCard" type="PanelContainer" parent="GameOver/Root/Center" unique_id=100000021]
+custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 
 [node name="VBox" type="VBoxContainer" parent="GameOver/Root/Center/SummaryCard" unique_id=646404208]
@@ -390,6 +391,7 @@ theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
+visible = false
 
 [node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("25_settings_ui_scene")]
 visible = false
