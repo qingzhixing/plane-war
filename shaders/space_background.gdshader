@@ -10,7 +10,7 @@ float hash(vec2 p) {
 
 void fragment() {
 	vec2 uv = UV;
-	vec3 col = vec3(0.04, 0.05, 0.12);
+	vec3 col = vec3(0.10, 0.12, 0.25);
 
 	float t = TIME * scroll_speed / 1280.0;
 
@@ -26,11 +26,13 @@ void fragment() {
 		vec2 local_uv = fract(layer_uv);
 
 		float r = hash(cell + fi * vec2(47.3, 31.7));
-		if (r > 0.93) {
+		if (r > 0.78) {
 			vec2 star_pos = vec2(hash(cell + vec2(1.0)), hash(cell + vec2(2.0)));
-			float dist = length(local_uv - star_pos);
-			float sz = 0.03 + hash(cell + vec2(3.0)) * 0.03;
-			float star = smoothstep(sz, 0.0, dist);
+			vec2 diff = abs(local_uv - star_pos);
+			float y_tiles = 8.0 + fi * 3.0;
+			// 将 diff 换算成屏幕像素，使方块在视觉上等宽高
+			float star_px = 3.0 + hash(cell + vec2(3.0)) * 2.0;
+			float star = step(max(diff.x * 720.0, diff.y * 1280.0 / y_tiles), star_px);
 			float twinkle = 0.75 + 0.25 * sin(TIME * (1.5 + r * 4.0) + r * 60.0);
 			float brightness = (0.35 + fi * 0.25) * twinkle;
 			col += star * brightness;
