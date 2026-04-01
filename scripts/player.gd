@@ -41,8 +41,10 @@ var _hit_invulnerable_timer: float = 0.0
 var _damage_multiplier: float = 1.0
 var _arrow_auto_timer: float = 0.0
 var _arrow_shot_count: int = 0
-## 当前在飞的回旋镖数量；归零后齐射下一波
+## 当前在飞的回旋镖数量
 var _boomerang_airborne: int = 0
+## 下一颗回旋镖使用的散射槽位索引（循环使用，实现逐颗独立发射）
+var _boomerang_next_index: int = 0
 var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
@@ -221,6 +223,7 @@ func _spawn_boomerang_volley() -> void:
 	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null or _boomerang_airborne > 0:
 		return
 	var n: int = maxi(1, _boomerang_shot_count)
+	_boomerang_next_index = 0
 	_boomerang_airborne = n
 	var spread := 0.18
 	for i in n:
@@ -230,6 +233,23 @@ func _spawn_boomerang_volley() -> void:
 			dir.y = -dir.y
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
 		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
+	_boomerang_next_index = n
+
+
+func _spawn_single_boomerang() -> void:
+	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
+		return
+	var n: int = maxi(1, _boomerang_shot_count)
+	var i: int = _boomerang_next_index % n
+	_boomerang_next_index += 1
+	var spread := 0.18
+	var angle: float = (i - (n - 1) * 0.5) * spread
+	var dir := Vector2(sin(angle), -cos(angle))
+	if dir.y > 0.0:
+		dir.y = -dir.y
+	var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+	_boomerang_airborne += 1
+	_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
 
 
 func _boomerang_aim_dir() -> Vector2:
@@ -247,8 +267,8 @@ func _boomerang_aim_dir() -> Vector2:
 
 func on_boomerang_returned() -> void:
 	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
-	if _boomerang_airborne == 0 and has_weapon_unlocked("boomerang"):
-		call_deferred("_spawn_boomerang_volley")
+	if has_weapon_unlocked("boomerang"):
+		call_deferred("_spawn_single_boomerang")
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -451,6 +471,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 				call_deferred("_spawn_boomerang_volley")
 			else:
 				_boomerang_shot_count = mini(6, _boomerang_shot_count + 1)
+				call_deferred("_spawn_single_boomerang")
 		"bomb_multi", "bomb_weapon":
 			if not has_weapon_unlocked("bomb"):
 				_weapon_unlocked["bomb"] = true
