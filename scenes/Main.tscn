@@ -288,7 +288,6 @@ visible = false
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
-visible = false
 script = ExtResource("5_game_over")
 
 [node name="Root" type="Control" parent="GameOver" unique_id=222543225]
@@ -361,7 +360,6 @@ mouse_filter = 2
 color = Color(0.2, 0.22, 0.3, 1)
 
 [node name="BuildTitle" type="Label" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000026]
-visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.47, 0.53, 0.67, 1)
 theme_override_font_sizes/font_size = 22
@@ -369,21 +367,25 @@ text = "本局构筑"
 horizontal_alignment = 1
 
 [node name="BuildLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=100000027]
-visible = false
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 22
 bbcode_enabled = true
 text = "[center][color=#bbccee]速射机炮   高爆弹头   双联机炮[/color][/center]"
 fit_content = true
 
-[node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=676963160]
+[node name="ButtonMargin" type="MarginContainer" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=300000001]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+
+[node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin" unique_id=676963160]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "重新开始"
 
-[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=676963161]
+[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin" unique_id=676963161]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2

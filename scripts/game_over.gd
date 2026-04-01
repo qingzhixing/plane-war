@@ -8,8 +8,8 @@ var _main: Node = null
 @onready var _stats_label: RichTextLabel = $Root/Center/SummaryCard/VBox/StatsLabel
 @onready var _build_title: Label = $Root/Center/SummaryCard/VBox/BuildTitle
 @onready var _build_label: RichTextLabel = $Root/Center/SummaryCard/VBox/BuildLabel
-@onready var _restart_btn: Button = $Root/Center/SummaryCard/VBox/RestartButton
-@onready var _main_menu_btn: Button = $Root/Center/SummaryCard/VBox/MainMenuButton
+@onready var _restart_btn: Button = $Root/Center/SummaryCard/VBox/ButtonMargin/RestartButton
+@onready var _main_menu_btn: Button = $Root/Center/SummaryCard/VBox/ButtonMargin/MainMenuButton
 
 
 func _ready() -> void:
