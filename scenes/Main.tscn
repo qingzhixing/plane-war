@@ -288,6 +288,7 @@ visible = false
 
 [node name="GameOver" type="CanvasLayer" parent="." unique_id=78857837]
 process_mode = 3
+visible = false
 script = ExtResource("5_game_over")
 
 [node name="Root" type="Control" parent="GameOver" unique_id=222543225]
@@ -376,21 +377,27 @@ fit_content = true
 [node name="ButtonMargin" type="MarginContainer" parent="GameOver/Root/Center/SummaryCard/VBox" unique_id=300000001]
 layout_mode = 2
 theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin" unique_id=676963160]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 80)
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin" unique_id=340543502]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "重新开始"
+theme_override_constants/separation = 14
 
-[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin" unique_id=676963161]
+[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin/VBoxContainer" unique_id=676963161]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "主菜单"
+
+[node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/VBox/ButtonMargin/VBoxContainer" unique_id=676963160]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "重新开始"
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
 visible = false
