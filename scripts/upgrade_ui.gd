@@ -1,4 +1,3 @@
-@tool
 extends CanvasLayer
 
 const UPGRADES: Array[Dictionary] = [
@@ -33,53 +32,34 @@ var _main: Node
 # 每张卡的节点引用：[{ root, title_label, desc_label, button }]
 var _cards: Array[Dictionary] = []
 
-@onready var _card0_root: Control = $Root/Center/VBox/CardBox/Card0
-@onready var _card1_root: Control = $Root/Center/VBox/CardBox/Card1
-@onready var _card2_root: Control = $Root/Center/VBox/CardBox/Card2
+@onready var _card0_root: Control = $Root/VBox/CardBox/Card0
+@onready var _card1_root: Control = $Root/VBox/CardBox/Card1
+@onready var _card2_root: Control = $Root/VBox/CardBox/Card2
 
-@onready var _card0_title: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
-@onready var _card0_desc: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
-@onready var _card0_btn: Button = $Root/Center/VBox/CardBox/Card0/CardBtn0
+@onready var _card0_title: Label = $Root/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
+@onready var _card0_desc: Label = $Root/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
+@onready var _card0_btn: Button = $Root/VBox/CardBox/Card0/CardBtn0
 
-@onready var _card1_title: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
-@onready var _card1_desc: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
-@onready var _card1_btn: Button = $Root/Center/VBox/CardBox/Card1/CardBtn1
+@onready var _card1_title: Label = $Root/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
+@onready var _card1_desc: Label = $Root/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
+@onready var _card1_btn: Button = $Root/VBox/CardBox/Card1/CardBtn1
 
-@onready var _card2_title: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
-@onready var _card2_desc: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
-@onready var _card2_btn: Button = $Root/Center/VBox/CardBox/Card2/CardBtn2
+@onready var _card2_title: Label = $Root/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
+@onready var _card2_desc: Label = $Root/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
+@onready var _card2_btn: Button = $Root/VBox/CardBox/Card2/CardBtn2
 
 
 func _ready() -> void:
-	if not Engine.is_editor_hint():
-		_main = get_parent()
-		visible = false
-		get_viewport().size_changed.connect(_update_card_sizes)
+	_main = get_parent()
+	visible = false
 	_cards = [
 		{"root": _card0_root, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_btn},
 		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
 		{"root": _card2_root, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_btn},
 	]
-	_update_card_sizes()
-
-
-func _update_card_sizes() -> void:
-	var vp := get_viewport()
-	if vp == null:
-		return
-	var vpr: Rect2 = vp.get_visible_rect()
-	var gap: float = 16.0
-	var panel_w: float = min(vpr.size.x * 0.72, 900.0)
-	var card_w: float = max(120.0, (panel_w - gap * 2.0) / 3.0)
-	var card_h: float = max(100.0, vpr.size.y * 0.18)
-	for card in _cards:
-		var root := card["root"] as Control
-		if root != null:
-			root.custom_minimum_size = Vector2(card_w, card_h)
 
 
 func show_pick() -> void:
-	_update_card_sizes()
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
