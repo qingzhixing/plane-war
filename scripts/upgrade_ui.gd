@@ -1,3 +1,4 @@
+@tool
 extends CanvasLayer
 
 const UPGRADES: Array[Dictionary] = [
@@ -27,8 +28,6 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-const CARD_HEIGHT: float = 140.0
-
 var _main: Node
 
 # 每张卡的节点引用：[{ root, title_label, desc_label, button }]
@@ -52,8 +51,10 @@ var _cards: Array[Dictionary] = []
 
 
 func _ready() -> void:
-	_main = get_parent()
-	visible = false
+	if not Engine.is_editor_hint():
+		_main = get_parent()
+		visible = false
+		get_viewport().size_changed.connect(_update_card_sizes)
 	_cards = [
 		{"root": _card0_root, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_btn},
 		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
@@ -63,15 +64,19 @@ func _ready() -> void:
 
 
 func _update_card_sizes() -> void:
-	var vpr: Rect2 = get_viewport().get_visible_rect()
+	var vp := get_viewport()
+	if vp == null:
+		return
+	var vpr: Rect2 = vp.get_visible_rect()
 	var margin: float = 32.0
 	var gap: float = 16.0
 	var available_w: float = max(0.0, vpr.size.x - margin * 2.0 - gap * 2.0)
-	var card_w: float = max(140.0, available_w / 3.0)
+	var card_w: float = max(120.0, available_w / 3.0)
+	var card_h: float = max(100.0, vpr.size.y * 0.18)
 	for card in _cards:
 		var root := card["root"] as Control
 		if root != null:
-			root.custom_minimum_size = Vector2(card_w, CARD_HEIGHT)
+			root.custom_minimum_size = Vector2(card_w, card_h)
 
 
 func show_pick() -> void:
