@@ -16,9 +16,10 @@ func _process(delta: float) -> void:
 		var target := _find_nearest_enemy()
 		if is_instance_valid(target):
 			var to_target := (target.global_position - global_position).normalized()
-			direction = Vector2.from_angle(
-				lerp_angle(direction.angle(), to_target.angle(), homing_strength * delta)
-			)
+			var current_angle := direction.angle()
+			var diff := wrapf(to_target.angle() - current_angle, -PI, PI)
+			var turn := clampf(diff, -homing_strength * delta, homing_strength * delta)
+			direction = Vector2.from_angle(current_angle + turn)
 	super._process(delta)
 
 

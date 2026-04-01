@@ -501,7 +501,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"bomb_side_cooldown":
 			bomb_auto_interval = maxf(0.85, bomb_auto_interval * 0.8)
 		"bullet_homing":
-			_bullet_homing_strength += 3.0
+			if _bullet_homing_strength == 0.0:
+				_bullet_homing_strength = 1.2
 		"bomb_heavy":
 			_bomb_damage_multiplier *= 1.5
 			_bomb_scale *= 1.05

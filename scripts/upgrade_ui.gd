@@ -7,7 +7,7 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
 	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
 	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
-	{"id": "bullet_homing", "name": "磁导弹头", "desc": "主武器子弹轻微向最近敌机偏转（可叠加）"},
+	{"id": "bullet_homing", "name": "磁导弹头", "desc": "主武器子弹轻微向最近敌机偏转（一次性）"},
 
 	# 副武器：弓箭（由 arrow_multi 首次解锁）
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
