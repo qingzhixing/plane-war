@@ -158,4 +158,3 @@ func _update_hit_material() -> void:
 	if _HIT_FLASH_DURATION > 0.0:
 		strength = _hit_flash_timer / _HIT_FLASH_DURATION
 	_hit_material.set_shader_parameter("hit_strength", strength)
-

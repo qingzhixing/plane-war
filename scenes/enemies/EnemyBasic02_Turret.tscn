@@ -1,18 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://26wp3qfsbfo7"]
+[gd_scene format=3 uid="uid://26wp3qfsbfo7"]
 
 [ext_resource type="Script" uid="uid://b534nt6k6kpla" path="res://scripts/enemy_turret.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://c0yfi8g3vqq3o" path="res://assets/sprites/enemies/enemy_basic_02.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://dyuh8c0dy0sfc" path="res://assets/sprites/enemies/enemy_basic_03.png" id="2_62a00"]
 
-[node name="EnemyBasic02_Turret" type="Area2D"]
+[node name="EnemyBasic02_Turret" type="Area2D" unique_id=1074681411]
 scale = Vector2(0.7, 0.7)
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=784736047]
 position = Vector2(-7, 8)
-scale = Vector2(0.16, 0.16)
-texture = ExtResource("2_tex")
+rotation = -3.1415927
+scale = Vector2(5.99, 5.99)
+texture = ExtResource("2_62a00")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(-36, 144, -21, 163, 6, 162, 25, 144, 22, 86, 61, 68, 94, 106, 132, 78, 101, 26, 98, -24, 118, -74, 78, -113, -87, -114, -130, -74, -131, -22, -107, -12, -111, 30, -146, 75, -118, 105, -83, 58, -41, 81)
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=2098636032]
+polygon = PackedVector2Array(-89.99999, -21.42857, -24.285713, -21.42857, -24.285713, -34.285713, 11.428571, -34.285713, 11.428571, -22.857141, 75.71428, -21.42857, 77.14285, 25.714285, 11.428571, 25.714285, 11.428571, 44.285713, -1.4285713, 68.57143, -12.857142, 67.14285, -24.285713, 44.285713, -25.714285, 25.714285, -89.99999, 25.714285)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
