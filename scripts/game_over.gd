@@ -4,7 +4,6 @@ extends CanvasLayer
 
 var _main: Node = null
 
-@onready var _vbox: VBoxContainer = $Root/Center/SummaryCard/VBox
 @onready var _death_label: Label = $Root/Center/SummaryCard/VBox/DeathLabel
 @onready var _stats_label: RichTextLabel = $Root/Center/SummaryCard/VBox/StatsLabel
 @onready var _build_title: Label = $Root/Center/SummaryCard/VBox/BuildTitle
@@ -21,14 +20,6 @@ func _ready() -> void:
 		_restart_btn.pressed.connect(_on_restart_pressed)
 	if _main_menu_btn != null:
 		_main_menu_btn.pressed.connect(_on_main_menu_pressed)
-	_update_card_width()
-	get_viewport().size_changed.connect(_update_card_width)
-
-
-func _update_card_width() -> void:
-	if _vbox == null:
-		return
-	_vbox.custom_minimum_size.x = max(320.0, get_viewport().get_visible_rect().size.x * 0.45)
 
 
 func show_game_over() -> void:
