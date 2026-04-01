@@ -125,3 +125,4 @@ HSlider/styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill_hl
 HSlider/styles/slider = SubResource("StyleBoxFlat_slider_track")
 Label/colors/font_color = Color(0.85, 0.88, 0.95, 1)
 Panel/styles/panel = SubResource("StyleBoxFlat_raised")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_raised")

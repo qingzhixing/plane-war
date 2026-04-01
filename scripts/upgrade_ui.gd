@@ -27,28 +27,26 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-const CARD_HEIGHT: float = 140.0
-
 var _main: Node
 
 # 每张卡的节点引用：[{ root, title_label, desc_label, button }]
 var _cards: Array[Dictionary] = []
 
-@onready var _card0_root: Control = $Root/Center/VBox/CardBox/Card0
-@onready var _card1_root: Control = $Root/Center/VBox/CardBox/Card1
-@onready var _card2_root: Control = $Root/Center/VBox/CardBox/Card2
+@onready var _card0_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0
+@onready var _card1_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1
+@onready var _card2_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2
 
-@onready var _card0_title: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
-@onready var _card0_desc: Label = $Root/Center/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
-@onready var _card0_btn: Button = $Root/Center/VBox/CardBox/Card0/CardBtn0
+@onready var _card0_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
+@onready var _card0_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
+@onready var _card0_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardBtn0
 
-@onready var _card1_title: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
-@onready var _card1_desc: Label = $Root/Center/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
-@onready var _card1_btn: Button = $Root/Center/VBox/CardBox/Card1/CardBtn1
+@onready var _card1_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
+@onready var _card1_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
+@onready var _card1_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardBtn1
 
-@onready var _card2_title: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
-@onready var _card2_desc: Label = $Root/Center/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
-@onready var _card2_btn: Button = $Root/Center/VBox/CardBox/Card2/CardBtn2
+@onready var _card2_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
+@onready var _card2_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
+@onready var _card2_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardBtn2
 
 
 func _ready() -> void:
@@ -59,23 +57,9 @@ func _ready() -> void:
 		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
 		{"root": _card2_root, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_btn},
 	]
-	_update_card_sizes()
-
-
-func _update_card_sizes() -> void:
-	var vpr: Rect2 = get_viewport().get_visible_rect()
-	var margin: float = 32.0
-	var gap: float = 16.0
-	var available_w: float = max(0.0, vpr.size.x - margin * 2.0 - gap * 2.0)
-	var card_w: float = max(140.0, available_w / 3.0)
-	for card in _cards:
-		var root := card["root"] as Control
-		if root != null:
-			root.custom_minimum_size = Vector2(card_w, CARD_HEIGHT)
 
 
 func show_pick() -> void:
-	_update_card_sizes()
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Node
 	var at_max_bullets: bool = false
