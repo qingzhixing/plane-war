@@ -240,6 +240,8 @@ func _spawn_single_boomerang() -> void:
 	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
 		return
 	var n: int = maxi(1, _boomerang_shot_count)
+	if _boomerang_airborne >= n:
+		return
 	var i: int = _boomerang_next_index % n
 	_boomerang_next_index += 1
 	var spread := 0.18
@@ -470,7 +472,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 				_weapon_unlocked["boomerang"] = true
 				call_deferred("_spawn_boomerang_volley")
 			else:
-				_boomerang_shot_count = mini(6, _boomerang_shot_count + 1)
+				_boomerang_shot_count += 1
 				call_deferred("_spawn_single_boomerang")
 		"bomb_multi", "bomb_weapon":
 			if not has_weapon_unlocked("bomb"):

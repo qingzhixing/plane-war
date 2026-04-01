@@ -13,7 +13,7 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "解锁弓箭；齐射+1；箭矢高伤且可撞毁敌弹"},
 
 	# 副武器：回旋镖（boomerang_multi 解锁 + 齐射 +1）
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖齐射 +1（全数回收后再射下一波）"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖数量 +1（回收一颗即发射一颗）"},
 
 	# 副武器：炸弹（由 bomb_multi 首次解锁）
 	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机"},
