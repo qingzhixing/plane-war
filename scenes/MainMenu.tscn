@@ -240,6 +240,7 @@ text = "返回"
 [node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
 unique_name_in_owner = true
 process_mode = 4
+visible = false
 script = ExtResource("6_about")
 
 [node name="AboutDimmer" type="ColorRect" parent="AboutUI" unique_id=1439742973]
