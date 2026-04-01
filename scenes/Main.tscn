@@ -385,19 +385,19 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/SummaryVBox/ButtonMargin/ButtonsVBox" unique_id=676963161]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "主菜单"
-
 [node name="RestartButton" type="Button" parent="GameOver/Root/Center/SummaryCard/SummaryVBox/ButtonMargin/ButtonsVBox" unique_id=676963160]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "重新开始"
+
+[node name="MainMenuButton" type="Button" parent="GameOver/Root/Center/SummaryCard/SummaryVBox/ButtonMargin/ButtonsVBox" unique_id=676963161]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "主菜单"
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
 visible = false

@@ -125,6 +125,7 @@ vertical_alignment = 2
 
 [node name="SettingsUI" parent="." unique_id=2015724451 instance=ExtResource("3_settings_scene")]
 unique_name_in_owner = true
+visible = false
 
 [node name="RecordsQueryUI" type="CanvasLayer" parent="." unique_id=1684068955]
 unique_name_in_owner = true
@@ -146,6 +147,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("4_theme")
 
 [node name="Panel" type="PanelContainer" parent="RecordsQueryUI/Center" unique_id=68687780]
 custom_minimum_size = Vector2(400, 320)
@@ -238,7 +240,6 @@ text = "返回"
 [node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
 unique_name_in_owner = true
 process_mode = 4
-visible = false
 script = ExtResource("6_about")
 
 [node name="AboutDimmer" type="ColorRect" parent="AboutUI" unique_id=1439742973]
@@ -255,6 +256,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("4_theme")
 
 [node name="AboutPanel" type="PanelContainer" parent="AboutUI/AboutCenter" unique_id=2014823278]
 custom_minimum_size = Vector2(420, 480)
@@ -289,6 +291,12 @@ size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
 bbcode_enabled = true
 text = "[b]plane-war 更新日志（节选）[/b]
+[color=#8af]v0.2.5[/color] - 2026-04-01
+  - UI 全面重构：所有弹出界面改为声明式场景节点，编辑器与运行时表现统一。
+  - 结算界面优化：新增\"本局构筑\"回顾，展示本局所有升级词条；面板宽度与设置页统一（480 px）；按钮间距与内边距更规整。
+  - 弹窗风格统一：升级选择、设置、Boss 击破等所有弹出面板统一加深色圆角背景框，与主菜单弹窗风格保持一致。
+  - 样式修复：修复拟态按钮 hover_pressed 状态渲染变平问题；补全 HSlider、成绩查询与关于界面的拟态样式。
+  - FIX：修正 Windows 构建版本号显示为空。
 [color=#8af]v0.2.2[/color] - 2026-03-17
 - 引入 2 条命离散生命值系统，生命归零当次立刻结算本局。
 - 每波结束若生命未满 2 条，会自动恢复 1 命。
