@@ -3,9 +3,8 @@
 [ext_resource type="Script" uid="uid://dkesqeyvv67v1" path="res://scripts/bullets/PlayerBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bquveuxuu5fn7" path="res://assets/sprites/bullets/player_bullet.png" id="2_p7wmw"]
 
-[sub_resource type="CapsuleShape2D" id="1_shape"]
-radius = 11.666666
-height = 31.42857
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p7wmw"]
+size = Vector2(14, 38)
 
 [node name="PlayerBullet" type="Area2D" unique_id=1489504139]
 z_index = 12
@@ -18,4 +17,5 @@ scale = Vector2(2.355, 2.355)
 texture = ExtResource("2_p7wmw")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2068878352]
-shape = SubResource("1_shape")
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_p7wmw")
