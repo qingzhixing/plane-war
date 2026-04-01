@@ -1,6 +1,5 @@
 extends CanvasLayer
 
-@onready var _name_label: Label = $Root/Panel/NameLabel
 @onready var _hp_bar: ProgressBar = $Root/Panel/HpBar
 @onready var _spell_label: Label = $Root/SpellLabel
 

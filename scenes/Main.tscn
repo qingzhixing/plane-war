@@ -22,9 +22,27 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/SettingsUI.tscn" id="25_settings_ui_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PostBossChoice.tscn" id="26_post_boss_scene"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DebugUpgradePicker.tscn" id="27_debug_picker_scene"]
+[ext_resource type="Shader" path="res://shaders/space_background.gdshader" id="28_bg_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
+shader = ExtResource("28_bg_shader")
+shader_parameter/scroll_speed = 80.0
 
 [node name="Main" type="Node2D" unique_id=1713390434]
 script = ExtResource("6_main")
+
+[node name="BgLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="SpaceBg" type="ColorRect" parent="BgLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_bg")
 
 [node name="Player" parent="." unique_id=1802700737 instance=ExtResource("1_elqb8")]
 position = Vector2(378, 1136)
