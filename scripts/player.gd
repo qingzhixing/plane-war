@@ -210,12 +210,14 @@ func _spawn_arrow_shot() -> void:
 func _spawn_bomb_shot() -> void:
 	var n: int = max(1, _bomb_shot_count)
 	var spread := 0.14
+	var half_span_b := (n - 1) * 0.5
+	var slot_px_b := minf(14.0, 36.0 / maxf(1.0, half_span_b))
 	for i in n:
-		var angle: float = (i - (n - 1) * 0.5) * spread
+		var angle: float = (i - half_span_b) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
 		if dir.y > 0.0:
 			dir.y = -dir.y
-		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 14.0 * (i - (n - 1) * 0.5)
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * slot_px_b * (i - half_span_b)
 		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.72, 0, "bullet", "straight", side_offset)
 
 
@@ -226,12 +228,14 @@ func _spawn_boomerang_volley() -> void:
 	_boomerang_next_index = 0
 	_boomerang_airborne = n
 	var spread := 0.18
+	var half_span := (n - 1) * 0.5
+	var slot_px := minf(18.0, 36.0 / maxf(1.0, half_span))
 	for i in n:
-		var angle: float = (i - (n - 1) * 0.5) * spread
+		var angle: float = (i - half_span) * spread
 		var dir := Vector2(sin(angle), -cos(angle))
 		if dir.y > 0.0:
 			dir.y = -dir.y
-		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * slot_px * (i - half_span)
 		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
 	_boomerang_next_index = n
 
@@ -245,11 +249,13 @@ func _spawn_single_boomerang() -> void:
 	var i: int = _boomerang_next_index % n
 	_boomerang_next_index += 1
 	var spread := 0.18
-	var angle: float = (i - (n - 1) * 0.5) * spread
+	var half_span := (n - 1) * 0.5
+	var slot_px := minf(18.0, 36.0 / maxf(1.0, half_span))
+	var angle: float = (i - half_span) * spread
 	var dir := Vector2(sin(angle), -cos(angle))
 	if dir.y > 0.0:
 		dir.y = -dir.y
-	var side_offset: Vector2 = Vector2(-dir.y, dir.x) * 18.0 * (i - (n - 1) * 0.5)
+	var side_offset: Vector2 = Vector2(-dir.y, dir.x) * slot_px * (i - half_span)
 	_boomerang_airborne += 1
 	_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
 
