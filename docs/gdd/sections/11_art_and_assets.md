@@ -1,5 +1,14 @@
 # 11 美术资源与目录约定
 
+## 游戏背景（Space Background）
+
+- **实现方式**：程序化 GLSL 着色器（`res://shaders/space_background.gdshader`），不依赖外部贴图。
+- **视觉效果**：三层星星以不同速度向下滚动，模拟飞船向上飞行的视差感；每颗星有随机闪烁动画。
+- **层次结构**：`BgLayer`（CanvasLayer，`layer = -1`）→ `SpaceBg`（ColorRect，全屏填充）。
+  - `layer = -1` 保证背景永远渲染在 Player、敌人、子弹、HUD 等所有内容之下。
+- **可调参数**：`scroll_speed`（默认 80.0）控制整体滚动速率。
+- **适用场景**：`Main.tscn` 游戏战斗场景。
+
 ## 应用图标
 
 - 工程图标：`res://icon.svg`（128×128 矢量，竖屏飞机 + 弹幕尾焰；`project.godot` → Application → Icon）。Android 等导出若单独指定 launcher 图标，可与该图一致或再导 PNG。

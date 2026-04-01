@@ -1,19 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://enemybasic01"]
+[gd_scene format=3 uid="uid://enemybasic01"]
 
 [ext_resource type="Script" uid="uid://d3lm60pm8ir82" path="res://scripts/enemy_basic.gd" id="1_eb01"]
-[ext_resource type="Texture2D" uid="uid://cbbujfsfctoh0" path="res://assets/sprites/enemies/enemy_basic_01.png" id="2_ebtex"]
+[ext_resource type="Texture2D" uid="uid://cw2ylb2igtebk" path="res://assets/sprites/enemies/Enemy Normal.svg" id="2_jkybx"]
 
-[node name="EnemyBasic01" type="Area2D"]
+[node name="EnemyBasic01" type="Area2D" unique_id=762140354]
 scale = Vector2(0.6, 0.6)
 script = ExtResource("1_eb01")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -1)
-rotation = -3.1415927
-scale = Vector2(0.14053592, 0.14053592)
-texture = ExtResource("2_ebtex")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=288157813]
+position = Vector2(-1.6666665, 14.999999)
+rotation = -4.7128677
+scale = Vector2(0.896, 0.896)
+texture = ExtResource("2_jkybx")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(31, 41, 118, 18, 118, 3, 24, -25, 14, -76, 47, -93, 47, -109, -49, -109, -49, -89, -17, -75, -23, -28, -121, 0, -122, 21, -26, 40, -25, 81, 0, 116, 28, 75)
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=748917530]
+position = Vector2(-1.6666666, -3.3333333)
+rotation = 0.005463138
+polygon = PackedVector2Array(-35.381893, -69.80774, -0.31868148, -58.332462, 32.94131, -71.847694, 39.71714, -51.88442, 18.169165, -30.099707, 16.675522, 1.5755899, 86.55611, -20.473171, 88.36843, 6.183992, 18.624424, 53.232376, 17.194517, 96.57417, 3.9251204, 108.31351, -16.138317, 96.75628, -16.365946, 55.09023, -88.277374, 10.482426, -88.43217, -17.850483, -16.666416, 0.09105182, -16.83031, -29.908495, -38.61502, -51.456474)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

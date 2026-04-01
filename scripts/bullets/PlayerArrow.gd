@@ -6,9 +6,6 @@ var _initialized_direction: bool = false
 
 func _ready() -> void:
 	super._ready()
-	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite != null:
-		sprite.texture = preload("res://assets/sprites/bullets/Arrow.png")
 
 
 func _on_area_entered(area: Node) -> void:

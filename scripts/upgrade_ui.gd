@@ -7,17 +7,19 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "multi_shot", "name": "双联机炮", "desc": "主武器弹数 +1"},
 	{"id": "bullet_speed", "name": "高初速弹体", "desc": "主武器弹速 +12%"},
 	{"id": "spread_focus", "name": "火力收束", "desc": "主武器弹道更集中"},
+	{"id": "bullet_homing", "name": "磁导弹头", "desc": "主武器子弹轻微向最近敌机偏转（一次性）"},
 
 	# 副武器：弓箭（由 arrow_multi 首次解锁）
 	{"id": "arrow_cooldown", "name": "轻量箭袋", "desc": "弓箭冷却 -20%"},
 	{"id": "arrow_multi", "name": "齐射箭矢", "desc": "解锁弓箭；齐射+1；箭矢高伤且可撞毁敌弹"},
 
 	# 副武器：回旋镖（boomerang_multi 解锁 + 齐射 +1）
-	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖齐射 +1（全数回收后再射下一波）"},
+	{"id": "boomerang_multi", "name": "双刃回旋", "desc": "解锁回旋镖；已解锁则回旋镖数量 +1（回收一颗即发射一颗）"},
 
 	# 副武器：炸弹（由 bomb_multi 首次解锁）
 	{"id": "bomb_multi", "name": "挂载炸弹", "desc": "解锁炸弹副武器，齐射 +1；自动向上发射，仅炸敌机"},
 	{"id": "bomb_side_cooldown", "name": "炸弹装填", "desc": "炸弹副武器冷却 -20%"},
+	{"id": "bomb_heavy", "name": "重型炸弹", "desc": "炸弹伤害 ×1.5，体型 +5%（可叠加）"},
 
 	# 通用 / 生存 / 表现
 	{"id": "combo_boost", "name": "节奏推进", "desc": "每次命中连击 +1"},
@@ -75,6 +77,8 @@ func show_pick() -> void:
 		bomb_unlocked = player.has_weapon_unlocked("bomb")
 	for u in UPGRADES:
 		if u["id"] == "spell_auto" and _main.has_method("has_spell_auto") and _main.has_spell_auto():
+			continue
+		if u["id"] == "bullet_homing" and player != null and player.has_method("has_bullet_homing") and player.has_bullet_homing():
 			continue
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue

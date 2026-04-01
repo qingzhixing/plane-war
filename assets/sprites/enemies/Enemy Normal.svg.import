@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://w478a7uockj4"
-path="res://.godot/imported/bullet_player_basic.png-dc6d72eaf4a54445f63cb31eccf8ed8b.ctex"
+uid="uid://cw2ylb2igtebk"
+path="res://.godot/imported/Enemy Normal.svg-e56e9447aadbfdb4e8562012822c479f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/bullets/bullet_player_basic.png"
-dest_files=["res://.godot/imported/bullet_player_basic.png-dc6d72eaf4a54445f63cb31eccf8ed8b.ctex"]
+source_file="res://assets/sprites/enemies/Enemy Normal.svg"
+dest_files=["res://.godot/imported/Enemy Normal.svg-e56e9447aadbfdb4e8562012822c479f.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
