@@ -1,7 +1,14 @@
-# plane-war
+# Plane War
 
-竖屏弹幕射击小品：**波次清场 → 三选一强化 → Boss**，以 **评分 / 连击 / DPS** 为核心反馈，采用 **2 条命离散生命值系统**（受击扣命，生命归零时立刻结算本局，且每波结束若未满血会自动恢复 1 命）。  
-Godot 4 开发，面向 **Windows / Android**。
+> 一款基于 Godot 4 的竖屏弹幕射击游戏：清场波次、三选一成长、挑战 Boss，冲击更高分数与连击。
+
+<p align="left">
+  <img alt="Godot" src="https://img.shields.io/badge/Engine-Godot%204.6-478cbf?logo=godot-engine&logoColor=white" />
+  <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%20%7C%20Android-2ea44f" />
+  <img alt="Status" src="https://img.shields.io/badge/Status-Active-ff9800" />
+</p>
+
+## 游戏预览
 
 <p align="center">
   <img src="docs/picture/Start%20Menu.png" alt="主菜单" width="280" />
@@ -10,48 +17,59 @@ Godot 4 开发，面向 **Windows / Android**。
   &nbsp;&nbsp;
   <img src="docs/picture/Upgrade.png" alt="升级三选一" width="280" />
   &nbsp;&nbsp;
-  <img src="docs/picture/Game%20Over.png" alt="游戏结束结算" width="280" />
+  <img src="docs/picture/Game%20Over.png" alt="游戏结束" width="280" />
 </p>
 
-| 主菜单 | 战斗 | 升级三选一 |
-|--------|------|------------|
+| 主菜单 | 战斗中 | 升级三选一 | 挑战 Boss |
+|---|---|---|---|
 
----
+## 功能亮点
 
-## 玩法摘要
+- 🎮 **核心循环**：波次战斗 -> 清场结算 -> 三选一强化 -> Boss 挑战  
+- ⚡ **操作手感**：单手拖拽移动 + 自动射击，适配移动端节奏  
+- ❤️ **生命机制**：2 条命离散生命系统，受击扣命并短暂无敌，波次间可恢复  
+- 🧠 **成长策略**：Roguelite 升级池构筑，围绕生存、爆发、节奏做取舍  
+- 📊 **局外反馈**：本地记录历史最高得分、连击和 DPS  
 
-- **操作**：单手拖拽移动，自动射击  
-- **流程**：多波敌人 → 每波结束 **三选一 Roguelite 强化** → 约第 8 波进入 **Boss**  
-- **惩罚**：玩家拥有固定 **2 条命**；受击在结算护盾后若仍命中则扣 1 命并短暂无敌，生命未归零时可继续战斗但会 **断连击 / 衰减评分加成**，当生命归零（Life = 0）时本局立刻进入结算；每当一波战斗清场并进入升级结算时，若生命未满 2 条会自动恢复 1 命；整体鼓励多打刷高分  
-- **局外**：本地记录历史最高 **得分 / 连击 / DPS**（主菜单「成绩查询」）
+## 快速开始
 
----
+### 1) 运行项目（Godot 编辑器）
 
-## 运行与导出
+1. 安装 [Godot 4.6](https://godotengine.org/)  
+2. 用 Godot 打开仓库根目录  
+3. 运行主场景 `scenes/MainMenu.tscn`
 
-- **引擎**：[Godot 4.6](https://godotengine.org/)（项目 `config/features` 含 `4.6`、`Mobile`）  
-- **打开工程**：用 Godot 打开本仓库根目录  
-- **运行**：主场景为 **`scenes/MainMenu.tscn`**（启动先进主菜单）  
-- **导出**：按 Godot 导出预设配置 **Windows / Android / Web** 等（见 `export_presets.cfg`）
+### 2) 导出目标平台
 
----
+- 导出预设见 `export_presets.cfg`  
+- 当前面向平台：`Windows`、`Android`（并保留 `Web` 相关导出配置）
 
-## 仓库与文档
+如果你要开发 Mod，建议先阅读运行机制文档，再基于示例 Mod 快速验证事件与注册流程。
 
-| 链接 | 说明 |
-|------|------|
-| **源码** | [github.com/qingzhixing/plane-war](https://github.com/qingzhixing/plane-war) |
-| **设计文档** | [`docs/gdd/GDD.md`](docs/gdd/GDD.md) 及 [`docs/gdd/sections/`](docs/gdd/sections/) |
-| **截图目录** | [`docs/picture/`](docs/picture/)（内含 `.gdignore`，Godot 不导入该目录，避免多余 `.import`） |
+## 文档导航
 
----
+- 📘 总体 GDD：[`docs/gdd/GDD.md`](docs/gdd/GDD.md)  
+- 🧱 分章节设计：[`docs/gdd/sections/`](docs/gdd/sections/)  
+- 🖼 截图资源：[`docs/picture/`](docs/picture/)  
+- 🗒 更新记录：[`CHANGELOG.md`](CHANGELOG.md)
 
-## 开发者
+## 项目结构（简版）
 
-**qingzhixing** — 欢迎 Issue / PR。
+```text
+plane-war/
+├─ scenes/           # 场景
+├─ scripts/          # 游戏逻辑脚本
+├─ assets/           # 资源素材
+├─ docs/             # 文档（GDD、Mod 指南、截图等）
+└─ project.godot
+```
 
----
+## 开发与协作
 
-## 许可
+- 仓库地址：[github.com/qingzhixing/plane-war](https://github.com/qingzhixing/plane-war)  
+- 欢迎通过 Issue / PR 提出建议与改进  
+- 维护者：`qingzhixing`
 
-若仓库根目录未单独放置 `LICENSE`，以仓库内实际声明为准；引用或二次分发前请留意作者授权说明。
+## 许可说明
+
+若仓库根目录未单独放置 `LICENSE`，请以仓库内实际声明为准；引用或分发前请确认授权范围。
