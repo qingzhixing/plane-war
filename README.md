@@ -9,6 +9,8 @@ Godot 4 开发，面向 **Windows / Android**。
   <img src="docs/picture/Playing.png" alt="战斗中" width="280" />
   &nbsp;&nbsp;
   <img src="docs/picture/Upgrade.png" alt="升级三选一" width="280" />
+  &nbsp;&nbsp;
+  <img src="docs/picture/Game%20Over.png" alt="游戏结束结算" width="280" />
 </p>
 
 | 主菜单 | 战斗 | 升级三选一 |
