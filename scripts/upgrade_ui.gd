@@ -32,21 +32,21 @@ var _main: Node
 # 每张卡的节点引用：[{ root, title_label, desc_label, button }]
 var _cards: Array[Dictionary] = []
 
-@onready var _card0_root: Control = $Root/VBox/CardBox/Card0
-@onready var _card1_root: Control = $Root/VBox/CardBox/Card1
-@onready var _card2_root: Control = $Root/VBox/CardBox/Card2
+@onready var _card0_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0
+@onready var _card1_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1
+@onready var _card2_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2
 
-@onready var _card0_title: Label = $Root/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
-@onready var _card0_desc: Label = $Root/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
-@onready var _card0_btn: Button = $Root/VBox/CardBox/Card0/CardBtn0
+@onready var _card0_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
+@onready var _card0_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
+@onready var _card0_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardBtn0
 
-@onready var _card1_title: Label = $Root/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
-@onready var _card1_desc: Label = $Root/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
-@onready var _card1_btn: Button = $Root/VBox/CardBox/Card1/CardBtn1
+@onready var _card1_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
+@onready var _card1_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
+@onready var _card1_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardBtn1
 
-@onready var _card2_title: Label = $Root/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
-@onready var _card2_desc: Label = $Root/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
-@onready var _card2_btn: Button = $Root/VBox/CardBox/Card2/CardBtn2
+@onready var _card2_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
+@onready var _card2_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
+@onready var _card2_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardBtn2
 
 
 func _ready() -> void:
