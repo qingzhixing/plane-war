@@ -45,6 +45,12 @@ var _arrow_shot_count: int = 0
 var _boomerang_airborne: int = 0
 ## 下一颗回旋镖使用的散射槽位索引（循环使用，实现逐颗独立发射）
 var _boomerang_next_index: int = 0
+## 主武器磁导转向率（rad/s）；0 = 直线
+var _bullet_homing_strength: float = 0.0
+## 炸弹伤害乘区（可叠加）
+var _bomb_damage_multiplier: float = 1.0
+## 炸弹体型缩放（可叠加）
+var _bomb_scale: float = 1.0
 var _bomb_auto_timer: float = 0.0
 var _bomb_shot_count: int = 0
 @onready var _fallback_bullet_scene_basic: PackedScene = preload("res://scenes/bullets/PlayerBullet.tscn")
@@ -218,7 +224,12 @@ func _spawn_bomb_shot() -> void:
 		if dir.y > 0.0:
 			dir.y = -dir.y
 		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * slot_px_b * (i - half_span_b)
-		_spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.72, 0, "bullet", "straight", side_offset)
+		var bullet := _spawn_configured_bullet(bullet_scene_bomb, dir, 0.0, 0.72, 0, "bullet", "straight", side_offset)
+		if bullet != null:
+			if _bomb_damage_multiplier != 1.0 and "damage" in bullet:
+				bullet.damage *= _bomb_damage_multiplier
+			if _bomb_scale != 1.0:
+				bullet.scale *= _bomb_scale
 
 
 func _spawn_boomerang_volley() -> void:
@@ -293,9 +304,9 @@ func _update_side_weapons(delta: float) -> void:
 
 
 @warning_ignore("UNUSED_PARAMETER")
-func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2) -> void:
+func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus: float, speed_mult: float, penetration: int, visual_type: String, bullet_motion_mode: String, side_offset: Vector2) -> Node:
 	if scene_res == null:
-		return
+		return null
 	var scene := get_tree().current_scene
 	var bullet := scene_res.instantiate()
 	bullet.global_position = global_position + dir * 20.0 + side_offset
@@ -314,7 +325,10 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 		bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
 	if penetration > 0 and bullet.has_method("set_penetration"):
 		bullet.set_penetration(penetration)
+	if "homing_strength" in bullet and _bullet_homing_strength > 0.0:
+		bullet.homing_strength = _bullet_homing_strength
 	scene.add_child(bullet)
+	return bullet
 
 func apply_damage(_amount: float) -> void:
 	if _hit_invulnerable_timer > 0.0:
@@ -486,6 +500,11 @@ func apply_upgrade(upgrade_id: String) -> void:
 			_bomb_shot_count = max(1, _bomb_shot_count + 1)
 		"bomb_side_cooldown":
 			bomb_auto_interval = maxf(0.85, bomb_auto_interval * 0.8)
+		"bullet_homing":
+			_bullet_homing_strength += 3.0
+		"bomb_heavy":
+			_bomb_damage_multiplier *= 1.5
+			_bomb_scale *= 1.05
 
 
 func set_shield_active(active: bool) -> void:
