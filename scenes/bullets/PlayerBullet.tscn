@@ -1,24 +1,21 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cptjx6iucl78c"]
 
-[ext_resource type="Script" path="res://scripts/bullets/PlayerBullet.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/bullets/bullet_player_basic.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://dkesqeyvv67v1" path="res://scripts/bullets/PlayerBullet.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bquveuxuu5fn7" path="res://assets/sprites/bullets/player_bullet.png" id="2_p7wmw"]
 
 [sub_resource type="CapsuleShape2D" id="1_shape"]
 radius = 11.666666
-height = 63.333332
+height = 31.42857
 
-[node name="PlayerBullet" type="Area2D"]
+[node name="PlayerBullet" type="Area2D" unique_id=1489504139]
 z_index = 12
 z_as_relative = false
-scale = Vector2(0.7, 0.7)
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(1.1920929e-07, 2.3841858e-07)
-rotation = 1.5701729
-scale = Vector2(0.04, 0.04)
-texture = ExtResource("2_tex")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1435521287]
+position = Vector2(0, 2.857143)
+scale = Vector2(2.355, 2.355)
+texture = ExtResource("2_p7wmw")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2068878352]
 shape = SubResource("1_shape")
-

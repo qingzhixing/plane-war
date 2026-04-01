@@ -11,7 +11,7 @@
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="11_ui_theme"]
 [ext_resource type="PackedScene" uid="uid://5hppc0ylcbtl" path="res://scenes/ui/SpellStarButton.tscn" id="14_spell_star_button"]
 [ext_resource type="PackedScene" uid="uid://bwh6830w5vlxv" path="res://scenes/ui/StatusSlot.tscn" id="15_status_slot"]
-[ext_resource type="Texture2D" uid="uid://bquveuxuu5fn7" path="res://assets/sprites/bullets/tile_0003.png" id="16_tex_gun"]
+[ext_resource type="Texture2D" uid="uid://bquveuxuu5fn7" path="res://assets/sprites/bullets/player_bullet.png" id="16_tex_gun"]
 [ext_resource type="Texture2D" uid="uid://bwmh6snhuyc61" path="res://assets/ui/heart.svg" id="18_tex_life"]
 [ext_resource type="Texture2D" uid="uid://rayda7qtyusb" path="res://assets/ui/star/star4.png" id="19_tex_spell"]
 [ext_resource type="Texture2D" uid="uid://dfk08r28unnt8" path="res://assets/sprites/bullets/Arrow.png" id="20_tex_arrow"]
