@@ -4,12 +4,12 @@ extends CanvasLayer
 
 var _main: Node = null
 
-@onready var _death_label: Label = $Root/Center/SummaryCard/VBox/DeathLabel
-@onready var _stats_label: RichTextLabel = $Root/Center/SummaryCard/VBox/StatsLabel
-@onready var _build_title: Label = $Root/Center/SummaryCard/VBox/BuildTitle
-@onready var _build_label: RichTextLabel = $Root/Center/SummaryCard/VBox/BuildLabel
-@onready var _restart_btn: Button = $Root/Center/SummaryCard/VBox/ButtonMargin/RestartButton
-@onready var _main_menu_btn: Button = $Root/Center/SummaryCard/VBox/ButtonMargin/MainMenuButton
+@onready var _death_label: Label = $Root/Center/SummaryCard/SummaryVBox/DeathLabel
+@onready var _stats_label: RichTextLabel = $Root/Center/SummaryCard/SummaryVBox/StatsLabel
+@onready var _build_title: Label = $Root/Center/SummaryCard/SummaryVBox/BuildTitle
+@onready var _build_label: RichTextLabel = $Root/Center/SummaryCard/SummaryVBox/BuildLabel
+@onready var _restart_btn: Button = $Root/Center/SummaryCard/SummaryVBox/ButtonMargin/ButtonsVBox/RestartButton
+@onready var _main_menu_btn: Button = $Root/Center/SummaryCard/SummaryVBox/ButtonMargin/ButtonsVBox/MainMenuButton
 
 
 func _ready() -> void:
