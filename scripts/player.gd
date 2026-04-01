@@ -388,6 +388,10 @@ func get_bomb_cd_remaining() -> float:
 	return maxf(0.0, _bomb_auto_timer)
 
 
+func has_bullet_homing() -> bool:
+	return _bullet_homing_strength > 0.0
+
+
 func get_boomerang_airborne() -> int:
 	return _boomerang_airborne
 

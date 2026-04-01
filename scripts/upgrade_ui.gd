@@ -78,6 +78,8 @@ func show_pick() -> void:
 	for u in UPGRADES:
 		if u["id"] == "spell_auto" and _main.has_method("has_spell_auto") and _main.has_spell_auto():
 			continue
+		if u["id"] == "bullet_homing" and player != null and player.has_method("has_bullet_homing") and player.has_bullet_homing():
+			continue
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
 		if u["id"] == "spread_focus" and bullet_count <= 1:
