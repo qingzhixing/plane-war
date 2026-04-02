@@ -6,8 +6,6 @@ var homing_strength: float = 0.0
 
 func _ready() -> void:
 	super._ready()
-	if homing_strength > 0.0:
-		modulate = Color(0.88, 0.72, 1.0)
 
 
 func _process(delta: float) -> void:
@@ -33,4 +31,3 @@ func _find_nearest_enemy() -> Node2D:
 					closest_dist = d
 					closest = e as Node2D
 	return closest
-
