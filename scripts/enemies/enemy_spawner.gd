@@ -25,37 +25,51 @@ func _ready() -> void:
 	if _timer != null:
 		_default_timer_wait = _timer.wait_time
 		_timer.stop()
+	set_process(true)
+	print("EnemySpawner._ready: process enabled")
 
 func _process(delta: float) -> void:
 	if _remaining_to_spawn <= 0:
 		var main := get_tree().current_scene as GameMain
 		var enemies := get_tree().get_nodes_in_group("enemy")
+		print("EnemySpawner._process: _remaining_to_spawn=", _remaining_to_spawn, ", enemies count=", enemies.size())
 		if enemies.is_empty() and main != null:
+			print("EnemySpawner: All enemies cleared, calling main.on_wave_cleared()")
 			main.on_wave_cleared()
 			# 防止重复调用
 			if _timer != null:
 				_timer.stop()
+		elif main == null:
+			print("EnemySpawner: main is null!")
+		else:
+			print("EnemySpawner: Enemies still present: ", enemies.size())
 
 
 func start_wave(wave: int) -> void:
+	print("EnemySpawner.start_wave(wave=", wave, ")")
 	_extension_index = 0
 	if _timer == null:
+		print("EnemySpawner: timer is null!")
 		return
 	_timer.wait_time = _default_timer_wait
 	_remaining_to_spawn = enemies_per_wave_base + enemies_per_wave_increment * max(wave - 1, 0)
+	print("EnemySpawner: _remaining_to_spawn=", _remaining_to_spawn)
 	_timer.start()
 
 
 ## 续战小怪：ext 1～7，数量/间隔/精英率递增
 func start_extension_wave(ext: int, threat_tier: int) -> void:
+	print("EnemySpawner.start_extension_wave(ext=", ext, ", threat_tier=", threat_tier, ")")
 	_extension_index = clampi(ext, 1, 7)
 	if _timer == null:
+		print("EnemySpawner: timer is null!")
 		return
 	var counts := [8, 11, 13, 15, 17, 19, 22]
 	var intervals := [0.88, 0.72, 0.64, 0.56, 0.50, 0.46, 0.42]
 	var tier_bonus := threat_tier * 2 if ext < 6 else threat_tier * 3
 	_remaining_to_spawn = counts[_extension_index - 1] + tier_bonus
 	_timer.wait_time = intervals[_extension_index - 1]
+	print("EnemySpawner: _remaining_to_spawn=", _remaining_to_spawn, ", interval=", _timer.wait_time)
 	_timer.start()
 
 
@@ -65,15 +79,20 @@ func _on_spawn_timeout() -> void:
 	if main != null:
 		wave = main.get_wave()
 
+	print("EnemySpawner._on_spawn_timeout: wave=", wave, " _remaining_to_spawn=", _remaining_to_spawn, " _extension_index=", _extension_index)
+
 	if main != null and main.is_boss_spawned():
+		print("EnemySpawner: Boss is spawned, stopping timer")
 		if _timer != null:
 			_timer.stop()
 		return
 
 	if _remaining_to_spawn <= 0:
 		var enemies := get_tree().get_nodes_in_group("enemy")
+		print("EnemySpawner: No more to spawn, enemies count=", enemies.size())
 		if enemies.is_empty():
 			if main != null:
+				print("EnemySpawner: Calling main.on_wave_cleared() from timeout")
 				main.on_wave_cleared()
 		return
 
@@ -113,3 +132,4 @@ func _on_spawn_timeout() -> void:
 	enemy.global_position = Vector2(x, -50.0)
 	get_tree().current_scene.add_child(enemy)
 	_remaining_to_spawn -= 1
+	print("EnemySpawner: Spawned enemy, remaining=", _remaining_to_spawn)
