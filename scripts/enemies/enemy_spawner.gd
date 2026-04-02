@@ -26,6 +26,16 @@ func _ready() -> void:
 		_default_timer_wait = _timer.wait_time
 		_timer.stop()
 
+func _process(delta: float) -> void:
+	if _remaining_to_spawn <= 0:
+		var main := get_tree().current_scene as GameMain
+		var enemies := get_tree().get_nodes_in_group("enemy")
+		if enemies.is_empty() and main != null:
+			main.on_wave_cleared()
+			# 防止重复调用
+			if _timer != null:
+				_timer.stop()
+
 
 func start_wave(wave: int) -> void:
 	_extension_index = 0

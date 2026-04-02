@@ -80,7 +80,7 @@ func _ready() -> void:
 	_spawner = get_node_or_null("EnemySpawner")
 	var pbc := get_node_or_null("PostBossChoice") as PostBossChoice
 	if pbc != null:
-		pbc.bind_main(self)
+		pbc.bind_main(self )
 	_start_wave()
 
 
@@ -661,6 +661,9 @@ func debug_set_combo(value: int) -> void:
 
 
 func _debug_skip_to_boss() -> void:
+	_debug_skip_to_boss_used = false
+	_debug_skip_to_boss_active = false
+	
 	# 调试：主线 = 假升级跳到第 8 波 Boss；续战 = 直接进续战第 8 波 Boss（同 on_boss_defeated 续战分支）
 	get_tree().paused = false
 	for enemy in get_tree().get_nodes_in_group("enemy"):
