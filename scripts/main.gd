@@ -116,7 +116,9 @@ func get_threat_hp_mult() -> float:
 
 
 func on_wave_cleared() -> void:
+	print("on_wave_cleared() called, _waiting_upgrade_choice = ", _waiting_upgrade_choice)
 	if _waiting_upgrade_choice:
+		print("Already waiting for upgrade choice, returning.")
 		return
 	for b in get_tree().get_nodes_in_group("enemy_bullet"):
 		if is_instance_valid(b):
@@ -139,6 +141,7 @@ func on_wave_cleared() -> void:
 
 
 func on_upgrade_selected() -> void:
+	print("on_upgrade_selected() called")
 	_waiting_upgrade_choice = false
 
 	if _pending_post_boss_upgrade:
@@ -189,12 +192,18 @@ func on_upgrade_selected() -> void:
 	_start_wave()
 
 func _on_level_up() -> void:
+	print("_on_level_up() called")
 	var p := get_node_or_null(player_path) as Player
 	if p != null:
 		p.release_pointer()
 	var ui := get_node_or_null("UpgradeUI") as UpgradeUI
+	print("UpgradeUI node: ", ui)
 	if ui != null:
+		print("Calling ui.show_pick()")
 		ui.show_pick()
+	else:
+		print("UpgradeUI node not found! Falling back to auto-upgrade.")
+		on_upgrade_selected()
 
 func apply_upgrade(upgrade_id: String) -> void:
 	_upgrade_counts[upgrade_id] = _upgrade_counts.get(upgrade_id, 0) + 1

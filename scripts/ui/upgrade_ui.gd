@@ -53,16 +53,27 @@ var _cards: Array[Dictionary] = []
 
 
 func _ready() -> void:
-	_main = get_parent() as GameMain
+	# 获取 GameMain 实例（与 UpgradeUI 是兄弟节点）
+	_main = get_tree().current_scene as GameMain
 	visible = false
 	_cards = [
 		{"root": _card0_root, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_btn},
 		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
 		{"root": _card2_root, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_btn},
 	]
+	# 连接按钮信号
+	for i in _cards.size():
+		var card: Dictionary = _cards[i]
+		var btn: Button = card["button"]
+		if btn != null:
+			btn.pressed.connect(_on_card_pressed.bind(i))
 
 
 func show_pick() -> void:
+	print("UpgradeUI.show_pick() called")
+	if _main == null:
+		print("ERROR: _main is null!")
+		return
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Player
 	var at_max_bullets: bool = false
@@ -89,6 +100,10 @@ func show_pick() -> void:
 			continue
 		pool.append(u)
 	pool.shuffle()
+	if pool.is_empty():
+		# 没有可用升级，直接跳过选择
+		_main.on_upgrade_selected()
+		return
 	var pick_count: int = min(3, pool.size())
 	var chosen: Array[Dictionary] = []
 	for i in pick_count:
@@ -127,6 +142,7 @@ func show_pick() -> void:
 		var root_hidden := card_hidden["root"] as Control
 		if root_hidden != null:
 			root_hidden.visible = false
+	print("UpgradeUI: pool size = ", pool.size(), ", chosen size = ", chosen.size())
 	visible = true
 	get_tree().paused = true
 
