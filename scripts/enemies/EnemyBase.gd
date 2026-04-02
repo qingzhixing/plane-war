@@ -102,17 +102,9 @@ func _give_exp() -> void:
 	get_tree().call_group("experience_listener", "add_exp", exp_value)
 
 
-func _get_audio_manager() -> AudioManager:
-	return get_tree().get_first_node_in_group("audio_manager") as AudioManager
-
-
 func _play_enemy_injured_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.play_enemy_injured()
+	AudioManager.play_enemy_injured()
 
 
 func _play_enemy_explosion_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.play_enemy_explosion()
+	AudioManager.play_enemy_explosion()

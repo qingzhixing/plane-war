@@ -284,9 +284,7 @@ func _set_combo_edge_visibility(is_enabled: bool) -> void:
 
 
 func _play_combo_break_sfx() -> void:
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_player_hurt()
+	AudioManager.play_player_hurt()
 
 
 func _update_left_slots() -> void:

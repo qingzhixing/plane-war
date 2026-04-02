@@ -47,10 +47,7 @@ func show_settings_from_menu() -> void:
 
 
 func _sync_audio_controls_from_manager() -> void:
-	var audio := _get_audio_manager()
-	if audio == null:
-		return
-	audio.reload_audio_settings_from_disk()
+	AudioManager.reload_audio_settings_from_disk()
 	_syncing_audio_ui = true
 	if _bgm_slider != null:
 		_bgm_slider.set_block_signals(true)
@@ -61,13 +58,13 @@ func _sync_audio_controls_from_manager() -> void:
 	if _sfx_mute_check != null:
 		_sfx_mute_check.set_block_signals(true)
 	if _bgm_slider != null:
-		_bgm_slider.value = float(audio.get_bgm_volume_percent())
+		_bgm_slider.value = float(AudioManager.get_bgm_volume_percent())
 	if _sfx_slider != null:
-		_sfx_slider.value = float(audio.get_sfx_volume_percent())
+		_sfx_slider.value = float(AudioManager.get_sfx_volume_percent())
 	if _bgm_mute_check != null:
-		_bgm_mute_check.button_pressed = audio.is_bgm_muted()
+		_bgm_mute_check.button_pressed = AudioManager.is_bgm_muted()
 	if _sfx_mute_check != null:
-		_sfx_mute_check.button_pressed = audio.is_sfx_muted()
+		_sfx_mute_check.button_pressed = AudioManager.is_sfx_muted()
 	if _bgm_slider != null:
 		_bgm_slider.set_block_signals(false)
 	if _sfx_slider != null:
@@ -135,44 +132,28 @@ func _on_debug_upgrades_pressed() -> void:
 		get_tree().paused = false
 		picker._open_panel()
 
-
-func _get_audio_manager() -> AudioManager:
-	var n := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if n != null:
-		return n
-	return get_tree().root.get_node_or_null("AudioManager") as AudioManager
-
-
 func _on_bgm_slider_changed(value: float) -> void:
 	if _syncing_audio_ui:
 		return
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.set_bgm_volume_linear(value / 100.0)
+	AudioManager.set_bgm_volume_linear(value / 100.0)
 
 
 func _on_sfx_slider_changed(value: float) -> void:
 	if _syncing_audio_ui:
 		return
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.set_sfx_volume_linear(value / 100.0)
+	AudioManager.set_sfx_volume_linear(value / 100.0)
 
 
 func _on_bgm_mute_toggled(pressed: bool) -> void:
 	if _syncing_audio_ui:
 		return
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.set_bgm_muted(pressed)
+	AudioManager.set_bgm_muted(pressed)
 
 
 func _on_sfx_mute_toggled(pressed: bool) -> void:
 	if _syncing_audio_ui:
 		return
-	var audio := _get_audio_manager()
-	if audio != null:
-		audio.set_sfx_muted(pressed)
+	AudioManager.set_sfx_muted(pressed)
 
 
 func _on_vibration_toggled(_pressed: bool) -> void:

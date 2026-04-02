@@ -34,9 +34,7 @@ func _physics_process(_delta: float) -> void:
 			continue
 		_last_score_ms[id] = now
 		main.record_graze()
-		var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-		if audio != null:
-			audio.play_graze()
+		AudioManager.play_graze()
 		var last_v: int = int(_last_vfx_ms.get(id, 0))
 		if now - last_v >= VFX_TICK_MS:
 			_last_vfx_ms[id] = now

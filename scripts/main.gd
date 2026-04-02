@@ -425,9 +425,7 @@ func get_lives_remaining() -> int:
 
 
 func on_player_hit() -> void:
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_player_hurt()
+	AudioManager.play_player_hurt()
 	if _combo_guard_charges > 0:
 		_combo_guard_charges -= 1
 		var p_hit := get_node_or_null(player_path) as Player
@@ -526,10 +524,8 @@ func _trigger_spell_effect() -> void:
 	if burst_scene != null:
 		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
 
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_enemy_explosion()
-		audio.play_power_up()
+	AudioManager.play_enemy_explosion()
+	AudioManager.play_power_up()
 
 
 func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_damage: float, boss_damage_multiplier: float) -> void:

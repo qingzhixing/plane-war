@@ -140,9 +140,7 @@ func _on_card_pressed(card_index: int) -> void:
 		return
 	var upgrade_id: String = btn.get_meta("upgrade_id")
 	_main.apply_upgrade(upgrade_id)
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_power_up()
+	AudioManager.play_power_up()
 	visible = false
 	get_tree().paused = false
 	_main.on_upgrade_selected()

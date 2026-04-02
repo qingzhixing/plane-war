@@ -70,6 +70,4 @@ func _close() -> void:
 func _on_pick(upgrade_id: String) -> void:
 	if _main != null:
 		_main.apply_upgrade(upgrade_id)
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_power_up()
+	AudioManager.play_power_up()

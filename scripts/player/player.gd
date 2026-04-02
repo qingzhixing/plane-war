@@ -604,6 +604,4 @@ func _play_shoot_sfx() -> void:
 	if _shoot_sfx_timer > 0.0:
 		return
 	_shoot_sfx_timer = 0.08
-	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
-	if audio != null:
-		audio.play_shoot()
+	AudioManager.play_shoot()
