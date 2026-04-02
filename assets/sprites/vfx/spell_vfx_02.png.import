@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cswwaiq2is6b"
-path="res://.godot/imported/spell_vfx_01.png-8dbd2efbf8eb62036b2c7c7e1913bdbe.ctex"
+uid="uid://cxpo0olu4t254"
+path="res://.godot/imported/spell_vfx_02.png-db18ff51497a4b076b981d178fc61017.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/player/spell_vfx_01.png"
-dest_files=["res://.godot/imported/spell_vfx_01.png-8dbd2efbf8eb62036b2c7c7e1913bdbe.ctex"]
+source_file="res://assets/sprites/vfx/spell_vfx_02.png"
+dest_files=["res://.godot/imported/spell_vfx_02.png-db18ff51497a4b076b981d178fc61017.ctex"]
 
 [params]
 

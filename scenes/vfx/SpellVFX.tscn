@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://d1w5xsqrnd0c6"]
+
+[ext_resource type="Texture2D" uid="uid://vpq2gubnb5ea" path="res://assets/sprites/vfx/spell_vfx_00.png" id="1_0p27c"]
+[ext_resource type="Texture2D" uid="uid://cswwaiq2is6b" path="res://assets/sprites/vfx/spell_vfx_01.png" id="2_syh0j"]
+[ext_resource type="Texture2D" uid="uid://cxpo0olu4t254" path="res://assets/sprites/vfx/spell_vfx_02.png" id="3_u0e7p"]
+[ext_resource type="Texture2D" uid="uid://bcjsjl6yiq2h5" path="res://assets/sprites/vfx/spell_vfx_03.png" id="4_p5xj2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6owxn"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_0p27c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_syh0j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_u0e7p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_p5xj2")
+}],
+"loop": false,
+"name": &"spell_use",
+"speed": 5.0
+}]
+
+[sub_resource type="Animation" id="Animation_spell_vfx"]
+resource_name = "spell_use_vfx"
+length = 1.05
+loop_mode = 0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(2.5, 2.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(1.05),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_spell"]
+_data = {
+&"spell_use_vfx": SubResource("Animation_spell_vfx")
+}
+
+[node name="SpellVfx" type="Node2D" unique_id=2029328085]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1623377948]
+sprite_frames = SubResource("SpriteFrames_6owxn")
+animation = &"spell_use"
+autoplay = "spell_use"
+frame = 3
+frame_progress = 1.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=3748291056]
+libraries = {
+&"": SubResource("AnimationLibrary_spell")
+}
+autoplay = "spell_use_vfx"

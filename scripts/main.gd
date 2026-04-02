@@ -65,6 +65,7 @@ const _SPELL_BURST_WAVE_COUNT: int = 4
 const _SPELL_BURST_WAVE_INTERVAL: float = 0.10
 const _SPELL_BURST_BULLET_COUNT: int = 40
 const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerSpellBullet.tscn"
+const _SPELL_VFX_SCENE := preload("res://scenes/vfx/SpellVFX.tscn")
 
 func _ready() -> void:
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
@@ -516,6 +517,10 @@ func _trigger_spell_effect() -> void:
 			player_damage = int(player.get_bullet_damage())
 		if player.has_method("get_boss_damage_multiplier"):
 			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
+
+	var vfx := _SPELL_VFX_SCENE.instantiate() as Node2D
+	vfx.global_position = origin
+	get_tree().current_scene.add_child(vfx)
 
 	var burst_scene := load(_SPELL_BURST_SCENE_PATH) as PackedScene
 	if burst_scene != null:
