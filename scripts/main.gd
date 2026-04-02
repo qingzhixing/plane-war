@@ -69,6 +69,7 @@ const _SPELL_BURST_SCENE_PATH: String = "res://scenes/bullets/PlayerSpellBullet.
 const _SPELL_VFX_SCENE := preload("res://scenes/vfx/SpellVFX.tscn")
 
 func _ready() -> void:
+	print("main.gd ready");
 	# 拉伸与基准分辨率见 project.godot Display → Stretch（viewport + keep，720×1280），主菜单与战斗统一
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_RESIZE_DISABLED, false)
 

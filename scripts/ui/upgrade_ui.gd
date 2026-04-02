@@ -101,7 +101,7 @@ func show_pick() -> void:
 		pool.append(u)
 	pool.shuffle()
 	if pool.is_empty():
-		# 没有可用升级，直接跳过选择
+	# 	# 没有可用升级，直接跳过选择
 		_main.on_upgrade_selected()
 		return
 	var pick_count: int = min(3, pool.size())
