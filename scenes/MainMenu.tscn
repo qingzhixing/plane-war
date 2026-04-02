@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://mainmenu"]
 
-[ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/main_menu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://jl0yyqpinp2y" path="res://scripts/ui/main_menu.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://btv236w48os2y" path="res://scenes/Main.tscn" id="2_main"]
 [ext_resource type="PackedScene" path="res://scenes/ui/SettingsUI.tscn" id="3_settings_scene"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="4_theme"]
