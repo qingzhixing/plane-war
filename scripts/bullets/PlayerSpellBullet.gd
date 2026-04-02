@@ -2,13 +2,15 @@ extends "res://scripts/bullets/BulletBase.gd"
 ## 符卡径向弹幕：仅销毁碰到的敌弹，不全场清弹；命中敌机逻辑同 BulletBase。
 ## 贴图默认朝向上方（-Y）；按飞行方向旋转整节点（含碰撞体）。
 
-@onready var _anim_player: AnimationPlayer = $AnimationPlayer
+@onready var _anim_player: AnimationPlayer = %AnimationPlayer
 
 var _is_disappearing: bool = false
 
 
 func _ready() -> void:
 	super._ready()
+	%BulletBody.visible = true
+	%Disappear.visible = false
 	_apply_rotation_from_direction()
 
 
@@ -46,6 +48,6 @@ func _on_area_entered(area: Node) -> void:
 func _play_disappear() -> void:
 	_is_disappearing = true
 	set_process(false)
-	$CollisionShape2D.set_deferred("disabled", true)
-	$Disappear.play("disappear")
+	%CollisionShape2D.set_deferred("disabled", true)
+	%Disappear.play("disappear")
 	_anim_player.play("disappear")

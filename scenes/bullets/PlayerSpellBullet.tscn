@@ -33,11 +33,10 @@ animations = [{
 [sub_resource type="Animation" id="Animation_disappear"]
 resource_name = "disappear"
 length = 0.27
-loop_mode = 0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:visible")
+tracks/0/path = NodePath("BulletBody:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -81,19 +80,22 @@ _data = {
 [node name="PlayerSpellBullet" type="Area2D" unique_id=1650058168]
 z_index = 12
 z_as_relative = false
-scale = Vector2(1.5, 1.5)
+scale = Vector2(2, 2)
 script = ExtResource("1_script")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1578002511]
+unique_name_in_owner = true
 position = Vector2(0, 0.5833335)
 shape = SubResource("RectangleShape2D_unp5v")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1481864673]
+[node name="BulletBody" type="Sprite2D" parent="." unique_id=1481864673]
+unique_name_in_owner = true
 position = Vector2(0.195, 24)
 rotation = -1.5707964
 texture = ExtResource("2_tex")
 
 [node name="Disappear" type="AnimatedSprite2D" parent="." unique_id=1882116036]
+unique_name_in_owner = true
 visible = false
 position = Vector2(0.6666667, 5.3290705e-15)
 rotation = -1.5707964
@@ -101,4 +103,5 @@ sprite_frames = SubResource("SpriteFrames_hsyn4")
 animation = &"disappear"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=-1447602277]
+unique_name_in_owner = true
 libraries/ = SubResource("AnimationLibrary_spell_bullet")

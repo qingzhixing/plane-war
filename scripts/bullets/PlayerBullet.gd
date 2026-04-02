@@ -3,9 +3,15 @@ extends "res://scripts/bullets/BulletBase.gd"
 ## 每秒最大转向角（弧度）；0 = 直线飞行
 var homing_strength: float = 0.0
 
+@onready var _anim_player: AnimationPlayer = %AnimationPlayer
+
+var _is_hit: bool = false
+
 
 func _ready() -> void:
 	super._ready()
+	%Sprite2D.visible = true
+	%Hit.visible = false
 
 
 func _process(delta: float) -> void:
@@ -18,6 +24,31 @@ func _process(delta: float) -> void:
 			var turn := clampf(diff, -homing_strength * delta, homing_strength * delta)
 			direction = Vector2.from_angle(current_angle + turn)
 	super._process(delta)
+
+
+func _on_area_entered(area: Node) -> void:
+	if _is_hit:
+		return
+	if area.is_in_group("enemy") or area.is_in_group("boss"):
+		var dealt_damage := damage
+		if area.is_in_group("boss"):
+			dealt_damage = max(1, int(round(float(damage) * _boss_damage_multiplier)))
+		if area.has_method("apply_damage"):
+			area.apply_damage(dealt_damage)
+			get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
+		if _penetration_left > 0:
+			_penetration_left -= 1
+			return
+		_play_hit()
+		return
+	super._on_area_entered(area)
+
+
+func _play_hit() -> void:
+	_is_hit = true
+	set_process(false)
+	%CollisionShape2D.set_deferred("disabled", true)
+	_anim_player.play("hit")
 
 
 func _find_nearest_enemy() -> Node2D:
