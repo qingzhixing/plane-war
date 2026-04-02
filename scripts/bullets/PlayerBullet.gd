@@ -26,15 +26,16 @@ func _process(delta: float) -> void:
 	super._process(delta)
 
 
-func _on_area_entered(area: Node) -> void:
+func _on_area_entered(area: Area2D) -> void:
 	if _is_hit:
 		return
 	if area.is_in_group("enemy") or area.is_in_group("boss"):
 		var dealt_damage := damage
 		if area.is_in_group("boss"):
 			dealt_damage = max(1, int(round(float(damage) * _boss_damage_multiplier)))
-		if area.has_method("apply_damage"):
-			area.apply_damage(dealt_damage)
+		var enemy := area as EnemyBase
+		if enemy != null:
+			enemy.apply_damage(dealt_damage)
 			get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
 		if _penetration_left > 0:
 			_penetration_left -= 1

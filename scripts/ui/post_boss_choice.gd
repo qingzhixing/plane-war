@@ -1,3 +1,4 @@
+class_name PostBossChoice
 extends CanvasLayer
 ## 主线 Boss 击破 / 续战块结束（第 8 波 Boss 后）：结算 vs 继续
 

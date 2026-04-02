@@ -1,10 +1,11 @@
+class_name EnemyBase
 extends Area2D
 
 @export var max_hp: int = 4
 @export var exp_value: int = 5
 @export var score_value: int = 10
 
-var hp: float
+var _hp: float
 
 const _HIT_FLASH_DURATION := 0.12
 var _hit_flash_timer: float = 0.0
@@ -13,7 +14,7 @@ var _hit_material: ShaderMaterial
 
 
 func _ready() -> void:
-	hp = max_hp
+	_hp = max_hp
 	add_to_group("enemy")
 	_init_hit_material()
 
@@ -25,8 +26,8 @@ func _process(delta: float) -> void:
 
 
 func apply_damage(amount: float) -> void:
-	hp -= amount
-	if hp <= 0:
+	_hp -= amount
+	if _hp <= 0:
 		_on_dead()
 	else:
 		_on_damaged()
@@ -40,14 +41,14 @@ func apply_wave_scaling(wave: int, threat_tier: int = 0) -> void:
 	if threat_tier > 0:
 		max_hp = int(round(float(max_hp) * pow(1.12, float(threat_tier))))
 	if wave > 1 or threat_tier > 0:
-		hp = max_hp
+		_hp = max_hp
 
 
-func _on_body_entered(body: Node) -> void:
-	if not body.is_in_group("player"):
+func _on_body_entered(body: Node2D) -> void:
+	var player := body as Player
+	if player == null:
 		return
-	if body.has_method("apply_damage"):
-		body.apply_damage(1)
+	player.apply_damage(1)
 	_on_player_collision()
 
 
@@ -77,7 +78,7 @@ func _init_hit_material() -> void:
 		new_mat.shader = shader_res
 		_sprite.material = new_mat
 		mat = new_mat
-	_hit_material = mat
+	_hit_material = mat as ShaderMaterial
 	_update_hit_material()
 
 
@@ -101,18 +102,17 @@ func _give_exp() -> void:
 	get_tree().call_group("experience_listener", "add_exp", exp_value)
 
 
-func _get_audio_manager() -> Node:
-	return get_tree().get_first_node_in_group("audio_manager")
+func _get_audio_manager() -> AudioManager:
+	return get_tree().get_first_node_in_group("audio_manager") as AudioManager
 
 
 func _play_enemy_injured_sfx() -> void:
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_injured"):
+	if audio != null:
 		audio.play_enemy_injured()
 
 
 func _play_enemy_explosion_sfx() -> void:
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_explosion"):
+	if audio != null:
 		audio.play_enemy_explosion()
-

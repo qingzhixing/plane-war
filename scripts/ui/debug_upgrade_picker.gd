@@ -1,3 +1,4 @@
+class_name DebugUpgradePicker
 extends CanvasLayer
 ## 调试：设置里打开，从完整列表任选升级，直接 apply_upgrade，不推进波次/升级流程。
 

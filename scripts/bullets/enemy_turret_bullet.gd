@@ -1,3 +1,4 @@
+class_name EnemyTurretBullet
 extends Area2D
 
 @export var speed: float = 400.0
@@ -21,9 +22,9 @@ func setup_direction(dir: Vector2) -> void:
 	_direction = dir.normalized()
 
 
-func _on_body_entered(body: Node) -> void:
-	if not body.is_in_group("player"):
+func _on_body_entered(body: Node2D) -> void:
+	var player := body as Player
+	if player == null:
 		return
-	if body.has_method("apply_damage"):
-		body.apply_damage(damage)
+	player.apply_damage(damage)
 	queue_free()

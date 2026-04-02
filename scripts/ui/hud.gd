@@ -1,9 +1,10 @@
+class_name HUD
 extends CanvasLayer
 
 @export var player_path: NodePath
 
-var _player: Node = null
-var _main: Node = null
+var _player: Player = null
+var _main: GameMain = null
 var _is_paused: bool = false
 var _combo_base_color: Color = Color.WHITE
 var _combo_base_scale: Vector2 = Vector2.ONE
@@ -41,9 +42,9 @@ var _combo_break_timer: float = 0.0
 
 func _ready() -> void:
 	if player_path != NodePath(""):
-		_player = get_node(player_path)
-	_main = get_parent()
-	if is_instance_valid(_main) and _main.has_signal("spell_used"):
+		_player = get_node(player_path) as Player
+	_main = get_parent() as GameMain
+	if is_instance_valid(_main):
 		_main.spell_used.connect(_on_spell_used)
 
 	if _score_label != null:
@@ -72,36 +73,27 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_main) and _main.has_method("get_wave"):
+	if is_instance_valid(_main):
 		var wave_text := "第 %d 波" % _main.get_wave()
-		if _main.has_method("get_extension_wave") and _main.get_extension_wave() > 0:
-			var ex: int = int(_main.get_extension_wave())
-			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned() and ex >= 8:
+		if _main.get_extension_wave() > 0:
+			var ex: int = _main.get_extension_wave()
+			if _main.is_boss_spawned() and ex >= 8:
 				wave_text = "续战 8/8 · Boss"
 			else:
 				wave_text = "续战 %d/8" % mini(ex, 8)
-			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+			if _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		else:
-			if _main.has_method("is_boss_spawned") and _main.is_boss_spawned():
+			if _main.is_boss_spawned():
 				wave_text = "%s - Boss" % wave_text
-			if _main.has_method("get_threat_tier") and _main.get_threat_tier() > 0:
+			if _main.get_threat_tier() > 0:
 				wave_text = "%s  威胁%d" % [wave_text, _main.get_threat_tier()]
 		_wave_label.text = wave_text
-	if is_instance_valid(_main):
-		var s: int = 0
-		var c: int = 0
-		var cur: float = 0.0
-		var max_val: float = 0.0
 
-		if _main.has_method("get_score"):
-			s = _main.get_score()
-		if _main.has_method("get_combo"):
-			c = _main.get_combo()
-		if _main.has_method("get_current_dps"):
-			cur = _main.get_current_dps()
-		if _main.has_method("get_max_dps"):
-			max_val = _main.get_max_dps()
+		var s: int = _main.get_score()
+		var c: int = _main.get_combo()
+		var cur: float = _main.get_current_dps()
+		var max_val: float = _main.get_max_dps()
 
 		if _score_label != null:
 			_score_label.text = "Score: %d" % s

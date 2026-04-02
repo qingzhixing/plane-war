@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 @export var move_speed: float = 600.0
@@ -23,9 +24,9 @@ var _last_pointer_pos: Vector2
 var bullet_damage: int = 1
 var bullet_speed: float = 1200.0
 var _bullet_count: int = 1
-const _max_bullet_count: int = 6
+const _MAX_BULLET_COUNT: int = 6
 var _spread_rad_per_bullet: float = 0.12
-const _min_spread_rad_per_bullet: float = 0.015
+const _MIN_SPREAD_RAD_PER_BULLET: float = 0.015
 var _boss_damage_multiplier: float = 1.0
 var _combo_fire_rate_mult: float = 1.0
 var _combo_move_speed_mult: float = 1.0
@@ -204,7 +205,7 @@ func _spawn_weapon_shot() -> void:
 
 
 func _spawn_default_shot() -> void:
-	var n: int = clampi(_bullet_count, 1, _max_bullet_count)
+	var n: int = clampi(_bullet_count, 1, _MAX_BULLET_COUNT)
 	for i in n:
 		var angle: float = (i - (n - 1) * 0.5) * _spread_rad_per_bullet
 		var dir := Vector2(sin(angle), -cos(angle))
@@ -318,21 +319,20 @@ func _spawn_configured_bullet(scene_res: PackedScene, dir: Vector2, damage_bonus
 	var scene := get_tree().current_scene
 	var bullet := scene_res.instantiate()
 	bullet.global_position = global_position + dir * 20.0 + side_offset
-	if "damage" in bullet:
+	var bb := bullet as BulletBase
+	if bb != null:
 		var combo_bonus_damage := float(_combo_damage_bonus) + _rof_overflow_damage
-		bullet.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
-	if "speed" in bullet:
-		bullet.speed = bullet_speed * _combo_bullet_speed_mult * speed_mult
-	if bullet.has_method("set_direction"):
-		bullet.set_direction(dir)
-	if bullet.has_method("set_boomerang_owner") and bullet_motion_mode == "boomerang":
-		bullet.set_boomerang_owner(self)
-		if "return_speed_multiplier" in bullet:
-			bullet.return_speed_multiplier = boomerang_return_speed_mult
-	if bullet.has_method("set_boss_damage_multiplier"):
-		bullet.set_boss_damage_multiplier(_boss_damage_multiplier)
-	if penetration > 0 and bullet.has_method("set_penetration"):
-		bullet.set_penetration(penetration)
+		bb.damage = maxf(0.1, (float(bullet_damage) + combo_bonus_damage + damage_bonus) * _damage_multiplier)
+		bb.speed = bullet_speed * _combo_bullet_speed_mult * speed_mult
+		bb.set_direction(dir)
+		bb.set_boss_damage_multiplier(_boss_damage_multiplier)
+		if penetration > 0:
+			bb.set_penetration(penetration)
+	if bullet_motion_mode == "boomerang":
+		var boom := bullet as PlayerBoomerang
+		if boom != null:
+			boom.set_boomerang_owner(self)
+			boom.return_speed_multiplier = boomerang_return_speed_mult
 	if "homing_strength" in bullet and _bullet_homing_strength > 0.0:
 		bullet.homing_strength = _bullet_homing_strength
 	scene.add_child(bullet)
@@ -349,8 +349,8 @@ func apply_damage(_amount: float) -> void:
 func get_bullet_count() -> int:
 	return _bullet_count
 
-func get_max_bullet_count() -> int:
-	return _max_bullet_count
+func get_MAX_BULLET_COUNT() -> int:
+	return _MAX_BULLET_COUNT
 
 
 func get_bullet_damage() -> int:
@@ -482,7 +482,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"damage":
 			bullet_damage += 1
 		"multi_shot":
-			_bullet_count = mini(_bullet_count + 1, _max_bullet_count)
+			_bullet_count = mini(_bullet_count + 1, _MAX_BULLET_COUNT)
 		"bullet_speed":
 			bullet_speed *= 1.12
 		"damage_percent":
@@ -490,7 +490,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 		"spread_focus":
 			# 聚焦只在多弹时有意义；效果做得更明显，便于玩家感知
 			if _bullet_count > 1:
-				_spread_rad_per_bullet = maxf(_min_spread_rad_per_bullet, _spread_rad_per_bullet * 0.7)
+				_spread_rad_per_bullet = maxf(_MIN_SPREAD_RAD_PER_BULLET, _spread_rad_per_bullet * 0.7)
 		"arrow_cooldown":
 			arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
 		"arrow_multi":
@@ -604,6 +604,6 @@ func _play_shoot_sfx() -> void:
 	if _shoot_sfx_timer > 0.0:
 		return
 	_shoot_sfx_timer = 0.08
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_shoot"):
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_shoot()

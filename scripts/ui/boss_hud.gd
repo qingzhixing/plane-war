@@ -1,3 +1,4 @@
+class_name BossHUD
 extends CanvasLayer
 
 @onready var _hp_bar: ProgressBar = $Root/Panel/HpBar

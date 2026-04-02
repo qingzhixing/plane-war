@@ -106,10 +106,11 @@ func _apply_aoe_damage() -> void:
 			var dealt := damage
 			if node.is_in_group("boss"):
 				dealt = max(1, int(round(float(damage) * _boss_damage_multiplier)))
-			if node.has_method("apply_damage"):
-				node.apply_damage(dealt)
-				get_tree().call_group("battle_stats_manager", "record_player_damage", dealt, node)
-				_spawn_hit_vfx(node)
+			var enemy := node as EnemyBase
+		if enemy != null:
+			enemy.apply_damage(dealt)
+			get_tree().call_group("battle_stats_manager", "record_player_damage", dealt, node)
+			_spawn_hit_vfx(node)
 
 
 func _clear_enemy_bullets_in_polygon(poly_global: PackedVector2Array) -> void:

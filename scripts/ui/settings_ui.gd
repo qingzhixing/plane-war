@@ -1,3 +1,4 @@
+class_name SettingsUI
 extends CanvasLayer
 
 const _SETTINGS_FILE_PATH: String = "user://settings.cfg"

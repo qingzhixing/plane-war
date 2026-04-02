@@ -19,8 +19,8 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	var main := get_tree().current_scene
-	if main == null or not main.has_method("record_graze"):
+	var main := get_tree().current_scene as GameMain
+	if main == null:
 		return
 	var now: int = Time.get_ticks_msec()
 	for area in get_overlapping_areas():
@@ -34,8 +34,8 @@ func _physics_process(_delta: float) -> void:
 			continue
 		_last_score_ms[id] = now
 		main.record_graze()
-		var audio := get_tree().get_first_node_in_group("audio_manager")
-		if audio != null and audio.has_method("play_graze"):
+		var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+		if audio != null:
 			audio.play_graze()
 		var last_v: int = int(_last_vfx_ms.get(id, 0))
 		if now - last_v >= VFX_TICK_MS:

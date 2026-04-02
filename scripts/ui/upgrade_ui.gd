@@ -1,3 +1,4 @@
+class_name UpgradeUI
 extends CanvasLayer
 
 const UPGRADES: Array[Dictionary] = [

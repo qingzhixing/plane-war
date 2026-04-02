@@ -1,3 +1,4 @@
+class_name EnemySpawner
 extends Node
 
 @export var enemy_scene: PackedScene
@@ -49,12 +50,12 @@ func start_extension_wave(ext: int, threat_tier: int) -> void:
 
 
 func _on_spawn_timeout() -> void:
-	var main := get_tree().current_scene
+	var main := get_tree().current_scene as GameMain
 	var wave := 1
-	if main != null and main.has_method("get_wave"):
+	if main != null:
 		wave = main.get_wave()
 
-	if main != null and main.has_method("is_boss_spawned") and main.is_boss_spawned():
+	if main != null and main.is_boss_spawned():
 		if _timer != null:
 			_timer.stop()
 		return
@@ -62,13 +63,13 @@ func _on_spawn_timeout() -> void:
 	if _remaining_to_spawn <= 0:
 		var enemies := get_tree().get_nodes_in_group("enemy")
 		if enemies.is_empty():
-			if main != null and main.has_method("on_wave_cleared"):
+			if main != null:
 				main.on_wave_cleared()
 		return
 
 	var scene_to_use: PackedScene = enemy_scene
 	var tier := 0
-	if main != null and main.has_method("get_threat_tier"):
+	if main != null:
 		tier = main.get_threat_tier()
 	var effective_wave := wave
 
@@ -94,8 +95,8 @@ func _on_spawn_timeout() -> void:
 	if scene_to_use == null:
 		return
 
-	var enemy := scene_to_use.instantiate()
-	if enemy != null and enemy.has_method("apply_wave_scaling"):
+	var enemy := scene_to_use.instantiate() as EnemyBase
+	if enemy != null:
 		enemy.apply_wave_scaling(effective_wave, tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	var x := randf_range(50.0, viewport_rect.size.x - 50.0)

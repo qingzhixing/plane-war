@@ -1,3 +1,4 @@
+class_name GameMain
 extends Node2D
 
 signal level_up
@@ -77,8 +78,8 @@ func _ready() -> void:
 	_load_records()
 
 	_spawner = get_node_or_null("EnemySpawner")
-	var pbc := get_node_or_null("PostBossChoice")
-	if pbc != null and pbc.has_method("bind_main"):
+	var pbc := get_node_or_null("PostBossChoice") as PostBossChoice
+	if pbc != null:
 		pbc.bind_main(self)
 	_start_wave()
 
@@ -93,8 +94,9 @@ func _process(delta: float) -> void:
 func _start_wave() -> void:
 	if _boss_spawned:
 		return
-	if _spawner != null and _spawner.has_method("start_wave"):
-		_spawner.start_wave(_wave)
+	var spawner := _spawner as EnemySpawner
+	if spawner != null:
+		spawner.start_wave(_wave)
 
 
 func get_extension_wave() -> int:
@@ -148,8 +150,9 @@ func on_upgrade_selected() -> void:
 		_pending_post_boss_upgrade = false
 		_post_continue_upgrades_left = 0
 		_extension_wave = 1
-		if _spawner != null and _spawner.has_method("start_extension_wave"):
-			_spawner.start_extension_wave(1, threat_tier)
+		var spawner := _spawner as EnemySpawner
+		if spawner != null:
+			spawner.start_extension_wave(1, threat_tier)
 		return
 
 	if _extension_wave == _EXTENSION_MOB_WAVES:
@@ -159,8 +162,9 @@ func on_upgrade_selected() -> void:
 
 	if _extension_wave > 0 and _extension_wave < _EXTENSION_MOB_WAVES:
 		_extension_wave += 1
-		if _spawner != null and _spawner.has_method("start_extension_wave"):
-			_spawner.start_extension_wave(_extension_wave, threat_tier)
+		var spawner2 := _spawner as EnemySpawner
+		if spawner2 != null:
+			spawner2.start_extension_wave(_extension_wave, threat_tier)
 		return
 
 	if _debug_skip_to_boss_active:
@@ -185,11 +189,11 @@ func on_upgrade_selected() -> void:
 	_start_wave()
 
 func _on_level_up() -> void:
-	var p := get_node_or_null(player_path)
-	if p != null and p.has_method("release_pointer"):
+	var p := get_node_or_null(player_path) as Player
+	if p != null:
 		p.release_pointer()
-	var ui := get_node_or_null("UpgradeUI")
-	if ui != null and ui.has_method("show_pick"):
+	var ui := get_node_or_null("UpgradeUI") as UpgradeUI
+	if ui != null:
 		ui.show_pick()
 
 func apply_upgrade(upgrade_id: String) -> void:
@@ -203,8 +207,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 			return
 		"combo_guard":
 			_combo_guard_charges += 1
-			var p_guard := get_node_or_null(player_path)
-			if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+			var p_guard := get_node_or_null(player_path) as Player
+			if p_guard != null:
 				p_guard.set_combo_guard_shield_visible(true)
 			return
 		"spell_cooldown", "bomb_cooldown":
@@ -232,8 +236,8 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if _spell_cooldown_remaining <= 0.0:
 				try_use_spell()
 			return
-	var p := get_node_or_null(player_path)
-	if p != null and p.has_method("apply_upgrade"):
+	var p := get_node_or_null(player_path) as Player
+	if p != null:
 		p.apply_upgrade(upgrade_id)
 
 func add_exp(amount: int) -> void:
@@ -325,8 +329,8 @@ func _try_spell_short_tap(screen_pos: Vector2, key: int) -> void:
 		return
 	if screen_pos.distance_to(p0) > 56.0:
 		return
-	var hud := get_node_or_null("HUD")
-	if hud != null and hud.has_method("get_spell_screen_rect"):
+	var hud := get_node_or_null("HUD") as HUD
+	if hud != null:
 		if hud.get_spell_screen_rect().has_point(screen_pos):
 			try_use_spell()
 
@@ -421,17 +425,15 @@ func get_lives_remaining() -> int:
 
 
 func on_player_hit() -> void:
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_player_hurt"):
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_player_hurt()
 	if _combo_guard_charges > 0:
 		_combo_guard_charges -= 1
-		var p_hit := get_node_or_null(player_path)
+		var p_hit := get_node_or_null(player_path) as Player
 		if p_hit != null:
-			if p_hit.has_method("play_combo_guard_pulse"):
-				p_hit.play_combo_guard_pulse()
-			if p_hit.has_method("set_combo_guard_shield_visible"):
-				p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
+			p_hit.play_combo_guard_pulse()
+			p_hit.set_combo_guard_shield_visible(_combo_guard_charges > 0)
 		return
 	# 扣命：稳态护盾未挡下时，实际消耗一条命；本次扣命后 Life = 0 则立即结算
 	_lives_remaining = maxi(0, _lives_remaining - 1)
@@ -467,8 +469,8 @@ func _update_combo_buffs() -> void:
 	if tier == _last_combo_buff_tier:
 		return
 	_last_combo_buff_tier = tier
-	var p := get_node_or_null(player_path)
-	if p != null and p.has_method("set_combo_buff_tier"):
+	var p := get_node_or_null(player_path) as Player
+	if p != null:
 		p.set_combo_buff_tier(tier)
 
 
@@ -507,16 +509,14 @@ func has_spell_auto() -> bool:
 
 func _trigger_spell_effect() -> void:
 	# 符卡效果：周身 360° 弹幕；敌弹靠符卡弹碰撞逐发消除（不全屏清弹）
-	var player := get_node_or_null(player_path)
+	var player := get_node_or_null(player_path) as Player
 	var origin := get_viewport().get_visible_rect().size * 0.5
 	var player_damage := 1.0
 	var boss_damage_multiplier := 1.0
 	if player != null:
 		origin = player.global_position
-		if player.has_method("get_bullet_damage"):
-			player_damage = int(player.get_bullet_damage())
-		if player.has_method("get_boss_damage_multiplier"):
-			boss_damage_multiplier = float(player.get_boss_damage_multiplier())
+		player_damage = float(player.get_bullet_damage())
+		boss_damage_multiplier = player.get_boss_damage_multiplier()
 
 	var vfx := _SPELL_VFX_SCENE.instantiate() as Node2D
 	vfx.global_position = origin
@@ -526,10 +526,9 @@ func _trigger_spell_effect() -> void:
 	if burst_scene != null:
 		_fire_spell_burst_waves(burst_scene, origin, player_damage, boss_damage_multiplier)
 
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_enemy_explosion"):
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_enemy_explosion()
-	if audio != null and audio.has_method("play_power_up"):
 		audio.play_power_up()
 
 
@@ -540,14 +539,13 @@ func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_
 		for i in _SPELL_BURST_BULLET_COUNT:
 			var angle := TAU * float(i) / float(_SPELL_BURST_BULLET_COUNT) + phase_offset
 			var dir := Vector2.RIGHT.rotated(angle)
-			var b := bullet_scene.instantiate()
+			var b := bullet_scene.instantiate() as BulletBase
+			if b == null:
+				continue
 			b.global_position = origin + dir * radius
-			if "damage" in b:
-				b.damage = player_damage
-			if b.has_method("set_direction"):
-				b.set_direction(dir)
-			if b.has_method("set_boss_damage_multiplier"):
-				b.set_boss_damage_multiplier(boss_damage_multiplier)
+			b.damage = player_damage
+			b.set_direction(dir)
+			b.set_boss_damage_multiplier(boss_damage_multiplier)
 			get_tree().current_scene.add_child(b)
 		if wave < _SPELL_BURST_WAVE_COUNT - 1:
 			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL).timeout
@@ -637,10 +635,10 @@ func _spawn_boss() -> void:
 	var is_extension_boss: bool = (_extension_wave >= _EXTENSION_BLOCK_SIZE)
 	if is_extension_boss:
 		hp_m *= 3.2 + tier_f
-	if "max_hp" in boss:
-		boss.max_hp = maxi(200, int(round(float(boss.max_hp) * hp_m)))
-	if boss.has_method("apply_threat_scaling"):
-		boss.apply_threat_scaling(threat_tier)
+	var boss01 := boss as Boss01
+	if boss01 != null:
+		boss01.max_hp = maxi(200, int(round(float(boss01.max_hp) * hp_m)))
+		boss01.apply_threat_scaling(threat_tier)
 	var viewport_rect := get_viewport().get_visible_rect()
 	# 从屏幕外上方进入：初始放在屏幕上缘外侧，然后由 Boss 自身逻辑缓慢驶入
 	boss.global_position = Vector2(viewport_rect.size.x * 0.5, -100.0)
@@ -719,22 +717,16 @@ func on_boss_defeated() -> void:
 	_boss_spawned = false
 	_pending_boss_spawn = false
 	get_tree().paused = true
-	var pbc := get_node_or_null("PostBossChoice")
+	var pbc := get_node_or_null("PostBossChoice") as PostBossChoice
 	if pbc == null:
 		get_tree().call_group("game_over_ui", "show_game_over")
 		return
 	# 续战块 Boss 击破 → 与「每轮续战结束」相同二选一
 	if _extension_wave >= _EXTENSION_BLOCK_SIZE:
 		_extension_wave = 0
-		if pbc.has_method("show_choice_after_block"):
-			pbc.show_choice_after_block()
-		else:
-			get_tree().call_group("game_over_ui", "show_game_over")
+		pbc.show_choice_after_block()
 	else:
-		if pbc.has_method("show_choice"):
-			pbc.show_choice()
-		else:
-			get_tree().call_group("game_over_ui", "show_game_over")
+		pbc.show_choice()
 
 
 func continue_after_boss() -> void:
@@ -751,8 +743,8 @@ func _begin_next_extension_block() -> void:
 	_score_multiplier += 0.08
 	_combo_guard_charges += 1
 	_debug_skip_to_boss_used = false
-	var p_guard := get_node_or_null(player_path)
-	if p_guard != null and p_guard.has_method("set_combo_guard_shield_visible"):
+	var p_guard := get_node_or_null(player_path) as Player
+	if p_guard != null:
 		p_guard.set_combo_guard_shield_visible(true)
 	_boss_spawned = false
 	_pending_boss_spawn = false

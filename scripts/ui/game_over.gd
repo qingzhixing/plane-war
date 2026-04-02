@@ -1,3 +1,4 @@
+class_name GameOver
 extends CanvasLayer
 
 @export var main_path: NodePath = NodePath("..")
