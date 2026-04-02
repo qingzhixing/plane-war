@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://baihdbmy4gb50"]
 
-[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/upgrade_ui.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dg6moapdsh5ux" path="res://scripts/ui/upgrade_ui.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_btn"]

@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/settings_ui.gd" id="1_script"]
-[ext_resource type="Theme" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://dy5ravijjpxn0" path="res://scripts/ui/settings_ui.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://6gltwgxumk04" path="res://assets/theme/default_ui_theme.tres" id="2_theme"]
 
 [node name="SettingsUI" type="CanvasLayer"]
 process_mode = 3

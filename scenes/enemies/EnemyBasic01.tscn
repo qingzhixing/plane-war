@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://enemybasic01"]
 
-[ext_resource type="Script" uid="uid://d3lm60pm8ir82" path="res://scripts/enemy_basic.gd" id="1_eb01"]
+[ext_resource type="Script" uid="uid://d3lm60pm8ir82" path="res://scripts/enemies/enemy_basic.gd" id="1_eb01"]
 [ext_resource type="Texture2D" uid="uid://cw2ylb2igtebk" path="res://assets/sprites/enemies/Enemy Normal.svg" id="2_jkybx"]
 
 [node name="EnemyBasic01" type="Area2D" unique_id=762140354]
