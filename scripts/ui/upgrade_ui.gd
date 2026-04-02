@@ -61,12 +61,6 @@ func _ready() -> void:
 		{"root": _card1_root, "title_label": _card1_title, "desc_label": _card1_desc, "button": _card1_btn},
 		{"root": _card2_root, "title_label": _card2_title, "desc_label": _card2_desc, "button": _card2_btn},
 	]
-	# 连接按钮信号
-	for i in _cards.size():
-		var card: Dictionary = _cards[i]
-		var btn: Button = card["button"]
-		if btn != null:
-			btn.pressed.connect(_on_card_pressed.bind(i))
 
 
 func show_pick() -> void:
@@ -82,7 +76,7 @@ func show_pick() -> void:
 	var bomb_unlocked: bool = false
 	if player != null:
 		bullet_count = player.get_bullet_count()
-		at_max_bullets = bullet_count >= player.get_max_bullet_count()
+		at_max_bullets = bullet_count >= player.get_MAX_BULLET_COUNT()
 		arrow_unlocked = player.has_weapon_unlocked("arrow")
 		bomb_unlocked = player.has_weapon_unlocked("bomb")
 	for u in UPGRADES:

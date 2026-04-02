@@ -28,7 +28,7 @@ func _ready() -> void:
 	set_process(true)
 	print("EnemySpawner._ready: process enabled")
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if _remaining_to_spawn <= 0:
 		var main := get_tree().current_scene as GameMain
 		var enemies := get_tree().get_nodes_in_group("enemy")

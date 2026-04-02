@@ -437,7 +437,6 @@ theme_override_font_sizes/font_size = 28
 text = "主菜单"
 
 [node name="UpgradeUI" parent="." unique_id=1043995664 instance=ExtResource("24_upgrade_ui_scene")]
-visible = false
 
 [node name="SettingsUI" parent="." unique_id=317848371 instance=ExtResource("25_settings_ui_scene")]
 visible = false
