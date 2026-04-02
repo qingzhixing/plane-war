@@ -17,6 +17,7 @@ extends CharacterBody2D
 var _fire_timer: float = 0.0
 var _shoot_sfx_timer: float = 0.0
 var _has_pointer: bool = false
+var _pointer_index: int = -1
 var _pointer_pos: Vector2
 var _last_pointer_pos: Vector2
 var bullet_damage: int = 1
@@ -97,9 +98,16 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		var e := event as InputEventScreenTouch
-		_has_pointer = e.pressed
-		_pointer_pos = e.position
-		_last_pointer_pos = e.position
+		if e.pressed:
+			if _pointer_index == -1:
+				_pointer_index = e.index
+				_has_pointer = true
+				_pointer_pos = e.position
+				_last_pointer_pos = e.position
+		else:
+			if e.index == _pointer_index:
+				_has_pointer = false
+				_pointer_index = -1
 	elif event is InputEventMouseButton:
 		var e := event as InputEventMouseButton
 		_has_pointer = e.pressed
@@ -107,7 +115,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_last_pointer_pos = e.position
 	elif event is InputEventScreenDrag:
 		var e := event as InputEventScreenDrag
-		if _has_pointer:
+		if _has_pointer and e.index == _pointer_index:
 			var delta_pos := e.position - _pointer_pos
 			# 单帧位移上限，避免触摸抖动或焦点丢失造成的大跳
 			const max_delta := 120.0
