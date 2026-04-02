@@ -1,4 +1,3 @@
-class_name AudioManager
 extends Node
 
 const BGM_STREAMS: Array[AudioStream] = [
