@@ -7,16 +7,16 @@ var _is_from_menu: bool = false
 var _was_paused_before: bool = false
 var _syncing_audio_ui: bool = false
 
-@onready var _bgm_slider: HSlider = $Root/Center/Panel/VBox/BgmRow/BgmSlider
-@onready var _sfx_slider: HSlider = $Root/Center/Panel/VBox/SfxRow/SfxSlider
-@onready var _bgm_mute_check: CheckBox = $Root/Center/Panel/VBox/BgmRow/BgmMuteCheck
-@onready var _sfx_mute_check: CheckBox = $Root/Center/Panel/VBox/SfxRow/SfxMuteCheck
-@onready var _vibration_check: CheckBox = $Root/Center/Panel/VBox/VibrationCheck
-@onready var _scale_option: OptionButton = $Root/Center/Panel/VBox/ScaleRow/ScaleOption
-@onready var _end_run_button: Button = $Root/Center/Panel/VBox/EndRunButton
-@onready var _skip_boss_button: Button = $Root/Center/Panel/VBox/SkipBossButton
-@onready var _debug_upgrades_button: Button = $Root/Center/Panel/VBox/DebugUpgradesButton
-@onready var _debug_combo_row: HBoxContainer = $Root/Center/Panel/VBox/DebugComboRow
+@onready var _bgm_slider: HSlider = %BgmSlider
+@onready var _sfx_slider: HSlider = %SfxSlider
+@onready var _bgm_mute_check: CheckBox = %BgmMuteCheck
+@onready var _sfx_mute_check: CheckBox = %SfxMuteCheck
+@onready var _vibration_check: CheckBox = %VibrationCheck
+@onready var _scale_option: OptionButton = %ScaleOption
+@onready var _end_run_button: Button = %EndRunButton
+@onready var _skip_boss_button: Button = %SkipBossButton
+@onready var _debug_upgrades_button: Button = %DebugUpgradesButton
+@onready var _debug_combo_row: HBoxContainer = %DebugComboRow
 
 
 func _ready() -> void:
@@ -50,8 +50,7 @@ func _sync_audio_controls_from_manager() -> void:
 	var audio := _get_audio_manager()
 	if audio == null:
 		return
-	if audio.has_method("reload_audio_settings_from_disk"):
-		audio.reload_audio_settings_from_disk()
+	audio.reload_audio_settings_from_disk()
 	_syncing_audio_ui = true
 	if _bgm_slider != null:
 		_bgm_slider.set_block_signals(true)
@@ -61,13 +60,13 @@ func _sync_audio_controls_from_manager() -> void:
 		_bgm_mute_check.set_block_signals(true)
 	if _sfx_mute_check != null:
 		_sfx_mute_check.set_block_signals(true)
-	if audio.has_method("get_bgm_volume_percent") and _bgm_slider != null:
+	if _bgm_slider != null:
 		_bgm_slider.value = float(audio.get_bgm_volume_percent())
-	if audio.has_method("get_sfx_volume_percent") and _sfx_slider != null:
+	if _sfx_slider != null:
 		_sfx_slider.value = float(audio.get_sfx_volume_percent())
-	if audio.has_method("is_bgm_muted") and _bgm_mute_check != null:
+	if _bgm_mute_check != null:
 		_bgm_mute_check.button_pressed = audio.is_bgm_muted()
-	if audio.has_method("is_sfx_muted") and _sfx_mute_check != null:
+	if _sfx_mute_check != null:
 		_sfx_mute_check.button_pressed = audio.is_sfx_muted()
 	if _bgm_slider != null:
 		_bgm_slider.set_block_signals(false)
@@ -100,55 +99,55 @@ func _on_close_pressed() -> void:
 
 
 func _on_end_run_pressed() -> void:
-	var game_over := get_tree().get_first_node_in_group("game_over_ui")
-	if game_over != null and game_over.has_method("show_game_over"):
+	var game_over := get_tree().get_first_node_in_group("game_over_ui") as GameOver
+	if game_over != null:
 		visible = false
 		game_over.show_game_over()
 
 
 func _on_skip_to_boss_pressed() -> void:
-	var main := get_tree().current_scene
-	if main != null and main.has_method("_debug_skip_to_boss"):
+	var main := get_tree().current_scene as GameMain
+	if main != null:
 		visible = false
 		get_tree().paused = false
 		main._debug_skip_to_boss()
 
 
 func _on_debug_combo_add(n: int) -> void:
-	var main := get_tree().current_scene
-	if main != null and main.has_method("debug_add_combo"):
+	var main := get_tree().current_scene as GameMain
+	if main != null:
 		main.debug_add_combo(n)
 
 
 func _on_debug_combo_clear() -> void:
-	var main := get_tree().current_scene
-	if main != null and main.has_method("debug_set_combo"):
+	var main := get_tree().current_scene as GameMain
+	if main != null:
 		main.debug_set_combo(0)
 
 
 func _on_debug_upgrades_pressed() -> void:
-	var main := get_tree().current_scene
+	var main := get_tree().current_scene as GameMain
 	if main == null:
 		return
-	var picker := main.get_node_or_null("DebugUpgradePicker")
-	if picker != null and picker.has_method("_open_panel"):
+	var picker := main.get_node_or_null("DebugUpgradePicker") as DebugUpgradePicker
+	if picker != null:
 		visible = false
 		get_tree().paused = false
 		picker._open_panel()
 
 
-func _get_audio_manager() -> Node:
-	var n := get_tree().get_first_node_in_group("audio_manager")
+func _get_audio_manager() -> AudioManager:
+	var n := get_tree().get_first_node_in_group("audio_manager") as AudioManager
 	if n != null:
 		return n
-	return get_tree().root.get_node_or_null("AudioManager")
+	return get_tree().root.get_node_or_null("AudioManager") as AudioManager
 
 
 func _on_bgm_slider_changed(value: float) -> void:
 	if _syncing_audio_ui:
 		return
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("set_bgm_volume_linear"):
+	if audio != null:
 		audio.set_bgm_volume_linear(value / 100.0)
 
 
@@ -156,7 +155,7 @@ func _on_sfx_slider_changed(value: float) -> void:
 	if _syncing_audio_ui:
 		return
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("set_sfx_volume_linear"):
+	if audio != null:
 		audio.set_sfx_volume_linear(value / 100.0)
 
 
@@ -164,7 +163,7 @@ func _on_bgm_mute_toggled(pressed: bool) -> void:
 	if _syncing_audio_ui:
 		return
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("set_bgm_muted"):
+	if audio != null:
 		audio.set_bgm_muted(pressed)
 
 
@@ -172,7 +171,7 @@ func _on_sfx_mute_toggled(pressed: bool) -> void:
 	if _syncing_audio_ui:
 		return
 	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("set_sfx_muted"):
+	if audio != null:
 		audio.set_sfx_muted(pressed)
 
 

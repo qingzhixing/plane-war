@@ -26,13 +26,13 @@ const _ALL: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-var _main: Node
+var _main: GameMain
 var _open: bool = false
 
 
 func _ready() -> void:
 	visible = false
-	_main = get_parent()
+	_main = get_parent() as GameMain
 	_build_buttons()
 
 
@@ -68,8 +68,8 @@ func _close() -> void:
 
 
 func _on_pick(upgrade_id: String) -> void:
-	if _main != null and _main.has_method("apply_upgrade"):
+	if _main != null:
 		_main.apply_upgrade(upgrade_id)
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_power_up"):
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_power_up()

@@ -1,8 +1,8 @@
 class_name BossHUD
 extends CanvasLayer
 
-@onready var _hp_bar: ProgressBar = $Root/Panel/HpBar
-@onready var _spell_label: Label = $Root/SpellLabel
+@onready var _hp_bar: ProgressBar = %HpBar
+@onready var _spell_label: Label = %SpellLabel
 
 func _ready() -> void:
 	add_to_group("boss_hud")

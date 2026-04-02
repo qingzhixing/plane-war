@@ -34,6 +34,7 @@ text = "Boss"
 theme_override_font_sizes/font_size = 24
 
 [node name="HpBar" type="ProgressBar" parent="Root/Panel"]
+unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.25
 anchor_right = 0.98
@@ -44,6 +45,7 @@ value = 0.0
 show_percentage = false
 
 [node name="SpellLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.2
 anchor_right = 0.8

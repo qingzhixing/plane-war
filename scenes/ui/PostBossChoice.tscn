@@ -52,12 +52,14 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Boss 击破"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 32
 
 [node name="BodyLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 22
@@ -74,6 +76,7 @@ text = "本局结算"
 theme_override_font_sizes/font_size = 22
 
 [node name="ContinueButton" type="Button" parent="Root/Center/Panel/Margin/VBox/HBox"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 56)
 layout_mode = 2
 text = "继续挑战"

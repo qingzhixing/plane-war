@@ -173,13 +173,16 @@ mouse_filter = 2
 theme_override_constants/separation = 12
 
 [node name="SlotGun" parent="HUD/Root/LeftSlotsVBox" unique_id=100000002 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("16_tex_gun")
 
 [node name="SlotShield" parent="HUD/Root/LeftSlotsVBox" unique_id=100000003 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="SlotLife" parent="HUD/Root/LeftSlotsVBox" unique_id=100000004 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("18_tex_life")
 
@@ -197,22 +200,27 @@ mouse_filter = 2
 theme_override_constants/separation = 12
 
 [node name="SlotSpell" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000006 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("19_tex_spell")
 
 [node name="SlotArrow" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000007 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("20_tex_arrow")
 
 [node name="SlotBomb" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000008 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("21_tex_bomb")
 
 [node name="SlotBoomerang" parent="HUD/Root/SideWeaponCdVBox" unique_id=100000009 instance=ExtResource("15_status_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("22_tex_boomerang")
 
 [node name="ComboNoticeLabel" type="Label" parent="HUD/Root" unique_id=100000010]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = -1
@@ -225,6 +233,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ComboEdgeTop" type="ColorRect" parent="HUD/Root" unique_id=100000011]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 10
@@ -234,6 +243,7 @@ grow_horizontal = 2
 mouse_filter = 2
 
 [node name="ComboEdgeBottom" type="ColorRect" parent="HUD/Root" unique_id=100000012]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 12
@@ -246,6 +256,7 @@ grow_vertical = 0
 mouse_filter = 2
 
 [node name="ComboEdgeLeft" type="ColorRect" parent="HUD/Root" unique_id=100000013]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 9
@@ -255,6 +266,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="ComboEdgeRight" type="ColorRect" parent="HUD/Root" unique_id=100000014]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 11
@@ -267,6 +279,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="ComboFullTint" type="ColorRect" parent="HUD/Root" unique_id=100000015]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -278,6 +291,7 @@ mouse_filter = 2
 color = Color(1, 1, 1, 0)
 
 [node name="SpellFlashRect" type="ColorRect" parent="HUD/Root" unique_id=100000016]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -289,6 +303,7 @@ mouse_filter = 2
 color = Color(0.65, 0.9, 1, 0)
 
 [node name="SpellNoticeLabel" type="Label" parent="HUD/Root" unique_id=100000017]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = -1
@@ -356,6 +371,7 @@ text = "结算"
 horizontal_alignment = 1
 
 [node name="DeathLabel" type="Label" parent="GameOver/Root/Center/SummaryCard/SummaryVBox" unique_id=100000023]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.33, 0.33, 1)
@@ -364,6 +380,7 @@ text = "— You Dead —"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/SummaryVBox" unique_id=100000024]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 26
 bbcode_enabled = true
@@ -379,6 +396,7 @@ mouse_filter = 2
 color = Color(0.2, 0.22, 0.3, 1)
 
 [node name="BuildTitle" type="Label" parent="GameOver/Root/Center/SummaryCard/SummaryVBox" unique_id=100000026]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.47, 0.53, 0.67, 1)
 theme_override_font_sizes/font_size = 22
@@ -386,6 +404,7 @@ text = "本局构筑"
 horizontal_alignment = 1
 
 [node name="BuildLabel" type="RichTextLabel" parent="GameOver/Root/Center/SummaryCard/SummaryVBox" unique_id=100000027]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 22
 bbcode_enabled = true

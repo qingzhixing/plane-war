@@ -21,23 +21,23 @@ var _combo_break_timer: float = 0.0
 @onready var _dps_label: Label = %DpsLabel
 @onready var _spell_button: TextureButton = %SpellStarButton
 
-@onready var _main_gun_slot: Control = $Root/LeftSlotsVBox/SlotGun
-@onready var _shield_slot: Control = $Root/LeftSlotsVBox/SlotShield
-@onready var _life_slot: Control = $Root/LeftSlotsVBox/SlotLife
+@onready var _main_gun_slot: Control = %SlotGun
+@onready var _shield_slot: Control = %SlotShield
+@onready var _life_slot: Control = %SlotLife
 
-@onready var _spell_cd_slot: Control = $Root/SideWeaponCdVBox/SlotSpell
-@onready var _slot_arrow: Control = $Root/SideWeaponCdVBox/SlotArrow
-@onready var _slot_bomb: Control = $Root/SideWeaponCdVBox/SlotBomb
-@onready var _slot_boomerang: Control = $Root/SideWeaponCdVBox/SlotBoomerang
+@onready var _spell_cd_slot: Control = %SlotSpell
+@onready var _slot_arrow: Control = %SlotArrow
+@onready var _slot_bomb: Control = %SlotBomb
+@onready var _slot_boomerang: Control = %SlotBoomerang
 
-@onready var _combo_notice_label: Label = $Root/ComboNoticeLabel
-@onready var _combo_edge_top: ColorRect = $Root/ComboEdgeTop
-@onready var _combo_edge_bottom: ColorRect = $Root/ComboEdgeBottom
-@onready var _combo_edge_left: ColorRect = $Root/ComboEdgeLeft
-@onready var _combo_edge_right: ColorRect = $Root/ComboEdgeRight
-@onready var _combo_full_tint: ColorRect = $Root/ComboFullTint
-@onready var _spell_flash_rect: ColorRect = $Root/SpellFlashRect
-@onready var _spell_notice_label: Label = $Root/SpellNoticeLabel
+@onready var _combo_notice_label: Label = %ComboNoticeLabel
+@onready var _combo_edge_top: ColorRect = %ComboEdgeTop
+@onready var _combo_edge_bottom: ColorRect = %ComboEdgeBottom
+@onready var _combo_edge_left: ColorRect = %ComboEdgeLeft
+@onready var _combo_edge_right: ColorRect = %ComboEdgeRight
+@onready var _combo_full_tint: ColorRect = %ComboFullTint
+@onready var _spell_flash_rect: ColorRect = %SpellFlashRect
+@onready var _spell_notice_label: Label = %SpellNoticeLabel
 
 
 func _ready() -> void:
@@ -117,18 +117,17 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		match e.keycode:
 			KEY_P:
-				var ui := _main.get_node_or_null("UpgradeUI")
+				var ui := _main.get_node_or_null("UpgradeUI") as UpgradeUI
 				if ui == null or not ui.visible:
 					_on_pause_button_pressed()
 			KEY_SPACE:
-				if _main.has_method("try_use_spell"):
-					_main.try_use_spell()
+				_main.try_use_spell()
 			KEY_ESCAPE:
-				var settings := get_tree().get_first_node_in_group("settings_menu")
+				var settings := get_tree().get_first_node_in_group("settings_menu") as SettingsUI
 				if settings != null:
-					if settings.visible and settings.has_method("_on_close_pressed"):
+					if settings.visible:
 						settings._on_close_pressed()
-					elif not settings.visible and settings.has_method("show_settings"):
+					else:
 						settings.show_settings()
 
 func _on_pause_button_pressed() -> void:
@@ -140,8 +139,8 @@ func _on_pause_button_pressed() -> void:
 func _on_settings_button_pressed() -> void:
 	if not is_instance_valid(_main):
 		return
-	var settings := _main.get_node_or_null("SettingsUI")
-	if settings != null and settings.has_method("show_settings"):
+	var settings := _main.get_node_or_null("SettingsUI") as SettingsUI
+	if settings != null:
 		settings.show_settings()
 
 
@@ -285,32 +284,31 @@ func _set_combo_edge_visibility(is_enabled: bool) -> void:
 
 
 func _play_combo_break_sfx() -> void:
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_player_hurt"):
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_player_hurt()
 
 
 func _update_left_slots() -> void:
 	if _main_gun_slot == null or _shield_slot == null or _life_slot == null:
 		return
-	if is_instance_valid(_player) and _player.has_method("get_main_fire_cd_remaining"):
-		var eff_iv: float = _player.get_effective_fire_interval() if _player.has_method("get_effective_fire_interval") else 0.2
+	if is_instance_valid(_player):
+		var eff_iv: float = _player.get_effective_fire_interval()
 		var rem: float = _player.get_main_fire_cd_remaining()
 		var r: float = rem / eff_iv if eff_iv > 0.0 else 1.0
-		var bc: int = _player.get_bullet_count() if _player.has_method("get_bullet_count") else 1
 		_main_gun_slot.set_ratio(r)
-		_main_gun_slot.set_count(bc)
+		_main_gun_slot.set_count(_player.get_bullet_count())
 	else:
 		_main_gun_slot.set_ratio(1.0)
 		_main_gun_slot.set_count(1)
 	var guard_n: int = 0
-	if is_instance_valid(_main) and _main.has_method("get_combo_guard_charges"):
+	if is_instance_valid(_main):
 		guard_n = _main.get_combo_guard_charges()
 	_shield_slot.set_ratio(1.0 if guard_n > 0 else 0.0)
 	_shield_slot.set_count(maxi(0, guard_n))
 
 	var lives: int = 0
-	if is_instance_valid(_main) and _main.has_method("get_lives_remaining"):
+	if is_instance_valid(_main):
 		lives = _main.get_lives_remaining()
 	_life_slot.set_ratio(0.0)
 	_life_slot.set_count(maxi(0, lives))
@@ -321,51 +319,42 @@ func _update_side_weapon_cd_slots() -> void:
 		return
 	_update_spell_cd_slot()
 
-	var arrow_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("arrow")
+	var arrow_unlocked: bool = _player.has_weapon_unlocked("arrow")
 	_slot_arrow.visible = arrow_unlocked
 	if arrow_unlocked:
-		var total: float = _player.arrow_auto_interval if "arrow_auto_interval" in _player else 1.4
-		var rem: float = _player.get_arrow_cd_remaining() if _player.has_method("get_arrow_cd_remaining") else 0.0
+		var total: float = _player.arrow_auto_interval
+		var rem: float = _player.get_arrow_cd_remaining()
 		_slot_arrow.set_ratio(rem / total if total > 0.0 else 1.0)
-		_slot_arrow.set_count(_player.get_arrow_shot_count() if _player.has_method("get_arrow_shot_count") else 1)
+		_slot_arrow.set_count(_player.get_arrow_shot_count())
 
-	var bomb_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("bomb")
+	var bomb_unlocked: bool = _player.has_weapon_unlocked("bomb")
 	_slot_bomb.visible = bomb_unlocked
 	if bomb_unlocked:
-		var total: float = _player.bomb_auto_interval if "bomb_auto_interval" in _player else 2.5
-		var rem: float = _player.get_bomb_cd_remaining() if _player.has_method("get_bomb_cd_remaining") else 0.0
+		var total: float = _player.bomb_auto_interval
+		var rem: float = _player.get_bomb_cd_remaining()
 		_slot_bomb.set_ratio(rem / total if total > 0.0 else 1.0)
-		_slot_bomb.set_count(_player.get_bomb_shot_count() if _player.has_method("get_bomb_shot_count") else 1)
+		_slot_bomb.set_count(_player.get_bomb_shot_count())
 
-	var boomerang_unlocked: bool = _player.has_method("has_weapon_unlocked") and _player.has_weapon_unlocked("boomerang")
+	var boomerang_unlocked: bool = _player.has_weapon_unlocked("boomerang")
 	_slot_boomerang.visible = boomerang_unlocked
 	if boomerang_unlocked:
-		var vol: int = _player.get_boomerang_shot_count() if _player.has_method("get_boomerang_shot_count") else 1
 		_slot_boomerang.set_ratio(0.0)
-		_slot_boomerang.set_count(vol)
+		_slot_boomerang.set_count(_player.get_boomerang_shot_count())
 
 
 func _update_spell_cd_slot() -> void:
 	if _spell_cd_slot == null or not is_instance_valid(_main):
 		return
-	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
+	var has_auto: bool = _main.has_spell_auto()
 	if not has_auto:
 		_spell_cd_slot.visible = false
 		_spell_cd_slot.set_ratio(0.0)
 		_spell_cd_slot.set_count(0)
 		return
 	_spell_cd_slot.visible = true
-	if not _main.has_method("get_spell_cooldown_remaining"):
-		_spell_cd_slot.set_ratio(0.0)
-		_spell_cd_slot.set_count(0)
-		return
-	var cd := float(_main.get_spell_cooldown_remaining())
-	var total := 12.0
-	if _main.has_method("get_spell_cooldown_total"):
-		total = float(_main.get_spell_cooldown_total())
-	var r: float = 0.0
-	if total > 0.0:
-		r = clampf(cd / total, 0.0, 1.0)
+	var cd := _main.get_spell_cooldown_remaining()
+	var total := _main.get_spell_cooldown_total()
+	var r: float = clampf(cd / total, 0.0, 1.0) if total > 0.0 else 0.0
 	_spell_cd_slot.set_ratio(r)
 	_spell_cd_slot.set_count(1)
 
@@ -383,30 +372,16 @@ func get_spell_screen_rect() -> Rect2:
 func _update_spell_button() -> void:
 	if _spell_button == null or not is_instance_valid(_main):
 		return
-	if not _main.has_method("get_spell_cooldown_remaining"):
-		return
-	var has_auto: bool = _main.has_method("has_spell_auto") and _main.has_spell_auto()
-	var cd := float(_main.get_spell_cooldown_remaining())
-	var total := 12.0
-	if _main.has_method("get_spell_cooldown_total"):
-		total = float(_main.get_spell_cooldown_total())
-	var progress := 1.0
-	if has_auto:
-		progress = 0.0
-	elif total > 0.0:
-		progress = clampf(1.0 - cd / total, 0.0, 1.0)
-	if _spell_button.has_method("set_progress"):
-		_spell_button.set_progress(progress)
-	if has_auto:
-		_spell_button.visible = false
-	else:
-		_spell_button.visible = true
+	var has_auto: bool = _main.has_spell_auto()
+	var cd := _main.get_spell_cooldown_remaining()
+	var total := _main.get_spell_cooldown_total()
+	var progress := 0.0 if has_auto else clampf(1.0 - cd / total, 0.0, 1.0) if total > 0.0 else 1.0
+	_spell_button.set_progress(progress)
+	_spell_button.visible = not has_auto
 
 
 func _on_spell_button_pressed() -> void:
-	if not is_instance_valid(_main):
-		return
-	if _main.has_method("try_use_spell"):
+	if is_instance_valid(_main):
 		_main.try_use_spell()
 
 

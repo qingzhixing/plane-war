@@ -30,30 +30,30 @@ const UPGRADES: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-var _main: Node
+var _main: GameMain
 
 # 每张卡的节点引用：[{ root, title_label, desc_label, button }]
 var _cards: Array[Dictionary] = []
 
-@onready var _card0_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0
-@onready var _card1_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1
-@onready var _card2_root: Control = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2
+@onready var _card0_root: Control = %Card0
+@onready var _card1_root: Control = %Card1
+@onready var _card2_root: Control = %Card2
 
-@onready var _card0_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardTitle0
-@onready var _card0_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0/CardDesc0
-@onready var _card0_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardBtn0
+@onready var _card0_title: Label = %CardTitle0
+@onready var _card0_desc: Label = %CardDesc0
+@onready var _card0_btn: Button = %CardBtn0
 
-@onready var _card1_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardTitle1
-@onready var _card1_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1/CardDesc1
-@onready var _card1_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardBtn1
+@onready var _card1_title: Label = %CardTitle1
+@onready var _card1_desc: Label = %CardDesc1
+@onready var _card1_btn: Button = %CardBtn1
 
-@onready var _card2_title: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardTitle2
-@onready var _card2_desc: Label = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2/CardDesc2
-@onready var _card2_btn: Button = $Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardBtn2
+@onready var _card2_title: Label = %CardTitle2
+@onready var _card2_desc: Label = %CardDesc2
+@onready var _card2_btn: Button = %CardBtn2
 
 
 func _ready() -> void:
-	_main = get_parent()
+	_main = get_parent() as GameMain
 	visible = false
 	_cards = [
 		{"root": _card0_root, "title_label": _card0_title, "desc_label": _card0_desc, "button": _card0_btn},
@@ -64,22 +64,20 @@ func _ready() -> void:
 
 func show_pick() -> void:
 	var pool: Array[Dictionary] = []
-	var player := _main.get_node_or_null(_main.player_path) as Node
+	var player := _main.get_node_or_null(_main.player_path) as Player
 	var at_max_bullets: bool = false
 	var bullet_count: int = 1
 	var arrow_unlocked: bool = false
 	var bomb_unlocked: bool = false
-	if player != null and player.has_method("get_bullet_count") and player.has_method("get_max_bullet_count"):
+	if player != null:
 		bullet_count = player.get_bullet_count()
 		at_max_bullets = bullet_count >= player.get_max_bullet_count()
-	if player != null and player.has_method("has_weapon_unlocked"):
 		arrow_unlocked = player.has_weapon_unlocked("arrow")
-	if player != null and player.has_method("has_weapon_unlocked"):
 		bomb_unlocked = player.has_weapon_unlocked("bomb")
 	for u in UPGRADES:
-		if u["id"] == "spell_auto" and _main.has_method("has_spell_auto") and _main.has_spell_auto():
+		if u["id"] == "spell_auto" and _main.has_spell_auto():
 			continue
-		if u["id"] == "bullet_homing" and player != null and player.has_method("has_bullet_homing") and player.has_bullet_homing():
+		if u["id"] == "bullet_homing" and player != null and player.has_bullet_homing():
 			continue
 		if u["id"] == "multi_shot" and at_max_bullets:
 			continue
@@ -141,15 +139,13 @@ func _on_card_pressed(card_index: int) -> void:
 	if not btn.has_meta("upgrade_id"):
 		return
 	var upgrade_id: String = btn.get_meta("upgrade_id")
-	if _main.has_method("apply_upgrade"):
-		_main.apply_upgrade(upgrade_id)
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_power_up"):
+	_main.apply_upgrade(upgrade_id)
+	var audio := get_tree().get_first_node_in_group("audio_manager") as AudioManager
+	if audio != null:
 		audio.play_power_up()
 	visible = false
 	get_tree().paused = false
-	if _main.has_method("on_upgrade_selected"):
-		_main.on_upgrade_selected()
+	_main.on_upgrade_selected()
 
 
 func _is_direct_combat_upgrade(upgrade_id: String) -> bool:

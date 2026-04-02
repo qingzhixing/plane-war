@@ -63,6 +63,7 @@ layout_mode = 2
 text = "BGM 音量"
 
 [node name="BgmSlider" type="HSlider" parent="Root/Center/Panel/VBox/BgmRow"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0
@@ -71,6 +72,7 @@ step = 1.0
 value = 80.0
 
 [node name="BgmMuteCheck" type="CheckBox" parent="Root/Center/Panel/VBox/BgmRow"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "静音"
 
@@ -85,6 +87,7 @@ layout_mode = 2
 text = "SFX 音量"
 
 [node name="SfxSlider" type="HSlider" parent="Root/Center/Panel/VBox/SfxRow"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 0.0
@@ -93,10 +96,12 @@ step = 1.0
 value = 100.0
 
 [node name="SfxMuteCheck" type="CheckBox" parent="Root/Center/Panel/VBox/SfxRow"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "静音"
 
 [node name="VibrationCheck" type="CheckBox" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 button_pressed = true
 text = "震动"
@@ -112,6 +117,7 @@ layout_mode = 2
 text = "画面缩放"
 
 [node name="ScaleOption" type="OptionButton" parent="Root/Center/Panel/VBox/ScaleRow"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="CloseButton" type="Button" parent="Root/Center/Panel/VBox"]
@@ -122,6 +128,7 @@ text = "返回"
 theme_override_font_sizes/font_size = 24
 
 [node name="EndRunButton" type="Button" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 64)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -129,6 +136,7 @@ text = "提前结算"
 theme_override_font_sizes/font_size = 24
 
 [node name="SkipBossButton" type="Button" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 64)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -136,6 +144,7 @@ text = "跳到 Boss（调试）"
 theme_override_font_sizes/font_size = 24
 
 [node name="DebugUpgradesButton" type="Button" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 64)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -143,6 +152,7 @@ text = "自选升级（调试）"
 theme_override_font_sizes/font_size = 24
 
 [node name="DebugComboRow" type="HBoxContainer" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8

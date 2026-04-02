@@ -62,6 +62,7 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="Card0" type="Control" parent="Root/Center/PanelWrap/Margin/VBox/CardBox" unique_id=1050018778]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -91,11 +92,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="CardTitle0" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0" unique_id=2083042636]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
 [node name="CardDesc0" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card0/CardMargin0/CardVBox0" unique_id=1122976343]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 18
@@ -103,6 +106,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="CardBtn0" type="Button" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card0" unique_id=1359912767]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -117,6 +121,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
 flat = true
 
 [node name="Card1" type="Control" parent="Root/Center/PanelWrap/Margin/VBox/CardBox" unique_id=368523698]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -146,11 +151,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="CardTitle1" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1" unique_id=1874239523]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
 [node name="CardDesc1" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card1/CardMargin1/CardVBox1" unique_id=1402233611]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 18
@@ -158,6 +165,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="CardBtn1" type="Button" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card1" unique_id=1656473584]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -172,6 +180,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_btn")
 flat = true
 
 [node name="Card2" type="Control" parent="Root/Center/PanelWrap/Margin/VBox/CardBox" unique_id=618288985]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -201,11 +210,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="CardTitle2" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2" unique_id=1548625994]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
 [node name="CardDesc2" type="Label" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card2/CardMargin2/CardVBox2" unique_id=378066375]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 18
@@ -213,6 +224,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="CardBtn2" type="Button" parent="Root/Center/PanelWrap/Margin/VBox/CardBox/Card2" unique_id=511392134]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
