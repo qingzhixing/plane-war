@@ -1,3 +1,4 @@
+class_name PlayerBoomerang
 extends "res://scripts/bullets/BulletBase.gd"
 
 @export var return_speed_multiplier: float = 1.0
@@ -18,14 +19,15 @@ func _ready() -> void:
 	# 不沿用 BulletBase 的穿透耗尽 queue_free，否则飞程中打满次数会消失
 
 
-func _on_area_entered(area: Node) -> void:
+func _on_area_entered(area: Area2D) -> void:
 	if not (area.is_in_group("enemy") or area.is_in_group("boss")):
 		return
 	var dealt_damage := damage
 	if area.is_in_group("boss"):
 		dealt_damage = max(1, int(round(float(damage) * _boss_damage_multiplier)))
-	if area.has_method("apply_damage"):
-		area.apply_damage(dealt_damage)
+	var enemy := area as EnemyBase
+	if enemy != null:
+		enemy.apply_damage(dealt_damage)
 		get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
 		_spawn_hit_vfx(area)
 	# 回旋镖不因命中销毁，仅回程触玩家或出界销毁
@@ -89,11 +91,11 @@ func _owner_global_pos() -> Vector2:
 
 
 func _notify_owner_returned() -> void:
-	if is_instance_valid(_owner) and _owner.has_method("on_boomerang_returned"):
+	if is_instance_valid(_owner):
 		_owner.on_boomerang_returned()
 		return
-	var p := get_tree().get_first_node_in_group("player")
-	if p != null and p.has_method("on_boomerang_returned"):
+	var p := get_tree().get_first_node_in_group("player") as Player
+	if p != null:
 		p.on_boomerang_returned()
 
 

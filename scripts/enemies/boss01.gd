@@ -1,37 +1,29 @@
-extends Area2D
+class_name Boss01
+extends EnemyBase
 
-@export var max_hp: int = 300
 @export var fire_interval_phase_a: float = 2.8
 @export var fire_interval_phase_b: float = 5.0
 @export var bullet_scene: PackedScene
-@export var score_value: int = 500
 
-var _hp: float
 var _phase_b: bool = false
 var _fire_timer: float = 0.0
 var _move_time: float = 0.0
 var _phase_transition_timer: float = 0.0
 var _bullet_speed_mult: float = 1.0
 
-const _HIT_FLASH_DURATION := 0.14
-var _hit_flash_timer: float = 0.0
-var _hit_material: ShaderMaterial
-@onready var _sprite: Node2D = get_node_or_null("Sprite2D")
-
 @onready var _fallback_bullet_scene: PackedScene = preload("res://scenes/bullets/EnemyBasicBullet.tscn")
+
 
 func apply_threat_scaling(tier: int) -> void:
 	_bullet_speed_mult = minf(1.38, pow(1.045, float(tier)))
 
 
 func _ready() -> void:
-	_hp = max_hp
 	add_to_group("boss")
-	add_to_group("enemy")
 	if bullet_scene == null and _fallback_bullet_scene != null:
 		bullet_scene = _fallback_bullet_scene
+	super._ready()
 	_update_boss_hud()
-	_init_hit_material()
 
 
 func _process(delta: float) -> void:
@@ -64,9 +56,7 @@ func _process(delta: float) -> void:
 		else:
 			_fire_phase_a()
 
-	if _hit_flash_timer > 0.0:
-		_hit_flash_timer = maxf(0.0, _hit_flash_timer - delta)
-		_update_hit_material()
+	super._process(delta)
 
 
 func _fire_phase_a() -> void:
@@ -82,10 +72,11 @@ func _fire_phase_a() -> void:
 		var t := float(i) / float(max(1, count - 1))
 		var angle: float = lerp(start_angle, end_angle, t)
 		var dir := Vector2(cos(angle), sin(angle))
-		var bullet := bullet_scene.instantiate()
+		var bullet := bullet_scene.instantiate() as EnemyTurretBullet
+		if bullet == null:
+			continue
 		bullet.global_position = global_position + dir * 40.0
-		if bullet.has_method("setup_direction"):
-			bullet.setup_direction(dir)
+		bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
 
 
@@ -95,9 +86,9 @@ func _fire_phase_b() -> void:
 		return
 
 	var target_dir := Vector2(0, 1)
-	var player := get_tree().get_first_node_in_group("player")
-	if player != null and player is Node2D:
-		var to_player := (player as Node2D).global_position - global_position
+	var player := get_tree().get_first_node_in_group("player") as Player
+	if player != null:
+		var to_player := player.global_position - global_position
 		if to_player.length() > 0.001:
 			target_dir = to_player.normalized()
 
@@ -108,12 +99,12 @@ func _fire_phase_b() -> void:
 		var t := float(i) / float(max(1, fan_count - 1))
 		var angle_offset: float = lerp(-fan_half_angle, fan_half_angle, t)
 		var dir := target_dir.rotated(angle_offset)
-		var bullet := bullet_scene.instantiate()
+		var bullet := bullet_scene.instantiate() as EnemyTurretBullet
+		if bullet == null:
+			continue
 		bullet.global_position = global_position + dir * 34.0
-		if "speed" in bullet:
-			bullet.speed = 380.0 * _bullet_speed_mult
-		if bullet.has_method("setup_direction"):
-			bullet.setup_direction(dir)
+		bullet.speed = 380.0 * _bullet_speed_mult
+		bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
 
 	# 2) 周身旋转环弹（提供持续走位压力）
@@ -122,12 +113,12 @@ func _fire_phase_b() -> void:
 	for i in ring_count:
 		var angle := base_angle + TAU * float(i) / float(ring_count)
 		var dir := Vector2.RIGHT.rotated(angle)
-		var bullet := bullet_scene.instantiate()
+		var bullet := bullet_scene.instantiate() as EnemyTurretBullet
+		if bullet == null:
+			continue
 		bullet.global_position = global_position + dir * 44.0
-		if "speed" in bullet:
-			bullet.speed = 280.0 * _bullet_speed_mult
-		if bullet.has_method("setup_direction"):
-			bullet.setup_direction(dir)
+		bullet.speed = 280.0 * _bullet_speed_mult
+		bullet.setup_direction(dir)
 		get_tree().current_scene.add_child(bullet)
 
 
@@ -137,7 +128,7 @@ func apply_damage(amount: float) -> void:
 		_on_dead()
 		return
 
-	_play_boss_injured_sfx()
+	_play_enemy_injured_sfx()
 	_trigger_hit_flash()
 
 	# 进入阶段 B：HP 低于 50% 时
@@ -150,10 +141,10 @@ func apply_damage(amount: float) -> void:
 func _on_dead() -> void:
 	_hp = 0
 	_update_boss_hud()
-	_play_boss_explosion_sfx()
+	_play_enemy_explosion_sfx()
 	get_tree().call_group("battle_stats_manager", "record_enemy_killed", self, score_value)
-	var main := get_tree().current_scene
-	if main != null and main.has_method("on_boss_defeated"):
+	var main := get_tree().current_scene as GameMain
+	if main != null:
 		main.on_boss_defeated()
 	else:
 		get_tree().call_group("game_over_ui", "show_game_over")
@@ -169,8 +160,8 @@ func get_max_hp() -> int:
 
 
 func _update_boss_hud() -> void:
-	var hud := get_tree().get_first_node_in_group("boss_hud")
-	if hud != null and hud.has_method("set_boss_hp"):
+	var hud := get_tree().get_first_node_in_group("boss_hud") as BossHUD
+	if hud != null:
 		hud.set_boss_hp(_hp, max_hp)
 
 
@@ -178,52 +169,6 @@ func _trigger_phase_transition() -> void:
 	# 阶段切换演出：短暂停顿 + 招式名提示（不清除敌方子弹）
 	_phase_transition_timer = 0.3
 	_fire_timer = 0.8
-	var hud := get_tree().get_first_node_in_group("boss_hud")
-	if hud != null and hud.has_method("show_spell_name"):
+	var hud := get_tree().get_first_node_in_group("boss_hud") as BossHUD
+	if hud != null:
 		hud.show_spell_name("符：星屑环舞", 1.2)
-
-
-func _get_audio_manager() -> Node:
-	return get_tree().get_first_node_in_group("audio_manager")
-
-
-func _play_boss_injured_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_injured"):
-		audio.play_enemy_injured()
-
-
-func _play_boss_explosion_sfx() -> void:
-	var audio := _get_audio_manager()
-	if audio != null and audio.has_method("play_enemy_explosion"):
-		audio.play_enemy_explosion()
-
-
-func _trigger_hit_flash() -> void:
-	_hit_flash_timer = _HIT_FLASH_DURATION
-	_update_hit_material()
-
-
-func _init_hit_material() -> void:
-	if _sprite == null:
-		return
-	var mat: Material = _sprite.material
-	if mat == null or not (mat is ShaderMaterial):
-		var shader_res := load("res://shaders/enemy_hit.gdshader")
-		if shader_res == null:
-			return
-		var new_mat := ShaderMaterial.new()
-		new_mat.shader = shader_res
-		_sprite.material = new_mat
-		mat = new_mat
-	_hit_material = mat
-	_update_hit_material()
-
-
-func _update_hit_material() -> void:
-	if _hit_material == null:
-		return
-	var strength := 0.0
-	if _HIT_FLASH_DURATION > 0.0:
-		strength = _hit_flash_timer / _HIT_FLASH_DURATION
-	_hit_material.set_shader_parameter("hit_strength", strength)

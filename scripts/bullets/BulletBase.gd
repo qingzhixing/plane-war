@@ -1,3 +1,4 @@
+class_name BulletBase
 extends Area2D
 
 @export var speed: float = 1200.0
@@ -32,7 +33,7 @@ func set_penetration(hit_count: int) -> void:
 	_penetration_left = max(0, hit_count)
 
 
-func _on_area_entered(area: Node) -> void:
+func _on_area_entered(area: Area2D) -> void:
 	if not (area.is_in_group("enemy") or area.is_in_group("boss")):
 		return
 
@@ -40,8 +41,9 @@ func _on_area_entered(area: Node) -> void:
 	if area.is_in_group("boss"):
 		dealt_damage = max(1, int(round(float(damage) * _boss_damage_multiplier)))
 
-	if area.has_method("apply_damage"):
-		area.apply_damage(dealt_damage)
+	var enemy := area as EnemyBase
+	if enemy != null:
+		enemy.apply_damage(dealt_damage)
 		get_tree().call_group("battle_stats_manager", "record_player_damage", dealt_damage, area)
 		_spawn_hit_vfx(area)
 

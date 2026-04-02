@@ -1,3 +1,4 @@
+class_name DebugUpgradePicker
 extends CanvasLayer
 ## 调试：设置里打开，从完整列表任选升级，直接 apply_upgrade，不推进波次/升级流程。
 
@@ -25,13 +26,13 @@ const _ALL: Array[Dictionary] = [
 	{"id": "score_up", "name": "评分增幅", "desc": "评分乘区 +15%"},
 ]
 
-var _main: Node
+var _main: GameMain
 var _open: bool = false
 
 
 func _ready() -> void:
 	visible = false
-	_main = get_parent()
+	_main = get_parent() as GameMain
 	_build_buttons()
 
 
@@ -67,8 +68,6 @@ func _close() -> void:
 
 
 func _on_pick(upgrade_id: String) -> void:
-	if _main != null and _main.has_method("apply_upgrade"):
+	if _main != null:
 		_main.apply_upgrade(upgrade_id)
-	var audio := get_tree().get_first_node_in_group("audio_manager")
-	if audio != null and audio.has_method("play_power_up"):
-		audio.play_power_up()
+	AudioManager.play_power_up()

@@ -2,9 +2,57 @@
 
 [ext_resource type="Script" uid="uid://dkesqeyvv67v1" path="res://scripts/bullets/PlayerBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bquveuxuu5fn7" path="res://assets/sprites/bullets/player_bullet.png" id="2_p7wmw"]
+[ext_resource type="Texture2D" uid="uid://goqqag6x1een" path="res://assets/sprites/vfx/player_bullet_hit.png" id="3_hit"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p7wmw"]
 size = Vector2(14, 38)
+
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Hit:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hit"]
+_data = {
+&"hit": SubResource("Animation_hit")
+}
 
 [node name="PlayerBullet" type="Area2D" unique_id=1489504139]
 z_index = 12
@@ -12,10 +60,22 @@ z_as_relative = false
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1435521287]
+unique_name_in_owner = true
 position = Vector2(0, 2.857143)
 scale = Vector2(2.355, 2.355)
 texture = ExtResource("2_p7wmw")
 
+[node name="Hit" type="Sprite2D" parent="." unique_id=-1282119735]
+unique_name_in_owner = true
+visible = false
+scale = Vector2(4, 4)
+texture = ExtResource("3_hit")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2068878352]
+unique_name_in_owner = true
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_p7wmw")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1837264905]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_hit")
