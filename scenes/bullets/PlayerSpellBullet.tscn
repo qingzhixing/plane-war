@@ -78,9 +78,8 @@ _data = {
 }
 
 [node name="PlayerSpellBullet" type="Area2D" unique_id=1650058168]
-z_index = 12
 z_as_relative = false
-scale = Vector2(2, 2)
+scale = Vector2(3, 3)
 script = ExtResource("1_script")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1578002511]
@@ -90,13 +89,13 @@ shape = SubResource("RectangleShape2D_unp5v")
 
 [node name="BulletBody" type="Sprite2D" parent="." unique_id=1481864673]
 unique_name_in_owner = true
+visible = false
 position = Vector2(0.195, 24)
 rotation = -1.5707964
 texture = ExtResource("2_tex")
 
 [node name="Disappear" type="AnimatedSprite2D" parent="." unique_id=1882116036]
 unique_name_in_owner = true
-visible = false
 position = Vector2(0.6666667, 5.3290705e-15)
 rotation = -1.5707964
 sprite_frames = SubResource("SpriteFrames_hsyn4")

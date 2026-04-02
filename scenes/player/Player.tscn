@@ -16,7 +16,6 @@ radius = 24.0
 radius = 165.01892
 
 [node name="Player" type="CharacterBody2D" unique_id=1665526431]
-z_index = -16
 z_as_relative = false
 scale = Vector2(0.4, 0.4)
 script = ExtResource("1_p0vlq")
@@ -37,11 +36,11 @@ script = ExtResource("7_graze")
 shape = SubResource("CircleShape2D_cw2d6")
 
 [node name="HitJudgementVisual" type="Node2D" parent="." unique_id=1055014287]
-z_index = 2
+z_index = 16
 script = ExtResource("6_hit")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1444472511]
-z_index = 1
+z_index = -16
 position = Vector2(-0.28250122, 0)
 scale = Vector2(7.725, 7.725)
 texture = ExtResource("8_khinc")
