@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://d1w5xsqrnd0c6"]
 
-[ext_resource type="Texture2D" uid="uid://vpq2gubnb5ea" path="res://assets/sprites/vfx/spell_vfx_00.png" id="1_0p27c"]
-[ext_resource type="Texture2D" uid="uid://cswwaiq2is6b" path="res://assets/sprites/vfx/spell_vfx_01.png" id="2_syh0j"]
-[ext_resource type="Texture2D" uid="uid://cxpo0olu4t254" path="res://assets/sprites/vfx/spell_vfx_02.png" id="3_u0e7p"]
-[ext_resource type="Texture2D" uid="uid://bcjsjl6yiq2h5" path="res://assets/sprites/vfx/spell_vfx_03.png" id="4_p5xj2"]
+[ext_resource type="Texture2D" uid="uid://vpq2gubnb5ea" path="res://assets/sprites/vfx/spell_vfx/spell_vfx_00.png" id="1_0p27c"]
+[ext_resource type="Texture2D" uid="uid://cswwaiq2is6b" path="res://assets/sprites/vfx/spell_vfx/spell_vfx_01.png" id="2_syh0j"]
+[ext_resource type="Texture2D" uid="uid://cxpo0olu4t254" path="res://assets/sprites/vfx/spell_vfx/spell_vfx_02.png" id="3_u0e7p"]
+[ext_resource type="Texture2D" uid="uid://bcjsjl6yiq2h5" path="res://assets/sprites/vfx/spell_vfx/spell_vfx_03.png" id="4_p5xj2"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6owxn"]
 animations = [{
@@ -28,7 +28,6 @@ animations = [{
 [sub_resource type="Animation" id="Animation_spell_vfx"]
 resource_name = "spell_use_vfx"
 length = 1.05
-loop_mode = 0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -76,14 +75,14 @@ _data = {
 [node name="SpellVfx" type="Node2D" unique_id=2029328085]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1623377948]
+modulate = Color(1, 1, 1, 0)
+scale = Vector2(2.5, 2.5)
 sprite_frames = SubResource("SpriteFrames_6owxn")
 animation = &"spell_use"
 autoplay = "spell_use"
 frame = 3
 frame_progress = 1.0
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=3748291056]
-libraries = {
-&"": SubResource("AnimationLibrary_spell")
-}
-autoplay = "spell_use_vfx"
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=-546676240]
+libraries/ = SubResource("AnimationLibrary_spell")
+autoplay = &"spell_use_vfx"

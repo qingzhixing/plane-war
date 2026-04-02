@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bcjsjl6yiq2h5"
-path="res://.godot/imported/spell_vfx_03.png-8090d6b0d797d293ffddc5772ffdc129.ctex"
+uid="uid://cxs5h60m7msd5"
+path="res://.godot/imported/spell_bullet_disappear_02.png-8f567162aa97586201dd983345542acb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/vfx/spell_vfx_03.png"
-dest_files=["res://.godot/imported/spell_vfx_03.png-8090d6b0d797d293ffddc5772ffdc129.ctex"]
+source_file="res://assets/sprites/vfx/spell_bullet_vfx/spell_bullet_disappear_02.png"
+dest_files=["res://.godot/imported/spell_bullet_disappear_02.png-8f567162aa97586201dd983345542acb.ctex"]
 
 [params]
 

@@ -2,8 +2,81 @@
 
 [ext_resource type="Script" uid="uid://dnounpqp244ow" path="res://scripts/bullets/PlayerSpellBullet.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bcf54jkmqsmnk" path="res://assets/sprites/bullets/spell_bullet.png" id="2_tex"]
+[ext_resource type="Texture2D" uid="uid://cpeuxyfo1ondi" path="res://assets/sprites/vfx/spell_bullet_vfx/spell_bullet_disappear_00.png" id="3_nilfg"]
+[ext_resource type="Texture2D" uid="uid://bsr774px6hdxd" path="res://assets/sprites/vfx/spell_bullet_vfx/spell_bullet_disappear_01.png" id="4_i7wq4"]
+[ext_resource type="Texture2D" uid="uid://cxs5h60m7msd5" path="res://assets/sprites/vfx/spell_bullet_vfx/spell_bullet_disappear_02.png" id="5_c3vsg"]
+[ext_resource type="Texture2D" uid="uid://c0w88ch4ibrte" path="res://assets/sprites/vfx/spell_bullet_vfx/spell_bullet_disappear_03.png" id="6_ml6pj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_unp5v"]
+size = Vector2(10.666667, 16.166668)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hsyn4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_nilfg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_i7wq4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_c3vsg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_ml6pj")
+}],
+"loop": false,
+"name": &"disappear",
+"speed": 15.0
+}]
+
+[sub_resource type="Animation" id="Animation_disappear"]
+resource_name = "disappear"
+length = 0.27
+loop_mode = 0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Disappear:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.27),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_spell_bullet"]
+_data = {
+&"disappear": SubResource("Animation_disappear")
+}
 
 [node name="PlayerSpellBullet" type="Area2D" unique_id=1650058168]
 z_index = 12
@@ -11,10 +84,21 @@ z_as_relative = false
 scale = Vector2(1.5, 1.5)
 script = ExtResource("1_script")
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1578002511]
+position = Vector2(0, 0.5833335)
+shape = SubResource("RectangleShape2D_unp5v")
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1481864673]
-scale = Vector2(0.08138393, 0.08138393)
+position = Vector2(0.195, 24)
+rotation = -1.5707964
 texture = ExtResource("2_tex")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1578002511]
-rotation = 0.7697089
-shape = SubResource("RectangleShape2D_unp5v")
+[node name="Disappear" type="AnimatedSprite2D" parent="." unique_id=1882116036]
+visible = false
+position = Vector2(0.6666667, 5.3290705e-15)
+rotation = -1.5707964
+sprite_frames = SubResource("SpriteFrames_hsyn4")
+animation = &"disappear"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=-1447602277]
+libraries/ = SubResource("AnimationLibrary_spell_bullet")
