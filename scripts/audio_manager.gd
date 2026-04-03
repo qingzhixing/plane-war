@@ -24,9 +24,20 @@ const LOSE_STREAM: AudioStream = preload("res://assets/SFX/game_state/Lose.ogg")
 ## 多路 SFX，避免大后期同一条 player 被 play() 顶掉导致半截断音
 const _SFX_POLYPHONY: int = 22
 
+## 高频音效冷却时间（毫秒），防止后期噪音过大
+const _SHOOT_COOLDOWN_MS: int = 80
+const _ENEMY_INJURED_COOLDOWN_MS: int = 60
+const _ENEMY_EXPLOSION_COOLDOWN_MS: int = 100
+const _GRAZE_COOLDOWN_MS: int = 50
+
 var _bgm_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_pool_index: int = 0
+
+var _last_shoot_ms: int = 0
+var _last_enemy_injured_ms: int = 0
+var _last_enemy_explosion_ms: int = 0
+var _last_graze_ms: int = 0
 
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
@@ -95,12 +106,20 @@ func _on_bgm_finished() -> void:
 
 
 func play_enemy_injured() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_enemy_injured_ms < _ENEMY_INJURED_COOLDOWN_MS:
+		return
+	_last_enemy_injured_ms = now
 	_play_stream_on_pool(ENEMY_INJURED_STREAM)
 
 
 func play_enemy_explosion() -> void:
 	if ENEMY_EXPLOSION_STREAMS.is_empty():
 		return
+	var now := Time.get_ticks_msec()
+	if now - _last_enemy_explosion_ms < _ENEMY_EXPLOSION_COOLDOWN_MS:
+		return
+	_last_enemy_explosion_ms = now
 	var index := randi() % ENEMY_EXPLOSION_STREAMS.size()
 	_play_stream_on_pool(ENEMY_EXPLOSION_STREAMS[index])
 
@@ -112,6 +131,10 @@ func play_lose() -> void:
 
 
 func play_shoot() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_shoot_ms < _SHOOT_COOLDOWN_MS:
+		return
+	_last_shoot_ms = now
 	_play_stream_on_pool(PLAYER_SHOOT_STREAM)
 
 
@@ -124,6 +147,10 @@ func play_power_up() -> void:
 
 
 func play_graze() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_graze_ms < _GRAZE_COOLDOWN_MS:
+		return
+	_last_graze_ms = now
 	_play_stream_on_pool(GRAZE_STREAM)
 
 
