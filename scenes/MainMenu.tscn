@@ -246,6 +246,66 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 text = "返回"
 
+[node name="ConfirmCenter" type="CenterContainer" parent="RecordsQueryUI" unique_id=1234567890]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_theme")
+visible = false
+
+[node name="ConfirmPanel" type="PanelContainer" parent="RecordsQueryUI/ConfirmCenter" unique_id=1234567891]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="ConfirmMargin" type="MarginContainer" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel" unique_id=1234567892]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="ConfirmVBox" type="VBoxContainer" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin" unique_id=1234567893]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ConfirmTitle" type="Label" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox" unique_id=1234567894]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "清空记录"
+horizontal_alignment = 1
+
+[node name="ConfirmBody" type="Label" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox" unique_id=1234567895]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.78, 0.85, 1)
+theme_override_font_sizes/font_size = 17
+text = "确认清空所有历史最佳记录？
+此操作不可恢复。"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ConfirmButtons" type="HBoxContainer" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox" unique_id=1234567896]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ConfirmYesButton" type="Button" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox/ConfirmButtons" unique_id=1234567897]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.42, 0.42, 1)
+text = "确认清空"
+
+[node name="ConfirmNoButton" type="Button" parent="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox/ConfirmButtons" unique_id=1234567898]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+theme_override_font_sizes/font_size = 20
+text = "取消"
+
 [node name="AboutUI" type="CanvasLayer" parent="." unique_id=2099651301]
 unique_name_in_owner = true
 process_mode = 4
@@ -346,6 +406,8 @@ text = "返回"
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/AboutButton" to="." method="_on_about_pressed"]
 [connection signal="pressed" from="MainMargin/MainColumn/ButtonColumn/QuitButton" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="RecordsQueryUI/Center/Panel/Margin/VBox/ClearRecordsButton" to="RecordsQueryUI" method="_on_clear_pressed"]
+[connection signal="pressed" from="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox/ConfirmButtons/ConfirmYesButton" to="RecordsQueryUI" method="_on_confirm_yes"]
+[connection signal="pressed" from="RecordsQueryUI/ConfirmCenter/ConfirmPanel/ConfirmMargin/ConfirmVBox/ConfirmButtons/ConfirmNoButton" to="RecordsQueryUI" method="_on_confirm_no"]
 [connection signal="pressed" from="RecordsQueryUI/Center/Panel/Margin/VBox/CloseRecordsButton" to="RecordsQueryUI" method="_on_close_pressed"]
 [connection signal="pressed" from="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/GithubButton" to="AboutUI" method="_on_github_pressed"]
 [connection signal="pressed" from="AboutUI/AboutCenter/AboutPanel/AboutMargin/AboutVBox/CloseAboutButton" to="AboutUI" method="_on_close_pressed"]

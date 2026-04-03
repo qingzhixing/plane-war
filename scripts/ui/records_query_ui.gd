@@ -10,8 +10,8 @@ const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 @onready var _dimmer: ColorRect = $Dimmer
 @onready var _center: CenterContainer = $Center
 @onready var _panel: PanelContainer = $Center/Panel
-
-var _confirm_dialog: ConfirmationDialog
+@onready var _confirm_center: CenterContainer = $ConfirmCenter
+@onready var _confirm_panel: PanelContainer = $ConfirmCenter/ConfirmPanel
 
 
 func _ready() -> void:
@@ -36,13 +36,10 @@ func _ready() -> void:
 	panel_style.shadow_offset = Vector2(4, 4)
 	_panel.add_theme_stylebox_override("panel", panel_style)
 
-	_confirm_dialog = ConfirmationDialog.new()
-	_confirm_dialog.title = "确认清空"
-	_confirm_dialog.dialog_text = "确认清空所有历史最佳记录？\n此操作不可恢复。"
-	_confirm_dialog.ok_button_text = "清空"
-	_confirm_dialog.cancel_button_text = "取消"
-	add_child(_confirm_dialog)
-	_confirm_dialog.confirmed.connect(_on_confirm_clear)
+	var confirm_style := panel_style.duplicate() as StyleBoxFlat
+	confirm_style.shadow_size = 10
+	confirm_style.shadow_offset = Vector2(0, 6)
+	_confirm_panel.add_theme_stylebox_override("panel", confirm_style)
 
 
 func show_panel() -> void:
@@ -64,10 +61,10 @@ func show_panel() -> void:
 
 
 func _on_clear_pressed() -> void:
-	_confirm_dialog.popup_centered()
+	_confirm_center.visible = true
 
 
-func _on_confirm_clear() -> void:
+func _on_confirm_yes() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("records", "best_score", 0)
 	cfg.set_value("records", "best_dps", 0.0)
@@ -79,6 +76,11 @@ func _on_confirm_clear() -> void:
 		_combo_label.text = "0"
 	if _dps_label != null:
 		_dps_label.text = "0"
+	_confirm_center.visible = false
+
+
+func _on_confirm_no() -> void:
+	_confirm_center.visible = false
 
 
 func _on_close_pressed() -> void:
