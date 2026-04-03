@@ -71,7 +71,7 @@ func _ready() -> void:
 	_spawner = get_node_or_null("EnemySpawner")
 	var pbc := get_node_or_null("PostBossChoice") as PostBossChoice
 	if pbc != null:
-		pbc.bind_main(self)
+		pbc.bind_main(self )
 	_start_wave()
 
 
@@ -215,7 +215,6 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if _spell_auto:
 				return
 			_spell_auto = true
-			var old_scale_auto := _spell_cooldown_scale
 			var new_scale_auto := maxf(0.05, _spell_cooldown_scale * 0.5)
 			_spell_cooldown_scale = new_scale_auto
 			_spell_cooldown_remaining = 0.0
