@@ -73,6 +73,7 @@ _data = {
 }
 
 [node name="SpellVfx" type="Node2D" unique_id=2029328085]
+modulate = Color(1, 1, 1, 0.67058825)
 z_index = 1
 scale = Vector2(2, 2)
 

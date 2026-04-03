@@ -9,7 +9,7 @@ radius = 13.333333
 [node name="PlayerBoomerang" type="Area2D" unique_id=920931509]
 z_index = 12
 z_as_relative = false
-scale = Vector2(3, 3)
+scale = Vector2(2, 2)
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1150670549]

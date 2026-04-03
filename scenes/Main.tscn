@@ -127,6 +127,7 @@ theme_override_constants/separation = 8
 
 [node name="PauseButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=484967350]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5)
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
@@ -134,6 +135,7 @@ text = "暂停"
 
 [node name="SettingsButton" type="Button" parent="HUD/Root/TopLeftButtons" unique_id=626905230]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5)
 custom_minimum_size = Vector2(160, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24

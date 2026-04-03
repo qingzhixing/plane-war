@@ -14,6 +14,8 @@ extends CharacterBody2D
 ## 回旋镖相对主弹速的比例（武器属性，非词条）
 @export var boomerang_speed_mult: float = 0.95
 @export var boomerang_return_speed_mult: float = 1.0
+## 回旋镖发射冷却时间（秒）；回旋镖归来后等待此时长才重新发射
+@export var boomerang_cooldown: float = 1.5
 
 var _fire_timer: float = 0.0
 var _shoot_sfx_timer: float = 0.0
@@ -47,6 +49,10 @@ var _arrow_shot_count: int = 0
 var _boomerang_airborne: int = 0
 ## 下一颗回旋镖使用的散射槽位索引（循环使用，实现逐颗独立发射）
 var _boomerang_next_index: int = 0
+## 已归来、等待冷却后重新发射的回旋镖数量
+var _boomerang_pending: int = 0
+## 回旋镖发射冷却剩余时间
+var _boomerang_cd_remaining: float = 0.0
 ## 主武器磁导转向率（rad/s）；0 = 直线
 var _bullet_homing_strength: float = 0.0
 ## 炸弹伤害乘区（可叠加）
@@ -296,7 +302,35 @@ func _boomerang_aim_dir() -> Vector2:
 func on_boomerang_returned() -> void:
 	_boomerang_airborne = maxi(0, _boomerang_airborne - 1)
 	if has_weapon_unlocked("boomerang"):
-		call_deferred("_spawn_single_boomerang")
+		_boomerang_pending += 1
+		# 冷却计时由发射动作触发，不在此处启动；_update_side_weapons 每帧检测
+
+
+## 发射一批 pending 回旋镖：积压不足10时每次射1个；每多10个积压额外+1
+func _fire_pending_boomerangs() -> void:
+	if not has_weapon_unlocked("boomerang") or bullet_scene_boomerang == null:
+		return
+	var n: int = maxi(1, _boomerang_shot_count)
+	# 本次批量 = 1 + floor(积压数 / 10)
+	var batch: int = 1 + _boomerang_pending / 10
+	var spread := 0.18
+	var half_span := (n - 1) * 0.5
+	var slot_px := minf(18.0, 36.0 / maxf(1.0, half_span))
+	for _j in batch:
+		if _boomerang_pending <= 0 or _boomerang_airborne >= n:
+			break
+		var i: int = _boomerang_next_index % n
+		_boomerang_next_index += 1
+		var angle: float = (i - half_span) * spread
+		var dir := Vector2(sin(angle), -cos(angle))
+		if dir.y > 0.0:
+			dir.y = -dir.y
+		var side_offset: Vector2 = Vector2(-dir.y, dir.x) * slot_px * (i - half_span)
+		_boomerang_airborne += 1
+		_boomerang_pending -= 1
+		_spawn_configured_bullet(bullet_scene_boomerang, dir, 0.35, boomerang_speed_mult, 0, "bullet", "boomerang", side_offset)
+	# 仍有积压 → 0.1s 后继续清；积压清空 → 无冷却，等归来即发
+	_boomerang_cd_remaining = 0.1 if _boomerang_pending > 0 else 0.0
 
 
 func _update_side_weapons(delta: float) -> void:
@@ -310,6 +344,11 @@ func _update_side_weapons(delta: float) -> void:
 		if _bomb_auto_timer <= 0.0:
 			_bomb_auto_timer += bomb_auto_interval
 			_spawn_bomb_shot()
+	if has_weapon_unlocked("boomerang"):
+		if _boomerang_cd_remaining > 0.0:
+			_boomerang_cd_remaining -= delta
+		if _boomerang_cd_remaining <= 0.0 and _boomerang_pending > 0:
+			_fire_pending_boomerangs()
 
 
 @warning_ignore("UNUSED_PARAMETER")
@@ -404,6 +443,10 @@ func get_boomerang_airborne() -> int:
 	return _boomerang_airborne
 
 
+func get_boomerang_cd_remaining() -> float:
+	return maxf(0.0, _boomerang_cd_remaining)
+
+
 func get_boomerang_shot_count() -> int:
 	return maxi(1, _boomerang_shot_count)
 
@@ -492,7 +535,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 			if _bullet_count > 1:
 				_spread_rad_per_bullet = maxf(_MIN_SPREAD_RAD_PER_BULLET, _spread_rad_per_bullet * 0.7)
 		"arrow_cooldown":
-			arrow_auto_interval = maxf(0.4, arrow_auto_interval * 0.8)
+			arrow_auto_interval = maxf(0.05, arrow_auto_interval * 0.8)
 		"arrow_multi":
 			if not has_weapon_unlocked("arrow"):
 				_weapon_unlocked["arrow"] = true
@@ -511,7 +554,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 				_weapon_unlocked["bomb"] = true
 			_bomb_shot_count = max(1, _bomb_shot_count + 1)
 		"bomb_side_cooldown":
-			bomb_auto_interval = maxf(0.85, bomb_auto_interval * 0.8)
+			bomb_auto_interval = maxf(0.1, bomb_auto_interval * 0.8)
 		"bullet_homing":
 			if _bullet_homing_strength == 0.0:
 				_bullet_homing_strength = 1.2

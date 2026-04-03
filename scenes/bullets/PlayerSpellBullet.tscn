@@ -78,6 +78,8 @@ _data = {
 }
 
 [node name="PlayerSpellBullet" type="Area2D" unique_id=1650058168]
+modulate = Color(0.40784314, 1, 1, 1)
+z_index = -17
 z_as_relative = false
 scale = Vector2(3, 3)
 script = ExtResource("1_script")
@@ -87,19 +89,17 @@ unique_name_in_owner = true
 position = Vector2(0, 0.5833335)
 shape = SubResource("RectangleShape2D_unp5v")
 
-[node name="BulletBody" type="Sprite2D" parent="." unique_id=1481864673]
-unique_name_in_owner = true
-visible = false
-position = Vector2(0.195, 24)
-rotation = -1.5707964
-texture = ExtResource("2_tex")
-
 [node name="Disappear" type="AnimatedSprite2D" parent="." unique_id=1882116036]
 unique_name_in_owner = true
-position = Vector2(0.6666667, 5.3290705e-15)
+position = Vector2(0.5, -2.1855694e-08)
 rotation = -1.5707964
 sprite_frames = SubResource("SpriteFrames_hsyn4")
 animation = &"disappear"
+
+[node name="BulletBody" type="Sprite2D" parent="." unique_id=1481864673]
+unique_name_in_owner = true
+rotation = -1.5707964
+texture = ExtResource("2_tex")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=-1447602277]
 unique_name_in_owner = true

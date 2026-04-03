@@ -8,9 +8,9 @@ radius = 5.0
 height = 63.333332
 
 [node name="PlayerArrow" type="Area2D" unique_id=284858832]
+modulate = Color(1.6475058, 1.6475058, 1.6475058, 1)
 z_index = 12
 z_as_relative = false
-scale = Vector2(1.5, 1.5)
 script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1440778023]

@@ -204,7 +204,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 			return
 		"spell_cooldown", "bomb_cooldown":
 			var old_scale := _spell_cooldown_scale
-			var new_scale := maxf(0.45, _spell_cooldown_scale * 0.85)
+			var new_scale := maxf(0.05, _spell_cooldown_scale * 0.85)
 			_spell_cooldown_scale = new_scale
 			if _spell_cooldown_remaining > 0.0 and old_scale > 0.0:
 				var factor := new_scale / old_scale
@@ -216,14 +216,10 @@ func apply_upgrade(upgrade_id: String) -> void:
 				return
 			_spell_auto = true
 			var old_scale_auto := _spell_cooldown_scale
-			var new_scale_auto := maxf(0.2, _spell_cooldown_scale * 0.5)
+			var new_scale_auto := maxf(0.05, _spell_cooldown_scale * 0.5)
 			_spell_cooldown_scale = new_scale_auto
-			if _spell_cooldown_remaining > 0.0 and old_scale_auto > 0.0:
-				var factor_auto := new_scale_auto / old_scale_auto
-				var new_total_auto := _SPELL_COOLDOWN_SECONDS * new_scale_auto
-				_spell_cooldown_remaining = clampf(_spell_cooldown_remaining * factor_auto, 0.0, new_total_auto)
-			if _spell_cooldown_remaining <= 0.0:
-				try_use_spell()
+			_spell_cooldown_remaining = 0.0
+			try_use_spell()
 			return
 	var p := get_node_or_null(player_path) as Player
 	if p != null:
