@@ -90,6 +90,8 @@ func show_pick() -> void:
 			continue
 		if u["id"] == "bomb_side_cooldown" and not bomb_unlocked:
 			continue
+		if u["id"] == "bomb_heavy" and not bomb_unlocked:
+			continue
 		pool.append(u)
 	pool.shuffle()
 	if pool.is_empty():

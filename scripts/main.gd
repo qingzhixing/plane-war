@@ -546,7 +546,7 @@ func _fire_spell_burst_waves(bullet_scene: PackedScene, origin: Vector2, player_
 			b.set_boss_damage_multiplier(boss_damage_multiplier)
 			get_tree().current_scene.add_child(b)
 		if wave < _SPELL_BURST_WAVE_COUNT - 1:
-			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL).timeout
+			await get_tree().create_timer(_SPELL_BURST_WAVE_INTERVAL, false).timeout
 
 
 func _get_combo_multiplier() -> float:
