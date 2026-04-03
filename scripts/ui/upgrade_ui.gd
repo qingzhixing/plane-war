@@ -64,9 +64,7 @@ func _ready() -> void:
 
 
 func show_pick() -> void:
-	print("UpgradeUI.show_pick() called")
 	if _main == null:
-		print("ERROR: _main is null!")
 		return
 	var pool: Array[Dictionary] = []
 	var player := _main.get_node_or_null(_main.player_path) as Player
@@ -136,7 +134,6 @@ func show_pick() -> void:
 		var root_hidden := card_hidden["root"] as Control
 		if root_hidden != null:
 			root_hidden.visible = false
-	print("UpgradeUI: pool size = ", pool.size(), ", chosen size = ", chosen.size())
 	visible = true
 	get_tree().paused = true
 

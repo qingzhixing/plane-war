@@ -292,6 +292,11 @@ size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 18
 bbcode_enabled = true
 text = "[b]plane-war 更新日志（节选）[/b]
+[color=#8af]v0.2.7[/color] - 2026-04-03
+  - 修复：修复 upgrade_ui.gd 函数名大小写错误；修复打光敌人后无法见到三选一界面的问题；修复波次无法推进与升级界面显示问题；修复手机端无法同时移动机体与点击符卡按钮；修复代码存在的问题；补充 AudioManager class_name 声明。
+  - 新功能：添加主动循环检测敌人的机制。
+  - UI/视觉效果：调整 VFX 显示顺序；实现 PlayerBullet 命中 VFX；简化符卡子弹消散效果；添加符卡使用的 SpellVFX 动画特效；删除子弹追踪变色。
+  - 重构与改进：移除 AudioManager 类名定义；UI 脚本补全 class_name、类型转换与 % 唯一化节点引用；重构代码中；修改目录，准备优化符卡特效。
 [color=#8af]v0.2.6[/color] - 2026-04-01
   - 背景与视觉：新增程序化太空星空滚动背景，优化为像素方块风格；替换玩家飞机、子弹、敌方机体和子弹贴图。
   - 武器与系统：回旋镖改为逐颗独立循环；移除回旋镖数量上限；新增磁导弹头与重型炸弹词条。
