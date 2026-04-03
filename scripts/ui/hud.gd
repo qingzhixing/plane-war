@@ -36,7 +36,6 @@ var _combo_break_timer: float = 0.0
 @onready var _combo_edge_left: ColorRect = %ComboEdgeLeft
 @onready var _combo_edge_right: ColorRect = %ComboEdgeRight
 @onready var _combo_full_tint: ColorRect = %ComboFullTint
-@onready var _spell_flash_rect: ColorRect = %SpellFlashRect
 @onready var _spell_notice_label: Label = %SpellNoticeLabel
 
 

@@ -312,7 +312,7 @@ func _fire_pending_boomerangs() -> void:
 		return
 	var n: int = maxi(1, _boomerang_shot_count)
 	# 本次批量 = 1 + floor(积压数 / 10)
-	var batch: int = 1 + _boomerang_pending / 10
+	var batch: int = 1 + int(_boomerang_pending / 10.0)
 	var spread := 0.18
 	var half_span := (n - 1) * 0.5
 	var slot_px := minf(18.0, 36.0 / maxf(1.0, half_span))
