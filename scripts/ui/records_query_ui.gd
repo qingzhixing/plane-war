@@ -11,6 +11,8 @@ const _THEME: Theme = preload("res://assets/theme/default_ui_theme.tres")
 @onready var _center: CenterContainer = $Center
 @onready var _panel: PanelContainer = $Center/Panel
 
+var _confirm_dialog: ConfirmationDialog
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -34,6 +36,14 @@ func _ready() -> void:
 	panel_style.shadow_offset = Vector2(4, 4)
 	_panel.add_theme_stylebox_override("panel", panel_style)
 
+	_confirm_dialog = ConfirmationDialog.new()
+	_confirm_dialog.title = "确认清空"
+	_confirm_dialog.dialog_text = "确认清空所有历史最佳记录？\n此操作不可恢复。"
+	_confirm_dialog.ok_button_text = "清空"
+	_confirm_dialog.cancel_button_text = "取消"
+	add_child(_confirm_dialog)
+	_confirm_dialog.confirmed.connect(_on_confirm_clear)
+
 
 func show_panel() -> void:
 	var cfg := ConfigFile.new()
@@ -51,6 +61,24 @@ func show_panel() -> void:
 	if _dps_label != null:
 		_dps_label.text = "%.0f" % best_dps
 	visible = true
+
+
+func _on_clear_pressed() -> void:
+	_confirm_dialog.popup_centered()
+
+
+func _on_confirm_clear() -> void:
+	var cfg := ConfigFile.new()
+	cfg.set_value("records", "best_score", 0)
+	cfg.set_value("records", "best_dps", 0.0)
+	cfg.set_value("records", "best_combo", 0)
+	cfg.save(_RECORDS_PATH)
+	if _score_label != null:
+		_score_label.text = "0"
+	if _combo_label != null:
+		_combo_label.text = "0"
+	if _dps_label != null:
+		_dps_label.text = "0"
 
 
 func _on_close_pressed() -> void:
