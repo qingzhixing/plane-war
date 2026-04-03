@@ -11,9 +11,9 @@
 ## 游戏预览
 
 <p align="center">
-  <img src="docs/picture/Start%20Menu.png" alt="主菜单" width="280" />
-  &nbsp;&nbsp;
   <img src="docs/picture/Playing.png" alt="战斗中" width="280" />
+  &nbsp;&nbsp;
+  <img src="docs/picture/Spell.png" alt="符卡发动" width="280" />
   &nbsp;&nbsp;
   <img src="docs/picture/Upgrade.png" alt="升级三选一" width="280" />
   &nbsp;&nbsp;
