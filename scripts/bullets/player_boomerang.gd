@@ -1,5 +1,5 @@
 class_name PlayerBoomerang
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://scripts/bullets/bullet_base.gd"
 
 @export var return_speed_multiplier: float = 1.0
 @export var spin_speed_deg: float = 720.0

@@ -24,9 +24,24 @@ const LOSE_STREAM: AudioStream = preload("res://assets/SFX/game_state/Lose.ogg")
 ## 多路 SFX，避免大后期同一条 player 被 play() 顶掉导致半截断音
 const _SFX_POLYPHONY: int = 22
 
+## BGM / SFX 独立总线名
+const _BGM_BUS: StringName = &"BGM"
+const _SFX_BUS: StringName = &"SFX"
+
+## 高频音效冷却时间（毫秒），防止后期噪音过大
+const _SHOOT_COOLDOWN_MS: int = 80
+const _ENEMY_INJURED_COOLDOWN_MS: int = 60
+const _ENEMY_EXPLOSION_COOLDOWN_MS: int = 100
+const _GRAZE_COOLDOWN_MS: int = 50
+
 var _bgm_player: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_pool_index: int = 0
+
+var _last_shoot_ms: int = 0
+var _last_enemy_injured_ms: int = 0
+var _last_enemy_explosion_ms: int = 0
+var _last_graze_ms: int = 0
 
 var _playlist: Array[AudioStream] = []
 var _playlist_index: int = 0
@@ -44,22 +59,34 @@ func _ready() -> void:
 	add_to_group("audio_manager")
 	randomize()
 	_load_audio_settings()
+	_ensure_audio_buses()
 
 	_bgm_player = AudioStreamPlayer.new()
-	_bgm_player.bus = "Master"
+	_bgm_player.bus = _BGM_BUS
 	_bgm_player.finished.connect(_on_bgm_finished)
 	add_child(_bgm_player)
-	_apply_bgm_volume()
 
 	for _i in _SFX_POLYPHONY:
 		var p := AudioStreamPlayer.new()
-		p.bus = "Master"
+		p.bus = _SFX_BUS
 		add_child(p)
 		_sfx_pool.append(p)
+
+	_apply_bgm_volume()
 	_apply_sfx_volume()
 
 	_reset_playlist()
 	_play_next_bgm()
+
+
+## 若总线不存在则在运行时创建，发送到 Master
+func _ensure_audio_buses() -> void:
+	for bus_name: StringName in [_BGM_BUS, _SFX_BUS]:
+		if AudioServer.get_bus_index(bus_name) == -1:
+			AudioServer.add_bus()
+			var idx := AudioServer.get_bus_count() - 1
+			AudioServer.set_bus_name(idx, bus_name)
+			AudioServer.set_bus_send(idx, "Master")
 
 
 func _play_stream_on_pool(stream: AudioStream) -> void:
@@ -95,12 +122,20 @@ func _on_bgm_finished() -> void:
 
 
 func play_enemy_injured() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_enemy_injured_ms < _ENEMY_INJURED_COOLDOWN_MS:
+		return
+	_last_enemy_injured_ms = now
 	_play_stream_on_pool(ENEMY_INJURED_STREAM)
 
 
 func play_enemy_explosion() -> void:
 	if ENEMY_EXPLOSION_STREAMS.is_empty():
 		return
+	var now := Time.get_ticks_msec()
+	if now - _last_enemy_explosion_ms < _ENEMY_EXPLOSION_COOLDOWN_MS:
+		return
+	_last_enemy_explosion_ms = now
 	var index := randi() % ENEMY_EXPLOSION_STREAMS.size()
 	_play_stream_on_pool(ENEMY_EXPLOSION_STREAMS[index])
 
@@ -112,6 +147,10 @@ func play_lose() -> void:
 
 
 func play_shoot() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_shoot_ms < _SHOOT_COOLDOWN_MS:
+		return
+	_last_shoot_ms = now
 	_play_stream_on_pool(PLAYER_SHOOT_STREAM)
 
 
@@ -124,6 +163,10 @@ func play_power_up() -> void:
 
 
 func play_graze() -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_graze_ms < _GRAZE_COOLDOWN_MS:
+		return
+	_last_graze_ms = now
 	_play_stream_on_pool(GRAZE_STREAM)
 
 
@@ -194,18 +237,18 @@ func _save_audio_settings() -> void:
 
 
 func _apply_bgm_volume() -> void:
-	if _bgm_player == null:
+	var idx := AudioServer.get_bus_index(_BGM_BUS)
+	if idx == -1:
 		return
-	if _bgm_muted or _bgm_volume_linear <= 0.001:
-		_bgm_player.volume_db = -80.0
-	else:
-		_bgm_player.volume_db = linear_to_db(_bgm_volume_linear)
+	AudioServer.set_bus_mute(idx, _bgm_muted)
+	var db := -80.0 if _bgm_volume_linear <= 0.001 else linear_to_db(_bgm_volume_linear)
+	AudioServer.set_bus_volume_db(idx, db)
 
 
 func _apply_sfx_volume() -> void:
-	var db := -80.0
-	if not _sfx_muted and _sfx_volume_linear > 0.001:
-		db = linear_to_db(_sfx_volume_linear)
-	for p in _sfx_pool:
-		if p != null:
-			p.volume_db = db
+	var idx := AudioServer.get_bus_index(_SFX_BUS)
+	if idx == -1:
+		return
+	AudioServer.set_bus_mute(idx, _sfx_muted)
+	var db := -80.0 if _sfx_volume_linear <= 0.001 else linear_to_db(_sfx_volume_linear)
+	AudioServer.set_bus_volume_db(idx, db)

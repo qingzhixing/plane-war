@@ -42,7 +42,8 @@ func start_wave(wave: int) -> void:
 	_extension_index = 0
 	if _timer == null:
 		return
-	_timer.wait_time = _default_timer_wait
+	# 间隔随波次缩短：每波 -0.07s，最低 0.50s
+	_timer.wait_time = maxf(0.50, _default_timer_wait - 0.07 * float(wave - 1))
 	_remaining_to_spawn = enemies_per_wave_base + enemies_per_wave_increment * max(wave - 1, 0)
 	_timer.start()
 
@@ -56,7 +57,8 @@ func start_extension_wave(ext: int, threat_tier: int) -> void:
 	var intervals := [0.88, 0.72, 0.64, 0.56, 0.50, 0.46, 0.42]
 	var tier_bonus := threat_tier * 2 if ext < 6 else threat_tier * 3
 	_remaining_to_spawn = counts[_extension_index - 1] + tier_bonus
-	_timer.wait_time = intervals[_extension_index - 1]
+	# 间隔随威胁等级缩短：每级 ×0.88，最低 0.28s
+	_timer.wait_time = maxf(0.28, intervals[_extension_index - 1] * pow(0.88, float(threat_tier)))
 	_timer.start()
 
 

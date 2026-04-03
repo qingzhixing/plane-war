@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://scripts/bullets/bullet_base.gd"
 ## 符卡径向弹幕：仅销毁碰到的敌弹，不全场清弹；命中敌机逻辑同 BulletBase。
 ## 贴图默认朝向上方（-Y）；按飞行方向旋转整节点（含碰撞体）。
 

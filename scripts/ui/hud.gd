@@ -36,7 +36,6 @@ var _combo_break_timer: float = 0.0
 @onready var _combo_edge_left: ColorRect = %ComboEdgeLeft
 @onready var _combo_edge_right: ColorRect = %ComboEdgeRight
 @onready var _combo_full_tint: ColorRect = %ComboFullTint
-@onready var _spell_flash_rect: ColorRect = %SpellFlashRect
 @onready var _spell_notice_label: Label = %SpellNoticeLabel
 
 
@@ -256,15 +255,15 @@ func _update_combo_screen_vfx(combo: int) -> void:
 		edge_alpha = 0.24
 		speed = 1.6
 
+	if _combo_full_tint != null:
+		_combo_full_tint.visible = false
+
 	if combo >= 100:
 		var hue := fmod(t * 0.35, 1.0)
 		_combo_edge_top.color = Color.from_hsv(hue, 0.85, 1.0, edge_alpha + 0.05)
 		_combo_edge_right.color = Color.from_hsv(fmod(hue + 0.25, 1.0), 0.85, 1.0, edge_alpha + 0.05)
 		_combo_edge_bottom.color = Color.from_hsv(fmod(hue + 0.50, 1.0), 0.85, 1.0, edge_alpha + 0.05)
 		_combo_edge_left.color = Color.from_hsv(fmod(hue + 0.75, 1.0), 0.85, 1.0, edge_alpha + 0.05)
-		if _combo_full_tint != null:
-			_combo_full_tint.visible = true
-			_combo_full_tint.color = Color.from_hsv(fmod(hue + 0.12, 1.0), 0.35, 0.95, 0.12)
 	else:
 		var pulse := 0.5 + 0.5 * sin(t * speed * TAU * 0.35)
 		var warm := Color(1.0, 0.55, 0.25, edge_alpha * (0.75 + 0.25 * pulse))
@@ -272,8 +271,6 @@ func _update_combo_screen_vfx(combo: int) -> void:
 		_combo_edge_right.color = warm
 		_combo_edge_bottom.color = warm
 		_combo_edge_left.color = warm
-		if _combo_full_tint != null:
-			_combo_full_tint.visible = false
 
 
 func _set_combo_edge_visibility(is_enabled: bool) -> void:
@@ -388,21 +385,12 @@ func _on_spell_used() -> void:
 
 
 func _play_spell_burst_vfx() -> void:
-	if _spell_flash_rect != null:
-		_spell_flash_rect.visible = true
-
 	if _spell_notice_label != null:
 		_spell_notice_label.visible = true
 		_spell_notice_label.text = "符卡爆发!"
 		_spell_notice_label.modulate = Color(1.0, 0.95, 0.55, 1.0)
 
 	for i in 4:
-		var alpha := 0.52 - 0.08 * float(i)
-		if _spell_flash_rect != null:
-			_spell_flash_rect.modulate = Color(1, 1, 1, 1)
-			_spell_flash_rect.color = Color(0.65, 0.9, 1.0, alpha)
-			var flash_tween := create_tween()
-			flash_tween.tween_property(_spell_flash_rect, "color:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		if _spell_notice_label != null:
 			_spell_notice_label.scale = Vector2.ONE
 			_spell_notice_label.modulate.a = 1.0
@@ -412,8 +400,6 @@ func _play_spell_burst_vfx() -> void:
 		if i < 3:
 			await get_tree().create_timer(0.10).timeout
 
-	if _spell_flash_rect != null:
-		_spell_flash_rect.visible = false
 	if _spell_notice_label != null:
 		_spell_notice_label.visible = false
 		_spell_notice_label.modulate = Color(1, 1, 1, 1)

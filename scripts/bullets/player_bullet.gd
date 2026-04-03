@@ -1,4 +1,4 @@
-extends "res://scripts/bullets/BulletBase.gd"
+extends "res://scripts/bullets/bullet_base.gd"
 
 ## 每秒最大转向角（弧度）；0 = 直线飞行
 var homing_strength: float = 0.0
