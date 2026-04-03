@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cs67ap8o7es0i"]
 
-[ext_resource type="Script" uid="uid://oj08j7svp55a" path="res://scripts/bullets/PlayerArrow.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://oj08j7svp55a" path="res://scripts/bullets/player_arrow.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dfk08r28unnt8" path="res://assets/sprites/bullets/Arrow.png" id="2_tex"]
 
 [sub_resource type="CapsuleShape2D" id="1_shape"]
